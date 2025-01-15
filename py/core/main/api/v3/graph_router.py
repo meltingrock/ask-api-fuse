@@ -50,12 +50,18 @@ class GraphRouter(BaseRouterV3):
             workflow_messages["build-communities"] = (
                 "Graph enrichment task queued successfully."
             )
+            workflow_messages["deduplicate-document-entities"] = (
+                "Entity deduplication task queued successfully."
+            )
         else:
             workflow_messages["extract-triples"] = (
                 "Document entities and relationships extracted successfully."
             )
             workflow_messages["build-communities"] = (
                 "Graph communities created successfully."
+            )
+            workflow_messages["deduplicate-document-entities"] = (
+                "Entity deduplication completed successfully."
             )
 
         self.providers.orchestration.register_workflows(
@@ -273,14 +279,26 @@ class GraphRouter(BaseRouterV3):
             if not auth_user.is_superuser:
                 raise FUSEException(
                     "Only superusers can build communities", 403
+            collections_overview_response = (
+                await self.services.management.collections_overview(
+                    user_ids=[auth_user.id],
+                    collection_ids=[collection_id],
+                    offset=0,
+                    limit=1,
                 )
+            )["results"]
+            if len(collections_overview_response) == 0:
+                raise R2RException("Collection not found.", 404)
+
+            # Check user permissions for graph
             if (
-                # not auth_user.is_superuser
-                collection_id
-                not in auth_user.collection_ids
+                not auth_user.is_superuser
+                and collections_overview_response[0].owner_id != auth_user.id
             ):
                 raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
+                raise R2RException(
+                    "Only superusers can `build communities` for a graph they do not own.",
                     403,
                 )
 
@@ -2046,6 +2064,18 @@ class GraphRouter(BaseRouterV3):
 
             The user must have access to both the graph and the documents being added.
             """
+
+            collections_overview_response = (
+                await self.services.management.collections_overview(
+                    user_ids=[auth_user.id],
+                    collection_ids=[collection_id],
+                    offset=0,
+                    limit=1,
+                )
+            )["results"]
+            if len(collections_overview_response) == 0:
+                raise FUSEException("Collection not found.", 404)
+
             # Check user permissions for graph
             if not auth_user.is_superuser:
                 raise FUSEException("Only superusers can `pull` a graph.", 403)

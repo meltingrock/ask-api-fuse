@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import math
+import re
 import time
 import xml.etree.ElementTree as ET
 from typing import Any, AsyncGenerator, Optional
@@ -341,22 +342,6 @@ class GraphService(Service):
             include_embeddings=include_embeddings,
         )
 
-    # @telemetry_event("create_new_graph")
-    # async def create_new_graph(
-    #     self,
-    #     collection_id: UUID,
-    #     user_id: UUID,
-    #     name: Optional[str],
-    #     description: str = "",
-    # ) -> GraphResponse:
-    #     return await self.providers.database.graphs_handler.create(
-    #         collection_id=collection_id,
-    #         user_id=user_id,
-    #         name=name,
-    #         description=description,
-    #         graph_id=collection_id,
-    #     )
-
     async def list_graphs(
         self,
         offset: int,
@@ -402,17 +387,12 @@ class GraphService(Service):
     async def get_document_ids_for_create_graph(
         self,
         collection_id: UUID,
-        force_kg_creation: bool = False,
         **kwargs,
     ):
         document_status_filter = [
             KGExtractionStatus.PENDING,
             KGExtractionStatus.FAILED,
         ]
-        if force_kg_creation:
-            document_status_filter += [
-                KGExtractionStatus.PROCESSING,
-            ]
 
         return await self.providers.database.documents_handler.get_document_ids_by_status(
             status_type="extraction_status",
@@ -793,15 +773,59 @@ class GraphService(Service):
                         400,
                     )
 
+                def sanitize_xml(response_str: str) -> str:
+                    """Attempts to sanitize the XML response string by"""
+                    # Strip any markdown
+                    response_str = re.sub(r"```xml|```", "", response_str)
+
+                    # Remove any XML processing instructions or style tags
+                    response_str = re.sub(r"<\?.*?\?>", "", response_str)
+                    response_str = re.sub(
+                        r"<userStyle>.*?</userStyle>", "", response_str
+                    )
+
+                    # Only replace & if it's not already part of an escape sequence
+                    response_str = re.sub(
+                        r"&(?!amp;|quot;|apos;|lt;|gt;)", "&amp;", response_str
+                    )
+
+                    # Remove any root tags since we'll add them in parse_fn
+                    response_str = response_str.replace("<root>", "").replace(
+                        "</root>", ""
+                    )
+
+                    # Find and track all opening/closing tags
+                    opened_tags = []
+                    for match in re.finditer(
+                        r"<(\w+)(?:\s+[^>]*)?>", response_str
+                    ):
+                        tag = match.group(1)
+                        if tag != "root":  # Don't track root tag
+                            opened_tags.append(tag)
+
+                    for match in re.finditer(r"</(\w+)>", response_str):
+                        tag = match.group(1)
+                        if tag in opened_tags:
+                            opened_tags.remove(tag)
+
+                    # Close any unclosed tags
+                    for tag in reversed(opened_tags):
+                        response_str += f"</{tag}>"
+
+                    return response_str.strip()
+
                 async def parse_fn(response_str: str) -> Any:
                     # Wrap the response in a root element to ensure it is valid XML
-                    wrapped_xml = f"<root>{response_str}</root>"
+                    cleaned_xml = sanitize_xml(response_str)
+                    wrapped_xml = f"<root>{cleaned_xml}</root>"
 
                     try:
                         root = ET.fromstring(wrapped_xml)
                     except ET.ParseError as e:
                         raise FUSEException(
                             f"Failed to parse XML response: {e}. Response: {response_str}",
+                        raise R2RException(
+                            f"Failed to parse XML response: {e}. Response: {wrapped_xml}",
                             400,
                         )
 
@@ -964,3 +988,67 @@ class GraphService(Service):
                         metadata=relationship.metadata,
                         store_type=StoreType.DOCUMENTS,
                     )
+
+    @telemetry_event("deduplicate_document_entities")
+    async def deduplicate_document_entities(
+        self,
+        document_id: UUID,
+    ):
+        """
+        Deduplicate entities in a document.
+        """
+
+        merged_results = await self.providers.database.entities_handler.merge_duplicate_name_blocks(
+            parent_id=document_id,
+            store_type=StoreType.DOCUMENTS,
+        )
+
+        response = await self.providers.database.documents_handler.get_documents_overview(
+            offset=0,
+            limit=1,
+            filter_document_ids=[document_id],
+        )
+        document_summary = (
+            response["results"][0].summary if response["results"] else None
+        )
+
+        for original_entities, merged_entity in merged_results:
+            # Generate new consolidated description using the LLM
+            messages = await self.providers.database.prompts_handler.get_message_payload(
+                task_prompt_name=self.providers.database.config.graph_creation_settings.graph_entity_description_prompt,
+                task_inputs={
+                    "document_summary": document_summary,
+                    "entity_info": f"{merged_entity.name}\n".join(
+                        [
+                            desc
+                            for desc in {
+                                e.description for e in original_entities
+                            }
+                            if desc is not None
+                        ]
+                    ),
+                    "relationships_txt": "",
+                },
+            )
+
+            generation_config = (
+                self.config.database.graph_creation_settings.generation_config
+            )
+            response = await self.providers.llm.aget_completion(
+                messages,
+                generation_config=generation_config,
+            )
+            new_description = response.choices[0].message.content
+
+            # Generate new embedding for the consolidated description
+            new_embedding = await self.providers.embedding.async_get_embedding(
+                new_description
+            )
+
+            # Update the entity with new description and embedding
+            await self.providers.database.graphs_handler.entities.update(
+                entity_id=merged_entity.id,
+                store_type=StoreType.DOCUMENTS,
+                description=new_description,
+                description_embedding=str(new_embedding),
+            )

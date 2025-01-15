@@ -1,5 +1,4 @@
 import base64
-import json
 import logging
 import mimetypes
 import textwrap
@@ -17,7 +16,7 @@ from pydantic import Json
 from core.base import (
     IngestionConfig,
     IngestionMode,
-    FUSEException,
+    R2RException,
     SearchMode,
     SearchSettings,
     UnprocessedChunk,
@@ -41,7 +40,7 @@ from core.base.api.models import (
 )
 from core.utils import update_settings_from_dict
 
-from ...abstractions import FUSEProviders, FUSEServices
+from ...abstractions import R2RProviders, R2RServices
 from .base_router import BaseRouterV3
 
 logger = logging.getLogger()
@@ -79,8 +78,8 @@ def merge_ingestion_config(
 class DocumentsRouter(BaseRouterV3):
     def __init__(
         self,
-        providers: FUSEProviders,
-        services: FUSEServices,
+        providers: R2RProviders,
+        services: R2RServices,
     ):
         super().__init__(providers, services)
         self._register_workflows()
@@ -199,9 +198,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import R2RClient
 
-                            client = FUSEClient()
+                            client = R2RClient()
                             # when using auth, do client.login(...)
 
                             response = client.documents.create(
@@ -216,9 +215,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.documents.create({
@@ -235,7 +234,7 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "CLI",
                         "source": textwrap.dedent(
                             """
-                            fuse documents create /path/to/file.txt
+                            r2r documents create /path/to/file.txt
                             """
                         ),
                     },
@@ -331,7 +330,7 @@ class DocumentsRouter(BaseRouterV3):
                 )
 
                 if user_document_count >= user_max_documents:
-                    raise FUSEException(
+                    raise R2RException(
                         status_code=403,
                         message=f"User has reached the maximum number of documents allowed ({user_max_documents}).",
                     )
@@ -350,7 +349,7 @@ class DocumentsRouter(BaseRouterV3):
                     )
                 )
                 if user_chunk_count >= user_max_chunks:
-                    raise FUSEException(
+                    raise R2RException(
                         status_code=403,
                         message=f"User has reached the maximum number of chunks allowed ({user_max_chunks}).",
                     )
@@ -368,7 +367,7 @@ class DocumentsRouter(BaseRouterV3):
                     )
                 )
                 if user_collections_count >= user_max_collections:
-                    raise FUSEException(
+                    raise R2RException(
                         status_code=403,
                         message=f"User has reached the maximum number of collections allowed ({user_max_collections}).",
                     )
@@ -378,7 +377,7 @@ class DocumentsRouter(BaseRouterV3):
                 ingestion_config=ingestion_config,
             )
             if not file and not raw_text and not chunks:
-                raise FUSEException(
+                raise R2RException(
                     status_code=422,
                     message="Either a `file`, `raw_text`, or `chunks` must be provided.",
                 )
@@ -387,7 +386,7 @@ class DocumentsRouter(BaseRouterV3):
                 or (file and chunks)
                 or (raw_text and chunks)
             ):
-                raise FUSEException(
+                raise R2RException(
                     status_code=422,
                     message="Only one of `file`, `raw_text`, or `chunks` may be provided.",
                 )
@@ -396,15 +395,16 @@ class DocumentsRouter(BaseRouterV3):
 
             if chunks:
                 if len(chunks) == 0:
-                    raise FUSEException("Empty list of chunks provided", 400)
+                    raise R2RException("Empty list of chunks provided", 400)
 
                 if len(chunks) > MAX_CHUNKS_PER_REQUEST:
-                    raise FUSEException(
+                    raise R2RException(
                         f"Maximum of {MAX_CHUNKS_PER_REQUEST} chunks per request",
                         400,
                     )
-                document_id = generate_document_id(
-                    json.dumps(chunks), auth_user.id
+
+                document_id = id or generate_document_id(
+                    "".join(chunks), auth_user.id
                 )
 
                 # FIXME: Metadata doesn't seem to be getting passed through
@@ -478,7 +478,7 @@ class DocumentsRouter(BaseRouterV3):
                     )
 
                     if content_length > max_allowed_size:
-                        raise FUSEException(
+                        raise R2RException(
                             status_code=413,  # HTTP 413: Payload Too Large
                             message=(
                                 f"File size exceeds maximum of {max_allowed_size} bytes "
@@ -505,7 +505,7 @@ class DocumentsRouter(BaseRouterV3):
                         "content_type": "text/plain",
                     }
                 else:
-                    raise FUSEException(
+                    raise R2RException(
                         status_code=422,
                         message="Either a file or content must be provided.",
                     )
@@ -535,7 +535,7 @@ class DocumentsRouter(BaseRouterV3):
                 file_data["content_type"],
             )
 
-            self.services.ingestion.ingest_file_ingress(
+            await self.services.ingestion.ingest_file_ingress(
                 file_data=workflow_input["file_data"],
                 user=auth_user,
                 document_id=workflow_input["document_id"],
@@ -585,9 +585,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import R2RClient
 
-                            client = FUSEClient("http://localhost:7272")
+                            client = R2RClient("http://localhost:7272")
                             # when using auth, do client.login(...)
 
                             response = client.documents.export(
@@ -602,9 +602,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient("http://localhost:7272");
+                            const client = new r2rClient("http://localhost:7272");
 
                             function main() {
                                 await client.documents.export({
@@ -660,7 +660,7 @@ class DocumentsRouter(BaseRouterV3):
             """
 
             if not auth_user.is_superuser:
-                raise FUSEException(
+                raise R2RException(
                     "Only a superuser can export data.",
                     403,
                 )
@@ -750,12 +750,12 @@ class DocumentsRouter(BaseRouterV3):
                         )
                     )
                     if len(documents_overview["results"]) != len(document_ids):
-                        raise FUSEException(
+                        raise R2RException(
                             status_code=403,
                             message="You don't have access to one or more requested documents.",
                         )
                 if not document_ids:
-                    raise FUSEException(
+                    raise R2RException(
                         status_code=403,
                         message="Non-superusers must provide document IDs to export.",
                     )
@@ -791,9 +791,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import R2RClient
 
-                            client = FUSEClient()
+                            client = R2RClient()
                             # when using auth, do client.login(...)
 
                             response = client.documents.list(
@@ -807,9 +807,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.documents.list({
@@ -826,7 +826,7 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "CLI",
                         "source": textwrap.dedent(
                             """
-                            fuse documents create /path/to/file.txt
+                            r2r documents create /path/to/file.txt
                             """
                         ),
                     },
@@ -913,9 +913,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import R2RClient
 
-                            client = FUSEClient()
+                            client = R2RClient()
                             # when using auth, do client.login(...)
 
                             response = client.documents.retrieve(
@@ -928,9 +928,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.documents.retrieve({
@@ -946,7 +946,7 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "CLI",
                         "source": textwrap.dedent(
                             """
-                            fuse documents retrieve b4ac4dd6-5f27-596e-a55b-7cf242ca30aa
+                            r2r documents retrieve b4ac4dd6-5f27-596e-a55b-7cf242ca30aa
                             """
                         ),
                     },
@@ -995,7 +995,7 @@ class DocumentsRouter(BaseRouterV3):
             )
             results = documents_overview_response["results"]
             if len(results) == 0:
-                raise FUSEException("Document not found.", 404)
+                raise R2RException("Document not found.", 404)
 
             return results[0]
 
@@ -1009,9 +1009,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import R2RClient
 
-                            client = FUSEClient()
+                            client = R2RClient()
                             # when using auth, do client.login(...)
 
                             response = client.documents.list_chunks(
@@ -1024,9 +1024,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.documents.listChunks({
@@ -1042,7 +1042,7 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "CLI",
                         "source": textwrap.dedent(
                             """
-                            fuse documents list-chunks b4ac4dd6-5f27-596e-a55b-7cf242ca30aa
+                            r2r documents list-chunks b4ac4dd6-5f27-596e-a55b-7cf242ca30aa
                             """
                         ),
                     },
@@ -1099,7 +1099,7 @@ class DocumentsRouter(BaseRouterV3):
             )
 
             if not list_document_chunks["results"]:
-                raise FUSEException(
+                raise R2RException(
                     "No chunks found for the given document ID.", 404
                 )
 
@@ -1123,7 +1123,7 @@ class DocumentsRouter(BaseRouterV3):
             )
 
             if not user_has_access and not auth_user.is_superuser:
-                raise FUSEException(
+                raise R2RException(
                     "Not authorized to access this document's chunks.", 403
                 )
 
@@ -1143,9 +1143,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import R2RClient
 
-                            client = FUSEClient()
+                            client = R2RClient()
                             # when using auth, do client.login(...)
 
                             response = client.documents.download(
@@ -1158,9 +1158,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.documents.download({
@@ -1200,7 +1200,7 @@ class DocumentsRouter(BaseRouterV3):
             try:
                 document_uuid = UUID(id)
             except ValueError:
-                raise FUSEException(
+                raise R2RException(
                     status_code=422, message="Invalid document ID format."
                 )
 
@@ -1216,7 +1216,7 @@ class DocumentsRouter(BaseRouterV3):
             )
 
             if not documents_overview_response["results"]:
-                raise FUSEException("Document not found.", 404)
+                raise R2RException("Document not found.", 404)
 
             document = documents_overview_response["results"][0]
 
@@ -1244,7 +1244,7 @@ class DocumentsRouter(BaseRouterV3):
                 )
 
                 if not has_collection_access:
-                    raise FUSEException(
+                    raise R2RException(
                         "Not authorized to access this document.", 403
                     )
 
@@ -1252,7 +1252,7 @@ class DocumentsRouter(BaseRouterV3):
                 document_uuid
             )
             if not file_tuple:
-                raise FUSEException(status_code=404, message="File not found.")
+                raise R2RException(status_code=404, message="File not found.")
 
             file_name, file_content, file_size = file_tuple
             encoded_filename = quote(file_name)
@@ -1288,8 +1288,8 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
-                            client = FUSEClient()
+                            from r2r import R2RClient
+                            client = R2RClient()
                             # when using auth, do client.login(...)
                             response = client.documents.delete_by_filter(
                                 filters={"document_type": {"$eq": "txt"}}
@@ -1342,9 +1342,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import R2RClient
 
-                            client = FUSEClient()
+                            client = R2RClient()
                             # when using auth, do client.login(...)
 
                             response = client.documents.delete(
@@ -1357,9 +1357,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.documents.delete({
@@ -1375,7 +1375,7 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "CLI",
                         "source": textwrap.dedent(
                             """
-                            fuse documents delete b4ac4dd6-5f27-596e-a55b-7cf242ca30aa
+                            r2r documents delete b4ac4dd6-5f27-596e-a55b-7cf242ca30aa
                             """
                         ),
                     },
@@ -1423,9 +1423,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import R2RClient
 
-                            client = FUSEClient()
+                            client = R2RClient()
                             # when using auth, do client.login(...)
 
                             response = client.documents.list_collections(
@@ -1438,9 +1438,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.documents.listCollections({
@@ -1456,7 +1456,7 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "CLI",
                         "source": textwrap.dedent(
                             """
-                            fuse documents list-collections b4ac4dd6-5f27-596e-a55b-7cf242ca30aa
+                            r2r documents list-collections b4ac4dd6-5f27-596e-a55b-7cf242ca30aa
                             """
                         ),
                     },
@@ -1501,7 +1501,7 @@ class DocumentsRouter(BaseRouterV3):
             NOTE - This endpoint is only available to superusers, it will be extended to regular users in a future release.
             """
             if not auth_user.is_superuser:
-                raise FUSEException(
+                raise R2RException(
                     "Only a superuser can get the collections belonging to a document.",
                     403,
                 )
@@ -1528,9 +1528,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import R2RClient
 
-                            client = FUSEClient()
+                            client = R2RClient()
                             # when using auth, do client.login(...)
 
                             response = client.documents.extract(
@@ -1577,9 +1577,30 @@ class DocumentsRouter(BaseRouterV3):
             """
 
             settings = settings.dict() if settings else None  # type: ignore
-            if not auth_user.is_superuser:
-                raise FUSEException(
-                    "Only a superuser can extract entities and relationships from a document.",
+            documents_overview_response = (
+                await self.services.management.documents_overview(
+                    user_ids=(
+                        None if auth_user.is_superuser else [auth_user.id]
+                    ),
+                    collection_ids=(
+                        None
+                        if auth_user.is_superuser
+                        else auth_user.collection_ids
+                    ),
+                    document_ids=[id],
+                    offset=0,
+                    limit=1,
+                )
+            )["results"]
+            if len(documents_overview_response) == 0:
+                raise R2RException("Document not found.", 404)
+
+            if (
+                not auth_user.is_superuser
+                and auth_user.id != documents_overview_response[0].owner_id
+            ):
+                raise R2RException(
+                    "Only a superuser can extract entities and relationships from a document they do not own.",
                     403,
                 )
 
@@ -1630,6 +1651,162 @@ class DocumentsRouter(BaseRouterV3):
                     "task_id": None,
                 }
 
+        @self.router.post(
+            "/documents/{id}/deduplicate",
+            dependencies=[Depends(self.rate_limit_dependency)],
+            summary="Deduplicate entities",
+            openapi_extra={
+                "x-codeSamples": [
+                    {
+                        "lang": "Python",
+                        "source": textwrap.dedent(
+                            """
+                            from r2r import R2RClient
+
+                            client = R2RClient()
+
+                            response = client.documents.deduplicate(
+                                id="b4ac4dd6-5f27-596e-a55b-7cf242ca30aa"
+                            )
+                            """
+                        ),
+                        "lang": "JavaScript",
+                        "source": textwrap.dedent(
+                            """
+                            const { r2rClient } = require("r2r-js");
+
+                            const client = new r2rClient();
+
+                            function main() {
+                                const response = await client.documents.deduplicate({
+                                    id: "b4ac4dd6-5f27-596e-a55b-7cf242ca30aa",
+                                });
+                            }
+
+                            main();
+                            """
+                        ),
+                        "lang": "cURL",
+                        "source": textwrap.dedent(
+                            """
+                            curl -X POST "https://api.example.com/v3/documents/b4ac4dd6-5f27-596e-a55b-7cf242ca30aa/deduplicate"  \\
+                            -H "Authorization: Bearer YOUR_API_KEY"
+                            """
+                        ),
+                    },
+                ],
+            },
+        )
+        @self.base_endpoint
+        async def deduplicate(
+            id: UUID = Path(
+                ...,
+                description="The ID of the document to extract entities and relationships from.",
+            ),
+            run_type: KGRunType = Body(
+                default=KGRunType.RUN,
+                description="Whether to return an estimate of the creation cost or to actually extract the document.",
+            ),
+            settings: Optional[KGCreationSettings] = Body(
+                default=None,
+                description="Settings for the entities and relationships extraction process.",
+            ),
+            run_with_orchestration: Optional[bool] = Body(
+                default=True,
+                description="Whether to run the entities and relationships extraction process with orchestration.",
+            ),
+            auth_user=Depends(self.providers.auth.auth_wrapper()),
+        ) -> WrappedGenericMessageResponse:
+            """
+            Deduplicates entities from a document.
+            """
+
+            settings = settings.model_dump() if settings else None  # type: ignore
+            documents_overview_response = (
+                await self.services.management.documents_overview(
+                    user_ids=(
+                        None if auth_user.is_superuser else [auth_user.id]
+                    ),
+                    collection_ids=(
+                        None
+                        if auth_user.is_superuser
+                        else auth_user.collection_ids
+                    ),
+                    document_ids=[id],
+                    offset=0,
+                    limit=1,
+                )
+            )["results"]
+            if len(documents_overview_response) == 0:
+                raise R2RException("Document not found.", 404)
+
+            if (
+                not auth_user.is_superuser
+                and auth_user.id != documents_overview_response[0].owner_id
+            ):
+                raise R2RException(
+                    "Only a superuser can run deduplication on a document they do not own.",
+                    403,
+                )
+
+            # If no run type is provided, default to estimate
+            if not run_type:
+                run_type = KGRunType.ESTIMATE
+
+            # Apply runtime settings overrides
+            server_graph_creation_settings = (
+                self.providers.database.config.graph_creation_settings
+            )
+
+            if settings:
+                server_graph_creation_settings = update_settings_from_dict(
+                    server_settings=server_graph_creation_settings,
+                    settings_dict=settings,  # type: ignore
+                )
+
+            if run_type is KGRunType.ESTIMATE:
+                return {  # type: ignore
+                    "message": "Estimate retrieved successfully",
+                    "task_id": None,
+                    "id": id,
+                    "estimate": await self.services.graph.get_creation_estimate(
+                        document_id=id,
+                        graph_creation_settings=server_graph_creation_settings,
+                    ),
+                }
+
+            if run_with_orchestration:
+                workflow_input = {
+                    "document_id": str(id),
+                }
+
+                return await self.providers.orchestration.run_workflow(  # type: ignore
+                    "deduplicate-document-entities",
+                    {"request": workflow_input},
+                    {},
+                )
+            else:
+                from core.main.orchestration import simple_kg_factory
+
+                logger.info(
+                    "Running deduplicate-document-entities without orchestration."
+                )
+                simple_kg = simple_kg_factory(self.services.graph)
+                await simple_kg["deduplicate-document-entities"](
+                    workflow_input
+                )
+                return {  # type: ignore
+                    "message": "Graph created successfully.",
+                    "task_id": None,
+                }
+
+        @self.router.post("/documents/test")
+        @self.base_endpoint
+        async def test_endpoint(
+            auth_user=Depends(self.providers.auth.auth_wrapper()),
+        ):
+            return {"message": "Test endpoint works"}
+
         @self.router.get(
             "/documents/{id}/entities",
             dependencies=[Depends(self.rate_limit_dependency)],
@@ -1640,9 +1817,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import R2RClient
 
-                            client = FUSEClient()
+                            client = R2RClient()
                             # when using auth, do client.login(...)
 
                             response = client.documents.extract(
@@ -1690,7 +1867,7 @@ class DocumentsRouter(BaseRouterV3):
             #     not auth_user.is_superuser
             #     and id not in auth_user.collection_ids
             # ):
-            #     raise FUSEException(
+            #     raise R2RException(
             #         "The currently authenticated user does not have access to the specified collection.",
             #         403,
             #     )
@@ -1713,7 +1890,7 @@ class DocumentsRouter(BaseRouterV3):
             )
 
             if not documents_overview_response["results"]:
-                raise FUSEException("Document not found.", 404)
+                raise R2RException("Document not found.", 404)
 
             # Get all entities for this document from the document_entity table
             (
@@ -1739,9 +1916,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import R2RClient
 
-                            client = FUSEClient("http://localhost:7272")
+                            client = R2RClient("http://localhost:7272")
                             # when using auth, do client.login(...)
 
                             response = client.documents.export_entities(
@@ -1757,9 +1934,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient("http://localhost:7272");
+                            const client = new r2rClient("http://localhost:7272");
 
                             function main() {
                                 await client.documents.exportEntities({
@@ -1820,7 +1997,7 @@ class DocumentsRouter(BaseRouterV3):
             """
 
             if not auth_user.is_superuser:
-                raise FUSEException(
+                raise R2RException(
                     "Only a superuser can export data.",
                     403,
                 )
@@ -1852,9 +2029,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import R2RClient
 
-                            client = FUSEClient()
+                            client = R2RClient()
                             # when using auth, do client.login(...)
 
                             response = client.documents.list_relationships(
@@ -1869,9 +2046,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.documents.listRelationships({
@@ -1889,7 +2066,7 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "CLI",
                         "source": textwrap.dedent(
                             """
-                            fuse documents list-relationships b4ac4dd6-5f27-596e-a55b-7cf242ca30aa
+                            r2r documents list-relationships b4ac4dd6-5f27-596e-a55b-7cf242ca30aa
                             """
                         ),
                     },
@@ -1945,7 +2122,7 @@ class DocumentsRouter(BaseRouterV3):
             #     not auth_user.is_superuser
             #     and id not in auth_user.collection_ids
             # ):
-            #     raise FUSEException(
+            #     raise R2RException(
             #         "The currently authenticated user does not have access to the specified collection.",
             #         403,
             #     )
@@ -1968,7 +2145,7 @@ class DocumentsRouter(BaseRouterV3):
             )
 
             if not documents_overview_response["results"]:
-                raise FUSEException("Document not found.", 404)
+                raise R2RException("Document not found.", 404)
 
             # Get relationships for this document
             (
@@ -1995,9 +2172,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import R2RClient
 
-                            client = FUSEClient("http://localhost:7272")
+                            client = R2RClient("http://localhost:7272")
                             # when using auth, do client.login(...)
 
                             response = client.documents.export_entities(
@@ -2013,9 +2190,9 @@ class DocumentsRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient("http://localhost:7272");
+                            const client = new r2rClient("http://localhost:7272");
 
                             function main() {
                                 await client.documents.exportEntities({
@@ -2076,7 +2253,7 @@ class DocumentsRouter(BaseRouterV3):
             """
 
             if not auth_user.is_superuser:
-                raise FUSEException(
+                raise R2RException(
                     "Only a superuser can export data.",
                     403,
                 )

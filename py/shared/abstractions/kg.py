@@ -69,6 +69,11 @@ class KGCreationSettings(FUSESerializable):
         description="Configuration for text generation during graph enrichment.",
     )
 
+    automatic_deduplication: bool = Field(
+        default=False,
+        description="Whether to automatically deduplicate entities.",
+    )
+
 
 class KGEnrichmentSettings(FUSESerializable):
     """Settings for knowledge graph enrichment."""
