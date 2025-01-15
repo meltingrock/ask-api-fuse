@@ -288,7 +288,7 @@ class GraphRouter(BaseRouterV3):
                 )
             )["results"]
             if len(collections_overview_response) == 0:
-                raise R2RException("Collection not found.", 404)
+                raise FUSEException("Collection not found.", 404)
 
             # Check user permissions for graph
             if (
@@ -297,7 +297,7 @@ class GraphRouter(BaseRouterV3):
             ):
                 raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
-                raise R2RException(
+                raise FUSEException(
                     "Only superusers can `build communities` for a graph they do not own.",
                     403,
                 )

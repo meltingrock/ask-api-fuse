@@ -155,7 +155,7 @@ def simple_ingestion_factory(service: IngestionService):
                         if (
                             service.providers.ingestion.config.automatic_extraction
                         ):
-                            raise R2RException(
+                            raise FUSEException(
                                 status_code=501,
                                 message="Automatic extraction not yet implemented for `simple` ingestion workflows.",
                             )
@@ -262,7 +262,7 @@ def simple_ingestion_factory(service: IngestionService):
 
         await asyncio.gather(*results)
         if service.providers.ingestion.config.automatic_extraction:
-            raise R2RException(
+            raise FUSEException(
                 status_code=501,
                 message="Automatic extraction not yet implemented for `simple` ingestion workflows.",
             )
@@ -390,7 +390,7 @@ def simple_ingestion_factory(service: IngestionService):
                         )
 
                     if service.providers.ingestion.config.automatic_extraction:
-                        raise R2RException(
+                        raise FUSEException(
                             status_code=501,
                             message="Automatic extraction not yet implemented for `simple` ingestion workflows.",
                         )

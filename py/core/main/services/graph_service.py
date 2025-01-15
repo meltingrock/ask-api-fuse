@@ -824,7 +824,7 @@ class GraphService(Service):
                     except ET.ParseError as e:
                         raise FUSEException(
                             f"Failed to parse XML response: {e}. Response: {response_str}",
-                        raise R2RException(
+                        raise FUSEException(
                             f"Failed to parse XML response: {e}. Response: {wrapped_xml}",
                             400,
                         )
