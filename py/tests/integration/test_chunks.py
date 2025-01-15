@@ -11,12 +11,13 @@ from fuse import FUSEAsyncClient, FUSEException
 class AsyncFUSETestClient:
     """Wrapper to ensure async operations use the correct event loop"""
 
-    def __init__(self, base_url: str = "http://localhost:7272"):
+    def __init__(self, base_url: str = "http://localhost:7272/api/v3/fuse"):
         self.client = FUSEAsyncClient(base_url)
 
     async def create_document(
         self, chunks: list[str], run_with_orchestration: bool = False
     ) -> Tuple[str, list[dict]]:
+        print(f"Making request to: {self.client.base_url}/documents")
         response = await self.client.documents.create(
             chunks=chunks, run_with_orchestration=run_with_orchestration
         )
