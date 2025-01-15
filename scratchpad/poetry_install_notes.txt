@@ -1,0 +1,32 @@
+# How to Build and Install Python Module Locally
+
+Prerequisites:
+- Python 3.x installed
+- pip installed
+- Poetry installed (pip install poetry)
+
+# Get into the venv
+source venv/bin/activate
+
+# Install poetry
+curl -sSL https://install.python-poetry.org | python3 -
+
+# Add poetry to PATH
+echo "export PATH=\"\$HOME/.local/bin:\$PATH\"" >> ~/.bashrc
+source ~/.bashrc
+
+# Verify installation
+poetry --version
+
+Method 1: Build and Install from Wheel/Distribution
+1. Navigate to project's Python directory:
+cd ./py
+
+2. Build the package using Poetry:
+poetry build
+
+3. Install the built package using pip:
+# Install from wheel (recommended)
+pip3 install  --force-reinstall dist/fuse-3.3.28-py3-none-any.whl
+
+

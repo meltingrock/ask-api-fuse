@@ -62,11 +62,11 @@ class AsyncFUSETestClient:
         await self.client.users.logout()
 
 
-@pytest.fixture
-async def test_client() -> AsyncGenerator[AsyncFUSETestClient, None]:
-    """Create a test client."""
-    client = AsyncFUSETestClient()
-    yield client
+# @pytest.fixture
+# async def test_client() -> AsyncGenerator[AsyncFUSETestClient, None]:
+#     """Create a test client."""
+#     client = AsyncFUSETestClient()
+#     yield client
 
 
 @pytest.fixture
@@ -89,17 +89,19 @@ async def test_document(
 class TestChunks:
     @pytest.mark.asyncio
     async def test_create_and_list_chunks(
-        self, test_client: AsyncFUSETestClient, cleanup_documents
+            self, test_client: AsyncFUSETestClient, cleanup_documents
     ):
+        client = await test_client  # Await the test_client fixture
+
         # Create document with chunks
-        doc_id, _ = await test_client.create_document(
+        doc_id, _ = await client.create_document(
             ["Hello chunk", "World chunk"]
         )
-        cleanup_documents(doc_id)
+        cleanup_documents.append(doc_id)
         await asyncio.sleep(1)  # Wait for ingestion
 
         # List and verify chunks
-        chunks = await test_client.list_chunks(doc_id)
+        chunks = await client.list_chunks(doc_id)
         assert len(chunks) == 2, "Expected 2 chunks in the document"
 
     @pytest.mark.asyncio
@@ -286,21 +288,18 @@ class TestChunks:
 
 
 @pytest.fixture
-async def cleanup_documents(test_client: AsyncFUSETestClient):
-    doc_ids = []
+async def cleanup_documents():
+    """Fixture for cleaning up documents after tests."""
+    documents = []
+    yield documents
 
-    def _track_document(doc_id: str) -> str:
-        doc_ids.append(doc_id)
-        return doc_id
-
-    yield _track_document
-
-    # Cleanup all documents
-    for doc_id in doc_ids:
+    # Cleanup happens after the test
+    for doc_id in documents:
         try:
-            await test_client.delete_document(doc_id)
-        except FUSEException:
-            pass
+            client = AsyncFUSETestClient()  # Create a new client for cleanup
+            await client.delete_document(doc_id)
+        except Exception as e:
+            print(f"Error cleaning up document {doc_id}: {e}")
 
 
 if __name__ == "__main__":

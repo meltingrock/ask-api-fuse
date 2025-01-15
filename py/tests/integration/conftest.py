@@ -1,4 +1,3 @@
-# tests/conftest.py
 import asyncio
 import uuid
 from typing import AsyncGenerator, Generator
@@ -6,86 +5,74 @@ from typing import AsyncGenerator, Generator
 import pytest
 
 from fuse import FUSEAsyncClient, FUSEClient
+from tests.integration.test_chunks import AsyncFUSETestClient  # Import the test client class
 
 
+from dataclasses import dataclass
+
+@dataclass
 class TestConfig:
-    def __init__(self):
-        self.base_url = "http://localhost:7272"
-        self.index_wait_time = 1.0
-        self.chunk_creation_wait_time = 1.0
-        self.superuser_email = "admin@example.com"
-        self.superuser_password = "change_me_immediately"
-        self.test_timeout = 30  # seconds
+    base_url: str = "http://localhost:7272"
+    api_base_url: str = f"{base_url}/api/v3/fuse"
+    index_wait_time: float = 1.0
+    chunk_creation_wait_time: float = 1.0
+    superuser_email: str = "admin@example.com"
+    superuser_password: str = "change_me_immediately"
+    test_timeout: int = 30  # seconds
 
-
-@pytest.fixture  # (scope="session")
+@pytest.fixture(scope="session")
 def config() -> TestConfig:
     return TestConfig()
 
 
 @pytest.fixture(scope="session")
-async def client(config) -> AsyncGenerator[FUSEClient, None]:
+def client(config: TestConfig) -> FUSEClient:
     """Create a shared client instance for the test session."""
-    client = FUSEClient(config.base_url)
-    yield client
-    # Session cleanup if needed
-
-
-@pytest.fixture  # scope="session")
-def mutable_client(config) -> FUSEClient:
-    """Create a shared client instance for the test session."""
-    client = FUSEClient(config.base_url)
-    return client  # a client for logging in and what-not
-    # Session cleanup if needed
-
-
-@pytest.fixture  # (scope="session")
-async def aclient(config) -> AsyncGenerator[FUSEClient, None]:
-    """Create a shared client instance for the test session."""
-    client = FUSEAsyncClient(config.base_url)
-    yield client
-    # Session cleanup if needed
-
-
-@pytest.fixture
-async def superuser_client(
-    client: FUSEClient, config: TestConfig
-) -> AsyncGenerator[FUSEClient, None]:
-    """Creates a superuser client for tests requiring elevated privileges."""
-    await client.users.login(config.superuser_email, config.superuser_password)
-    yield client
-    await client.users.logout()
-
-
-import uuid
-
-import pytest
-
-from fuse import  FUSEClient, FUSEException
-
-
-@pytest.fixture(scope="session")
-def config():
-    class TestConfig:
-        base_url = "http://localhost:7272"
-        superuser_email = "admin@example.com"
-        superuser_password = "change_me_immediately"
-
-    return TestConfig()
-
-
-@pytest.fixture(scope="session")
-def client(config):
-    """Create a client instance and log in as a superuser."""
-    client = FUSEClient(config.base_url)
+    client = FUSEClient(config.api_base_url)
     client.users.login(config.superuser_email, config.superuser_password)
     return client
 
 
 @pytest.fixture(scope="session")
-def test_document(client):
-    """Create and yield a test document, then clean up."""
+def mutable_client(config: TestConfig) -> FUSEClient:
+    """Create a shared client instance for the test session."""
+    return FUSEClient(config.api_base_url)
 
+
+@pytest.fixture
+async def aclient(config: TestConfig) -> AsyncGenerator[FUSEAsyncClient, None]:
+    """Create a shared async client instance."""
+    client = FUSEAsyncClient(config.api_base_url)
+    yield client
+    # Add any cleanup if needed
+
+
+@pytest.fixture
+async def test_client():
+    """Create an async test client instance."""
+    return AsyncFUSETestClient()
+
+
+@pytest.fixture
+async def superuser_client(
+    aclient: FUSEAsyncClient, config: TestConfig
+) -> AsyncGenerator[FUSEAsyncClient, None]:
+    """Creates a superuser client for tests requiring elevated privileges."""
+    await aclient.users.login(config.superuser_email, config.superuser_password)
+    yield aclient
+    await aclient.users.logout()
+
+
+@pytest.fixture
+async def cleanup_documents():
+    """Fixture for cleaning up documents after tests."""
+    documents = []
+    yield documents
+
+
+@pytest.fixture(scope="session")
+def test_document(client: FUSEClient) -> Generator[str, None, None]:
+    """Create and yield a test document, then clean up."""
     random_suffix = str(uuid.uuid4())
     doc_resp = client.documents.create(
         raw_text=f"{random_suffix} Test doc for collections",
@@ -94,20 +81,17 @@ def test_document(client):
 
     doc_id = doc_resp["results"]["document_id"]
     yield doc_id
-    # Cleanup: Try deleting the document if it still exists
     try:
         client.documents.delete(id=doc_id)
-    except FUSEException:
+    except Exception:
         pass
 
 
 @pytest.fixture(scope="session")
-def test_collection(client, test_document):
+def test_collection(client: FUSEClient, test_document: str) -> Generator[dict, None, None]:
     """Create a test collection with sample documents and clean up after tests."""
     collection_name = f"Test Collection {uuid.uuid4()}"
-    collection_id = client.collections.create(name=collection_name)["results"][
-        "id"
-    ]
+    collection_id = client.collections.create(name=collection_name)["results"]["id"]
 
     docs = [
         {
@@ -147,7 +131,9 @@ def test_collection(client, test_document):
     doc_ids = []
     for doc in docs:
         result = client.documents.create(
-            raw_text=doc["text"], metadata=doc["metadata"]
+            raw_text=doc["text"],
+            metadata=doc["metadata"],
+            run_with_orchestration=False,
         )["results"]
         doc_id = result["document_id"]
         doc_ids.append(doc_id)
@@ -158,16 +144,14 @@ def test_collection(client, test_document):
 
     # Cleanup after tests
     try:
-        # Remove and delete all documents
         for doc_id in doc_ids:
             try:
                 client.documents.delete(id=doc_id)
-            except FUSEException:
+            except Exception:
                 pass
-        # Delete the collection
         try:
             client.collections.delete(collection_id)
-        except FUSEException:
-            pass
+        except Exception:
+                pass
     except Exception as e:
         print(f"Error during test_collection cleanup: {e}")

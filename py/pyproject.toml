@@ -7,8 +7,8 @@ name = "fuse"
 readme = "README.md"
 version = "3.3.28"
 
-description = "SciPhi FUSE"
-authors = ["Owen Colegrove <owen@sciphi.ai>"]
+description = "Melting Rock FUSE, forked off of Sciphi R2R"
+authors = ["Riaan Labuschagne"]
 license = "MIT"
 
 packages = [

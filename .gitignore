@@ -5,6 +5,7 @@
 logs/
 workspace/
 py/workspace/
+py/dist/
 uploads/
 env/
 **/__pycache__
