@@ -61,7 +61,7 @@ import uuid
 
 import pytest
 
-from fuse import Message, FUSEClient, FUSEException, SearchMode
+from fuse import  FUSEClient, FUSEException
 
 
 @pytest.fixture(scope="session")

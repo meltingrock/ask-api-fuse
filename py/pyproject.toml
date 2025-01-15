@@ -212,6 +212,7 @@ fuse = "cli.main:main"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 addopts = "--cov=fuse --cov-report=term-missing --cov-report=xml --cache-clear"
 testpaths = [
     "tests",
@@ -219,4 +220,5 @@ testpaths = [
 filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore::pytest.PytestUnraisableExceptionWarning",
+    "ignore::pytest.PytestDeprecationWarning"
 ]
