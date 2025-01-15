@@ -823,8 +823,6 @@ class GraphService(Service):
                         root = ET.fromstring(wrapped_xml)
                     except ET.ParseError as e:
                         raise FUSEException(
-                            f"Failed to parse XML response: {e}. Response: {response_str}",
-                        raise FUSEException(
                             f"Failed to parse XML response: {e}. Response: {wrapped_xml}",
                             400,
                         )

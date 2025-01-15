@@ -9,6 +9,7 @@ class FUSEException(Exception):
     ):
         self.message = message
         self.status_code = status_code
+        self.detail = detail
         super().__init__(self.message)
 
     def to_dict(self):
