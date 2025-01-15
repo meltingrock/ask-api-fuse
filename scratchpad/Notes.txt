@@ -1,0 +1,37 @@
+4. Keep your project in sync with the original (upstream)
+Let’s say later the original repo updates. You want those changes in your new project as well. Here’s what you’ll do:
+
+Fetch and check out the changes from the original repo:
+
+bash
+Copy code
+git fetch upstream
+Merge or rebase those changes into your branch. For example, if you’re working off your main branch:
+
+bash
+Copy code
+# Ensure you're on your local main branch
+git checkout main
+
+# Merge the latest upstream main
+git merge upstream/main
+or, if you prefer a cleaner history, you could rebase instead:
+
+bash
+Copy code
+git rebase upstream/main
+Resolve any merge conflicts (especially if your renaming touches lines that upstream has changed). Once conflicts are resolved, commit the merge or finish the rebase:
+
+bash
+Copy code
+git add .
+git commit
+# or, if rebasing, `git rebase --continue`
+Finally, push your updated branch back to your own remote (origin):
+
+bash
+Copy code
+git push origin main
+This process allows you to continually pull in any new changes from the original repository, while keeping your own custom naming in place.
+
+
