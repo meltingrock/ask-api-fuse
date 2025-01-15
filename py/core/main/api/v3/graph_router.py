@@ -89,7 +89,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient()
                             # when using auth, do client.login(...)
@@ -102,9 +102,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.graphs.list({});
@@ -172,7 +172,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient()
                             # when using auth, do client.login(...)
@@ -186,9 +186,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.graphs.retrieve({
@@ -276,9 +276,6 @@ class GraphRouter(BaseRouterV3):
                 - Community detection algorithm parameters
                 - Summary generation prompt
             """
-            if not auth_user.is_superuser:
-                raise FUSEException(
-                    "Only superusers can build communities", 403
             collections_overview_response = (
                 await self.services.management.collections_overview(
                     user_ids=[auth_user.id],
@@ -295,8 +292,6 @@ class GraphRouter(BaseRouterV3):
                 not auth_user.is_superuser
                 and collections_overview_response[0].owner_id != auth_user.id
             ):
-                raise FUSEException(
-                    "The currently authenticated user does not have access to the collection associated with the given graph.",
                 raise FUSEException(
                     "Only superusers can `build communities` for a graph they do not own.",
                     403,
@@ -349,7 +344,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient()
                             # when using auth, do client.login(...)
@@ -363,9 +358,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.graphs.reset({
@@ -429,7 +424,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient()
                             # when using auth, do client.login(...)
@@ -447,9 +442,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.graphs.update({
@@ -515,7 +510,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient()
                             # when using auth, do client.login(...)
@@ -528,9 +523,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.graphs.listEntities({
@@ -595,7 +590,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient("http://localhost:7272")
                             # when using auth, do client.login(...)
@@ -613,9 +608,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient("http://localhost:7272");
+                            const client = new r2rClient("http://localhost:7272");
 
                             function main() {
                                 await client.graphs.exportEntities({
@@ -817,7 +812,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient("http://localhost:7272")
                             # when using auth, do client.login(...)
@@ -835,9 +830,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient("http://localhost:7272");
+                            const client = new r2rClient("http://localhost:7272");
 
                             function main() {
                                 await client.graphs.exportEntities({
@@ -929,7 +924,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient()
                             # when using auth, do client.login(...)
@@ -945,9 +940,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.graphs.get_entity({
@@ -1056,7 +1051,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient()
                             # when using auth, do client.login(...)
@@ -1072,9 +1067,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.graphs.removeEntity({
@@ -1135,7 +1130,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient()
                             # when using auth, do client.login(...)
@@ -1148,9 +1143,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.graphs.listRelationships({
@@ -1217,7 +1212,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient()
                             # when using auth, do client.login(...)
@@ -1233,9 +1228,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.graphs.getRelationship({
@@ -1364,7 +1359,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient()
                             # when using auth, do client.login(...)
@@ -1380,9 +1375,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.graphs.deleteRelationship({
@@ -1442,7 +1437,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient()
                             # when using auth, do client.login(...)
@@ -1462,9 +1457,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.graphs.createCommunity({
@@ -1551,7 +1546,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient()
                             # when using auth, do client.login(...)
@@ -1564,9 +1559,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.graphs.listCommunities({
@@ -1633,7 +1628,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient()
                             # when using auth, do client.login(...)
@@ -1646,9 +1641,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.graphs.getCommunity({
@@ -1711,7 +1706,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient()
                             # when using auth, do client.login(...)
@@ -1727,9 +1722,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             function main() {
                                 const response = await client.graphs.deleteCommunity({
@@ -1791,7 +1786,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient("http://localhost:7272")
                             # when using auth, do client.login(...)
@@ -1809,9 +1804,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient("http://localhost:7272");
+                            const client = new r2rClient("http://localhost:7272");
 
                             function main() {
                                 await client.graphs.exportCommunities({
@@ -1904,7 +1899,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient()
                             # when using auth, do client.login(...)
@@ -1924,9 +1919,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             async function main() {
                                 const response = await client.graphs.updateCommunity({
@@ -1999,7 +1994,7 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from fuse import FUSEClient
+                            from r2r import FUSEClient
 
                             client = FUSEClient()
                             # when using auth, do client.login(...)
@@ -2013,9 +2008,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { fuseClient } = require("fuse-js");
+                            const { r2rClient } = require("r2r-js");
 
-                            const client = new fuseClient();
+                            const client = new r2rClient();
 
                             async function main() {
                                 const response = await client.graphs.pull({
@@ -2077,7 +2072,10 @@ class GraphRouter(BaseRouterV3):
                 raise FUSEException("Collection not found.", 404)
 
             # Check user permissions for graph
-            if not auth_user.is_superuser:
+            if (
+                not auth_user.is_superuser
+                and collections_overview_response[0].owner_id != auth_user.id
+            ):
                 raise FUSEException("Only superusers can `pull` a graph.", 403)
 
             if (
@@ -2117,16 +2115,6 @@ class GraphRouter(BaseRouterV3):
             success = False
 
             for document in documents:
-                # TODO - Add better checks for user permissions
-                if (
-                    not auth_user.is_superuser
-                    and document.id
-                    not in auth_user.document_ids  # TODO - extend to include checks on collections
-                ):
-                    raise FUSEException(
-                        f"The currently authenticated user does not have access to document {document.id}",
-                        403,
-                    )
                 entities = (
                     await self.providers.database.graphs_handler.entities.get(
                         parent_id=document.id,
