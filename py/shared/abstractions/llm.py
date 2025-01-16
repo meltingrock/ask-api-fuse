@@ -30,8 +30,11 @@ class RAGCompletion:
         self.search_results = search_results
 
 
+from typing import ClassVar, Optional, Dict, Any
+
 class GenerationConfig(FUSESerializable):
-    _defaults: ClassVar[dict] = {
+    # Define defaults as a proper class variable with ClassVar annotation
+    _defaults: ClassVar[Dict[str, Any]] = {
         "model": "openai/gpt-4o",
         "temperature": 0.1,
         "top_p": 1.0,
@@ -44,38 +47,63 @@ class GenerationConfig(FUSESerializable):
         "response_format": None,
     }
 
+    # Instance fields with their default values from a function
     model: str = Field(
-        default_factory=lambda: GenerationConfig._defaults["model"]
+        default="openai/gpt-4o",  # Direct default instead of default_factory
+        description="The model to use for generation"
     )
     temperature: float = Field(
-        default_factory=lambda: GenerationConfig._defaults["temperature"]
+        default=0.1,
+        description="Temperature for generation"
     )
     top_p: float = Field(
-        default_factory=lambda: GenerationConfig._defaults["top_p"],
+        default=1.0,
+        description="Top p for generation"
     )
     max_tokens_to_sample: int = Field(
-        default_factory=lambda: GenerationConfig._defaults[
-            "max_tokens_to_sample"
-        ],
+        default=1024,
+        description="Maximum tokens to sample"
     )
     stream: bool = Field(
-        default_factory=lambda: GenerationConfig._defaults["stream"]
+        default=False,
+        description="Whether to stream the response"
     )
     functions: Optional[list[dict]] = Field(
-        default_factory=lambda: GenerationConfig._defaults["functions"]
+        default=None,
+        description="Functions to use for generation"
     )
     tools: Optional[list[dict]] = Field(
-        default_factory=lambda: GenerationConfig._defaults["tools"]
+        default=None,
+        description="Tools to use for generation"
     )
     add_generation_kwargs: Optional[dict] = Field(
-        default_factory=lambda: GenerationConfig._defaults[
-            "add_generation_kwargs"
-        ],
+        default=None,
+        description="Additional generation kwargs"
     )
     api_base: Optional[str] = Field(
-        default_factory=lambda: GenerationConfig._defaults["api_base"],
+        default=None,
+        description="API base URL"
     )
-    response_format: Optional[dict | BaseModel] = None
+    response_format: Optional[dict | BaseModel] = Field(
+        default=None,
+        description="Response format configuration"
+    )
+
+    model_config = {
+        "frozen": True,
+        "populate_by_name": True,
+        "json_schema_extra": {
+            "model": "openai/gpt-4o",
+            "temperature": 0.1,
+            "top_p": 1.0,
+            "max_tokens_to_sample": 1024,
+            "stream": False,
+            "functions": None,
+            "tools": None,
+            "add_generation_kwargs": None,
+            "api_base": None,
+        }
+    }
 
     @classmethod
     def set_default(cls, **kwargs):
@@ -111,19 +139,19 @@ class GenerationConfig(FUSESerializable):
     def __str__(self):
         return json.dumps(self.to_dict())
 
-    class Config:
-        populate_by_name = True
-        json_schema_extra = {
-            "model": "openai/gpt-4o",
-            "temperature": 0.1,
-            "top_p": 1.0,
-            "max_tokens_to_sample": 1024,
-            "stream": False,
-            "functions": None,
-            "tools": None,
-            "add_generation_kwargs": None,
-            "api_base": None,
-        }
+    def __hash__(self):
+        return hash((
+            self.model,
+            self.temperature,
+            self.top_p,
+            self.max_tokens_to_sample,
+            self.stream,
+            tuple(tuple(f.items()) for f in (self.functions or [])),
+            tuple(tuple(t.items()) for t in (self.tools or [])),
+            tuple(self.add_generation_kwargs.items()) if self.add_generation_kwargs else None,
+            self.api_base,
+            str(self.response_format) if self.response_format else None
+        ))
 
 
 class MessageType(Enum):

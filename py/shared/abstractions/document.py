@@ -315,7 +315,6 @@ class ChunkEnrichmentSettings(FUSESerializable):
     generation_config: GenerationConfig = Field(
         default_factory=GenerationConfig,
         description="The generation config to use for chunk enrichment",
-        exclude=True,
     )
 
     def __hash__(self):
@@ -325,7 +324,8 @@ class ChunkEnrichmentSettings(FUSESerializable):
             self.forward_chunks,
             self.backward_chunks,
             self.semantic_neighbors,
-            self.semantic_similarity_threshold
+            self.semantic_similarity_threshold,
+            self.generation_config.__hash__()
         ))
 ## TODO - Move ingestion config
 

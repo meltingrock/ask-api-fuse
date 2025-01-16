@@ -84,7 +84,7 @@ class FUSEApp:
         self.app.include_router(self.chunks_router, prefix="/chunks", tags=["Chunks"])
         self.app.include_router(self.collections_router, prefix="/collections", tags=["Collections"])
         self.app.include_router(self.conversations_router, prefix="/conversations", tags=["Conversations"])
-        self.app.include_router(self.documents_router, prefix="/documents", include_in_schema=False)
+        self.app.include_router(self.documents_router, prefix="/documents", tags=["Documents"]) #, include_in_schema=False
         self.app.include_router(self.graph_router, prefix="/graphs", tags=["Graph"])
         self.app.include_router(self.indices_router, prefix="/indices", tags=["Indices"])
         self.app.include_router(self.logs_router, prefix="/logs", tags=["Logs"])

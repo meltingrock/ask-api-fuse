@@ -294,6 +294,44 @@ class GraphSearchSettings(FUSESerializable):
 class SearchSettings(FUSESerializable):
     """Main search settings class that combines shared settings with specialized settings for chunks and KG."""
 
+    model_config = {
+        "populate_by_name": True,
+        "json_encoders": {UUID: str},
+        "json_schema_extra": {
+            "use_semantic_search": True,
+            "use_fulltext_search": False,
+            "use_hybrid_search": False,
+            "filters": {"category": "technology"},
+            "limit": 20,
+            "offset": 0,
+            "search_strategy": "vanilla",
+            "hybrid_settings": {
+                "full_text_weight": 1.0,
+                "semantic_weight": 5.0,
+                "full_text_limit": 200,
+                "rrf_k": 50,
+            },
+            "chunk_settings": {
+                "enabled": True,
+                "index_measure": "cosine_distance",
+                "include_metadata": True,
+                "probes": 10,
+                "ef_search": 40,
+            },
+            "graph_settings": {
+                "enabled": True,
+                "generation_config": GenerationConfig.model_config["json_schema_extra"],
+                "max_community_description_length": 65536,
+                "max_llm_queries_for_global_search": 250,
+                "limits": {
+                    "entity": 20,
+                    "relationship": 20,
+                    "community": 20,
+                },
+            },
+        }
+    }
+
     # Search type flags
     use_hybrid_search: bool = Field(
         default=False,
@@ -363,42 +401,42 @@ class SearchSettings(FUSESerializable):
         description="Settings specific to knowledge graph search",
     )
 
-    class Config:
-        populate_by_name = True
-        json_encoders = {UUID: str}
-        json_schema_extra = {
-            "use_semantic_search": True,
-            "use_fulltext_search": False,
-            "use_hybrid_search": False,
-            "filters": {"category": "technology"},
-            "limit": 20,
-            "offset": 0,
-            "search_strategy": "vanilla",
-            "hybrid_settings": {
-                "full_text_weight": 1.0,
-                "semantic_weight": 5.0,
-                "full_text_limit": 200,
-                "rrf_k": 50,
-            },
-            "chunk_settings": {
-                "enabled": True,
-                "index_measure": "cosine_distance",
-                "include_metadata": True,
-                "probes": 10,
-                "ef_search": 40,
-            },
-            "graph_settings": {
-                "enabled": True,
-                "generation_config": GenerationConfig.Config.json_schema_extra,
-                "max_community_description_length": 65536,
-                "max_llm_queries_for_global_search": 250,
-                "limits": {
-                    "entity": 20,
-                    "relationship": 20,
-                    "community": 20,
-                },
-            },
-        }
+    # class Config:
+    #     populate_by_name = True
+    #     json_encoders = {UUID: str}
+    #     json_schema_extra = {
+    #         "use_semantic_search": True,
+    #         "use_fulltext_search": False,
+    #         "use_hybrid_search": False,
+    #         "filters": {"category": "technology"},
+    #         "limit": 20,
+    #         "offset": 0,
+    #         "search_strategy": "vanilla",
+    #         "hybrid_settings": {
+    #             "full_text_weight": 1.0,
+    #             "semantic_weight": 5.0,
+    #             "full_text_limit": 200,
+    #             "rrf_k": 50,
+    #         },
+    #         "chunk_settings": {
+    #             "enabled": True,
+    #             "index_measure": "cosine_distance",
+    #             "include_metadata": True,
+    #             "probes": 10,
+    #             "ef_search": 40,
+    #         },
+    #         "graph_settings": {
+    #             "enabled": True,
+    #             "generation_config": GenerationConfig.Config.json_schema_extra,
+    #             "max_community_description_length": 65536,
+    #             "max_llm_queries_for_global_search": 250,
+    #             "limits": {
+    #                 "entity": 20,
+    #                 "relationship": 20,
+    #                 "community": 20,
+    #             },
+    #         },
+    #     }
 
     def __init__(self, **data):
         # Handle legacy search_filters field
