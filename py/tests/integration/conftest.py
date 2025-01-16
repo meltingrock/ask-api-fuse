@@ -10,7 +10,7 @@ from fuse import FUSEAsyncClient, FUSEClient
 
 class TestConfig:
     def __init__(self):
-        self.base_url = "http://localhost:7272"
+        self.base_url = "http://localhost:7272/api/v3/fuse"
         self.index_wait_time = 1.0
         self.chunk_creation_wait_time = 1.0
         self.superuser_email = "admin@example.com"
@@ -61,7 +61,7 @@ import uuid
 
 import pytest
 
-from fuse import Message, FUSEClient, FUSEException, SearchMode
+from fuse import FUSEClient, FUSEException
 
 
 @pytest.fixture(scope="session")
@@ -77,6 +77,9 @@ def config():
 @pytest.fixture(scope="session")
 def client(config):
     """Create a client instance and log in as a superuser."""
+    print(config.base_url)
+    print(config.superuser_email)  # Add these before the login attempt
+    print(config.superuser_password)
     client = FUSEClient(config.base_url)
     client.users.login(config.superuser_email, config.superuser_password)
     return client

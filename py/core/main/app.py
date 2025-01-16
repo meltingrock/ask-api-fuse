@@ -59,10 +59,13 @@ class FUSEApp:
         self.app = FastAPI(
             title="FUSE application API",
             version="fuse",
-            openapi_url="/api/v3/fuse/openapi.json",
-            docs_url="/api/v3/fuse/docs",
+            openapi_url="/openapi.json",
+            docs_url="/docs",
             root_path=""
         )
+
+        # Mount the FUSE application's FastAPI instance at your desired prefix
+        self.app.mount(path="/api/v3/fuse", app=self.app)
 
         @self.app.exception_handler(FUSEException)
         async def fuse_exception_handler(request: Request, exc: FUSEException):
