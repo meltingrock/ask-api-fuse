@@ -10,7 +10,7 @@ from fuse import FUSEAsyncClient, FUSEClient
 
 class TestConfig:
     def __init__(self):
-        self.base_url = "http://localhost:7272/api/v3/fuse"
+        self.base_url = "http://192.168.100.12:7272/api/fuse"
         self.index_wait_time = 1.0
         self.chunk_creation_wait_time = 1.0
         self.superuser_email = "admin@example.com"
@@ -18,20 +18,19 @@ class TestConfig:
         self.test_timeout = 30  # seconds
 
 
-@pytest.fixture  # (scope="session")
+@pytest.fixture (scope="session")
 def config() -> TestConfig:
     return TestConfig()
 
 
 @pytest.fixture(scope="session")
-async def client(config) -> AsyncGenerator[FUSEClient, None]:
-    """Create a shared client instance for the test session."""
+async def async_client(config) -> AsyncGenerator[FUSEClient, None]:
+    """Create a shared async client instance for the test session."""
     client = FUSEClient(config.base_url)
     yield client
     # Session cleanup if needed
 
-
-@pytest.fixture  # scope="session")
+@pytest.fixture(scope="session")
 def mutable_client(config) -> FUSEClient:
     """Create a shared client instance for the test session."""
     client = FUSEClient(config.base_url)
@@ -39,7 +38,7 @@ def mutable_client(config) -> FUSEClient:
     # Session cleanup if needed
 
 
-@pytest.fixture  # (scope="session")
+@pytest.fixture(scope="session")
 async def aclient(config) -> AsyncGenerator[FUSEClient, None]:
     """Create a shared client instance for the test session."""
     client = FUSEAsyncClient(config.base_url)
@@ -64,18 +63,18 @@ import pytest
 from fuse import FUSEClient, FUSEException
 
 
+# @pytest.fixture(scope="session")
+# def config():
+#     class TestConfig:
+#         base_url = "http://localhost:7272"
+#         superuser_email = "admin@example.com"
+#         superuser_password = "change_me_immediately"
+#
+#     return TestConfig()
+
+
 @pytest.fixture(scope="session")
-def config():
-    class TestConfig:
-        base_url = "http://localhost:7272"
-        superuser_email = "admin@example.com"
-        superuser_password = "change_me_immediately"
-
-    return TestConfig()
-
-
-@pytest.fixture(scope="session")
-def client(config):
+def client(config) -> FUSEClient:
     """Create a client instance and log in as a superuser."""
     print(config.base_url)
     print(config.superuser_email)  # Add these before the login attempt

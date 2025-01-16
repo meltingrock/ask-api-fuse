@@ -102,38 +102,47 @@ def test_remove_non_member_user_from_collection(mutable_client):
     # Create a user and a collection
     user_email = f"user_{uuid.uuid4()}@test.com"
     password = "pwd123"
-    mutable_client.users.create(user_email, password)
-    mutable_client.users.login(user_email, password)
+    collection_id = None
 
-    # Create a collection by the same user
-    collection_resp = mutable_client.collections.create(
-        name="User Owned Collection"
-    )["results"]
-    collection_id = collection_resp["id"]
-    mutable_client.users.logout()
+    try:
+        # Create first user
+        mutable_client.users.create(user_email, password)
+        mutable_client.users.login(user_email, password)
 
-    # Create another user who will not be added to the collection
-    another_user_email = f"user2_{uuid.uuid4()}@test.com"
-    mutable_client.users.create(another_user_email, password)
-    mutable_client.users.login(another_user_email, password)
-    another_user_id = mutable_client.users.me()["results"]["id"]
-    mutable_client.users.logout()
+        # Create a collection by the same user
+        collection_resp = mutable_client.collections.create(
+            name="User Owned Collection"
+        )["results"]
+        collection_id = collection_resp["id"]
 
-    # Re-login as collection owner
-    mutable_client.users.login(user_email, password)
+        # Create second user
+        another_user_email = f"user2_{uuid.uuid4()}@test.com"
+        mutable_client.users.create(another_user_email, password)
+        mutable_client.users.login(another_user_email, password)
+        another_user_id = mutable_client.users.me()["results"]["id"]
+        mutable_client.users.logout()
 
-    # Attempt to remove the other user (who was never added)
-    with pytest.raises(FUSEException) as exc_info:
-        mutable_client.collections.remove_user(collection_id, another_user_id)
+        # Re-login as collection owner
+        mutable_client.users.login(user_email, password)
 
-    assert exc_info.value.status_code in [
-        400,
-        404,
-    ], "Wrong error code for removing non-member user"
+        # Test the main functionality
+        with pytest.raises(FUSEException) as exc_info:
+            mutable_client.collections.remove_user(collection_id, another_user_id)
 
-    # Cleanup
-    mutable_client.collections.delete(collection_id)
+        assert exc_info.value.status_code in [
+            400,
+            404,
+        ], "Wrong error code for removing non-member user"
 
+    finally:
+        # Cleanup with better error handling
+        if collection_id:
+            try:
+                # Make sure we're logged in as the owner for cleanup
+                mutable_client.users.login(user_email, password)
+                mutable_client.collections.delete(collection_id)
+            except FUSEException as e:
+                print(f"Cleanup warning: Failed to delete collection: {str(e)}")
 
 def test_delete_collection(client):
     # Create a collection and delete it

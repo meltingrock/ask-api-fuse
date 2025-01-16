@@ -65,7 +65,7 @@ class FUSEApp:
         )
 
         # Mount the FUSE application's FastAPI instance at your desired prefix
-        self.app.mount(path="/api/v3/fuse", app=self.app)
+        self.app.mount(path="/api/fuse/v3", app=self.app)
 
         @self.app.exception_handler(FUSEException)
         async def fuse_exception_handler(request: Request, exc: FUSEException):
