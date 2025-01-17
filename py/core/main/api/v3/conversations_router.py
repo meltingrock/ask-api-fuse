@@ -36,56 +36,6 @@ class ConversationsRouter(BaseRouterV3):
             "",
             summary="Create a new conversation",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.conversations.create()
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.conversations.create();
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse conversations create
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/conversations" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def create_conversation(
@@ -110,59 +60,6 @@ class ConversationsRouter(BaseRouterV3):
             "",
             summary="List conversations",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.conversations.list(
-                                offset=0,
-                                limit=10,
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.conversations.list();
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse conversations list
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/conversations?offset=0&limit=10" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def list_conversations(
@@ -424,60 +321,6 @@ class ConversationsRouter(BaseRouterV3):
             "/by-id/{id}",
             summary="Get conversation details",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.conversations.get(
-                                "123e4567-e89b-12d3-a456-426614174000"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.conversations.retrieve({
-                                    id: "123e4567-e89b-12d3-a456-426614174000",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse conversations retrieve 123e4567-e89b-12d3-a456-426614174000
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/conversations/123e4567-e89b-12d3-a456-426614174000" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_conversation(
@@ -505,61 +348,6 @@ class ConversationsRouter(BaseRouterV3):
             "/by-id/{id}",
             summary="Update conversation",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.conversations.update("123e4567-e89b-12d3-a456-426614174000", "new_name")
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.conversations.update({
-                                    id: "123e4567-e89b-12d3-a456-426614174000",
-                                    name: "new_name",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse conversations delete 123e4567-e89b-12d3-a456-426614174000
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/conversations/123e4567-e89b-12d3-a456-426614174000" \
-                                -H "Authorization: Bearer YOUR_API_KEY" \
-                                -H "Content-Type: application/json" \
-                                -d '{"name": "new_name"}'
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def update_conversation(
@@ -588,58 +376,6 @@ class ConversationsRouter(BaseRouterV3):
             "/by-id/{id}",
             summary="Delete conversation",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.conversations.delete("123e4567-e89b-12d3-a456-426614174000")
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.conversations.delete({
-                                    id: "123e4567-e89b-12d3-a456-426614174000",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse conversations delete 123e4567-e89b-12d3-a456-426614174000
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X DELETE "https://api.example.com/v3/conversations/123e4567-e89b-12d3-a456-426614174000" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def delete_conversation(
@@ -668,61 +404,6 @@ class ConversationsRouter(BaseRouterV3):
             "/by-id/{id}/messages",
             summary="Add message to conversation",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.conversations.add_message(
-                                "123e4567-e89b-12d3-a456-426614174000",
-                                content="Hello, world!",
-                                role="user",
-                                parent_id="parent_message_id",
-                                metadata={"key": "value"}
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.conversations.addMessage({
-                                    id: "123e4567-e89b-12d3-a456-426614174000",
-                                    content: "Hello, world!",
-                                    role: "user",
-                                    parentId: "parent_message_id",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/conversations/123e4567-e89b-12d3-a456-426614174000/messages" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" \\
-                                -H "Content-Type: application/json" \\
-                                -d '{"content": "Hello, world!", "parent_id": "parent_message_id", "metadata": {"key": "value"}}'
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def add_message(
@@ -764,58 +445,6 @@ class ConversationsRouter(BaseRouterV3):
             "/by-id/{id}/messages/{message_id}",
             summary="Update message in conversation",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.conversations.update_message(
-                                "123e4567-e89b-12d3-a456-426614174000",
-                                "message_id_to_update",
-                                content="Updated content"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.conversations.updateMessage({
-                                    id: "123e4567-e89b-12d3-a456-426614174000",
-                                    messageId: "message_id_to_update",
-                                    content: "Updated content",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/conversations/123e4567-e89b-12d3-a456-426614174000/messages/message_id_to_update" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" \\
-                                -H "Content-Type: application/json" \\
-                                -d '{"content": "Updated content"}'
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def update_message(

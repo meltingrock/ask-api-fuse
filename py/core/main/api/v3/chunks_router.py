@@ -47,26 +47,6 @@ class ChunksRouter(BaseRouterV3):
             "/search",
             summary="Search Chunks",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            response = client.chunks.search(
-                                query="search query",
-                                search_settings={
-                                    "limit": 10
-                                }
-                            )
-                            """
-                        ),
-                    }
-                ]
-            },
         )
         @self.base_endpoint
         async def search_chunks(
@@ -102,41 +82,6 @@ class ChunksRouter(BaseRouterV3):
             "/by-id/{id}",
             summary="Retrieve Chunk",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            response = client.chunks.retrieve(
-                                id="b4ac4dd6-5f27-596e-a55b-7cf242ca30aa"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.chunks.retrieve({
-                                    id: "b4ac4dd6-5f27-596e-a55b-7cf242ca30aa"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def retrieve_chunk(
@@ -175,47 +120,6 @@ class ChunksRouter(BaseRouterV3):
             "/by-id/{id}",
             summary="Update Chunk",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            response = client.chunks.update(
-                                {
-                                    "id": "b4ac4dd6-5f27-596e-a55b-7cf242ca30aa",
-                                    "text": "Updated content",
-                                    "metadata": {"key": "new value"}
-                                }
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.chunks.update({
-                                    id: "b4ac4dd6-5f27-596e-a55b-7cf242ca30aa",
-                                    text: "Updated content",
-                                    metadata: {key: "new value"}
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def update_chunk(
@@ -268,41 +172,6 @@ class ChunksRouter(BaseRouterV3):
             "/by-id/{id}",
             summary="Delete Chunk",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            response = client.chunks.delete(
-                                id="b4ac4dd6-5f27-596e-a55b-7cf242ca30aa"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.chunks.delete({
-                                    id: "b4ac4dd6-5f27-596e-a55b-7cf242ca30aa"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def delete_chunk(
@@ -339,47 +208,6 @@ class ChunksRouter(BaseRouterV3):
             "",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List Chunks",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            response = client.chunks.list(
-                                metadata_filter={"key": "value"},
-                                include_vectors=False,
-                                offset=0,
-                                limit=10,
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.chunks.list({
-                                    metadataFilter: {key: "value"},
-                                    includeVectors: false,
-                                    offset: 0,
-                                    limit: 10,
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def list_chunks(

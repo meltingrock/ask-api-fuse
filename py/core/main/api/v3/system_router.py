@@ -31,57 +31,6 @@ class SystemRouter(BaseRouterV3):
         @self.router.get(
             "/health",
             # dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.system.health()
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.system.health();
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse health
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/health"\\
-                                 -H "Content-Type: application/json" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY" \\
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def health_check() -> WrappedGenericMessageResponse:
@@ -90,57 +39,6 @@ class SystemRouter(BaseRouterV3):
         @self.router.get(
             "/settings",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.system.settings()
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.system.settings();
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse system settings
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/system/settings" \\
-                                 -H "Content-Type: application/json" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY" \\
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def app_settings(
@@ -156,57 +54,6 @@ class SystemRouter(BaseRouterV3):
         @self.router.get(
             "/status",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.system.status()
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.system.status();
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse system status
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/system/status" \\
-                                 -H "Content-Type: application/json" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY" \\
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def server_stats(

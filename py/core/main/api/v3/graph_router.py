@@ -83,39 +83,6 @@ class GraphRouter(BaseRouterV3):
             "",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List graphs",
-            openapi_extra={
-                "x-codeSamples": [
-                    {  # TODO: Verify
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.list()
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.graphs.list({});
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def list_graphs(
@@ -166,50 +133,6 @@ class GraphRouter(BaseRouterV3):
             "/by-id/{collection_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Retrieve graph details",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.get(
-                                collection_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                            )"""
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.graphs.retrieve({
-                                    collectionId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/graphs/d09dedb1-b2ab-48a5-b950-6e1f464d83e7" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_graph(
@@ -338,50 +261,6 @@ class GraphRouter(BaseRouterV3):
             "/by-id/{collection_id}/reset",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Reset a graph back to the initial state.",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.reset(
-                                collection_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                            )"""
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.graphs.reset({
-                                    collectionId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/graphs/d09dedb1-b2ab-48a5-b950-6e1f464d83e7/reset" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def reset(
@@ -418,48 +297,6 @@ class GraphRouter(BaseRouterV3):
             "/by-id/{collection_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Update graph",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.update(
-                                collection_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                graph={
-                                    "name": "New Name",
-                                    "description": "New Description"
-                                }
-                            )"""
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.graphs.update({
-                                    collection_id: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                    name: "New Name",
-                                    description: "New Description",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def update_graph(
@@ -918,45 +755,6 @@ class GraphRouter(BaseRouterV3):
         @self.router.get(
             "/by-id/{collection_id}/entities/{entity_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.get_entity(
-                                collection_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                entity_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.graphs.get_entity({
-                                    collectionId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                    entityId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_entity(
@@ -1045,45 +843,6 @@ class GraphRouter(BaseRouterV3):
             "/by-id/{collection_id}/entities/{entity_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Remove an entity",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.remove_entity(
-                                collection_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                entity_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.graphs.removeEntity({
-                                    collectionId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                    entityId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def delete_entity(
@@ -1540,41 +1299,6 @@ class GraphRouter(BaseRouterV3):
             "/by-id/{collection_id}/communities",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List communities",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.list_communities(collection_id="9fbe403b-c11c-5aae-8ade-ef22980c3ad1")
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.graphs.listCommunities({
-                                    collectionId: "9fbe403b-c11c-5aae-8ade-ef22980c3ad1",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_communities(
@@ -1622,41 +1346,6 @@ class GraphRouter(BaseRouterV3):
             "/by-id/{collection_id}/communities/{community_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Retrieve a community",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.get_community(collection_id="9fbe403b-c11c-5aae-8ade-ef22980c3ad1")
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.graphs.getCommunity({
-                                    collectionId: "9fbe403b-c11c-5aae-8ade-ef22980c3ad1",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_community(
@@ -1700,45 +1389,6 @@ class GraphRouter(BaseRouterV3):
             "/by-id/{collection_id}/communities/{community_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Delete a community",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.delete_community(
-                                collection_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                community_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.graphs.deleteCommunity({
-                                    collectionId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                    communityId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def delete_community(
@@ -1893,55 +1543,6 @@ class GraphRouter(BaseRouterV3):
             "/by-id/{collection_id}/communities/{community_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Update community",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.update_community(
-                                collection_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                community_update={
-                                    "metadata": {
-                                        "topic": "Technology",
-                                        "description": "Tech companies and products"
-                                    }
-                                }
-                            )"""
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            async function main() {
-                                const response = await client.graphs.updateCommunity({
-                                    collectionId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                    communityId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                    communityUpdate: {
-                                        metadata: {
-                                            topic: "Technology",
-                                            description: "Tech companies and products"
-                                        }
-                                    }
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def update_community(
@@ -1988,42 +1589,6 @@ class GraphRouter(BaseRouterV3):
             "/by-id/{collection_id}/pull",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Pull latest entities to the graph",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.pull(
-                                collection_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                            )"""
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            async function main() {
-                                const response = await client.graphs.pull({
-                                    collection_id: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def pull(

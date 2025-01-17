@@ -30,58 +30,6 @@ class PromptsRouter(BaseRouterV3):
             "",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Create a new prompt",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.prompts.create(
-                                name="greeting_prompt",
-                                template="Hello, {name}!",
-                                input_types={"name": "string"}
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.prompts.create({
-                                    name: "greeting_prompt",
-                                    template: "Hello, {name}!",
-                                    inputTypes: { name: "string" },
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/prompts" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" \\
-                                -H "Content-Type: application/json" \\
-                                -d '{"name": "greeting_prompt", "template": "Hello, {name}!", "input_types": {"name": "string"}}'
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def create_prompt(
@@ -114,56 +62,6 @@ class PromptsRouter(BaseRouterV3):
             "",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List all prompts",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.prompts.list()
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.prompts.list();
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse prompts list
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                                curl -X GET "https://api.example.com/v3/prompts" \\
-                                    -H "Authorization: Bearer YOUR_API_KEY"
-                                """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_prompts(
@@ -194,64 +92,6 @@ class PromptsRouter(BaseRouterV3):
             "/by-name/{name}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Get a specific prompt",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.prompts.get(
-                                "greeting_prompt",
-                                inputs={"name": "John"},
-                                prompt_override="Hi, {name}!"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.prompts.retrieve({
-                                    name: "greeting_prompt",
-                                    inputs: { name: "John" },
-                                    promptOverride: "Hi, {name}!",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse prompts retrieve greeting_prompt --inputs '{"name": "John"}' --prompt-override "Hi, {name}!"
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/prompts/greeting_prompt?inputs=%7B%22name%22%3A%22John%22%7D&prompt_override=Hi%2C%20%7Bname%7D!" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_prompt(
@@ -284,58 +124,6 @@ class PromptsRouter(BaseRouterV3):
             "/by-name/{name}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Update an existing prompt",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.prompts.update(
-                                "greeting_prompt",
-                                template="Greetings, {name}!",
-                                input_types={"name": "string", "age": "integer"}
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.prompts.update({
-                                    name: "greeting_prompt",
-                                    template: "Greetings, {name}!",
-                                    inputTypes: { name: "string", age: "integer" },
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X PUT "https://api.example.com/v3/prompts/greeting_prompt" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" \\
-                                -H "Content-Type: application/json" \\
-                                -d '{"template": "Greetings, {name}!", "input_types": {"name": "string", "age": "integer"}}'
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def update_prompt(
@@ -368,58 +156,6 @@ class PromptsRouter(BaseRouterV3):
             "/by-name/{name}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Delete a prompt",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.prompts.delete("greeting_prompt")
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.prompts.delete({
-                                    name: "greeting_prompt",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse prompts delete greeting_prompt
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X DELETE "https://api.example.com/v3/prompts/greeting_prompt" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def delete_prompt(

@@ -52,62 +52,6 @@ class UsersRouter(BaseRouterV3):
             "",
             # dependencies=[Depends(self.rate_limit_dependency)],
             response_model=WrappedUserResponse,
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            new_user = client.users.create(
-                                email="jane.doe@example.com",
-                                password="secure_password123"
-                            )"""
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.users.create({
-                                    email: "jane.doe@example.com",
-                                    password: "secure_password123"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse users create jane.doe@example.com secure_password123
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/users" \\
-                                -H "Content-Type: application/json" \\
-                                -d '{
-                                    "email": "jane.doe@example.com",
-                                    "password": "secure_password123"
-                                }'"""
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def register(
@@ -266,52 +210,6 @@ class UsersRouter(BaseRouterV3):
             "/verify-email",
             # dependencies=[Depends(self.rate_limit_dependency)],
             response_model=WrappedGenericMessageResponse,
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            tokens = client.users.verify_email(
-                                email="jane.doe@example.com",
-                                verification_code="1lklwal!awdclm"
-                            )"""
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.users.verifyEmail({
-                                    email: jane.doe@example.com",
-                                    verificationCode: "1lklwal!awdclm"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/users/login" \\
-                                -H "Content-Type: application/x-www-form-urlencoded" \\
-                                -d "email=jane.doe@example.com&verification_code=1lklwal!awdclm"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def verify_email(
@@ -343,50 +241,6 @@ class UsersRouter(BaseRouterV3):
                 Depends(self.providers.auth.auth_wrapper(public=True))
             ],
             response_model=WrappedGenericMessageResponse,
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            tokens = client.users.send_verification_email(
-                                email="jane.doe@example.com",
-                            )"""
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.users.sendVerificationEmail({
-                                    email: jane.doe@example.com",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/users/send-verification-email" \\
-                                -H "Content-Type: application/x-www-form-urlencoded" \\
-                                -d "email=jane.doe@example.com"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def send_verification_email(
@@ -411,53 +265,6 @@ class UsersRouter(BaseRouterV3):
             "/login",
             # dependencies=[Depends(self.rate_limit_dependency)],
             response_model=WrappedTokenResponse,
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            tokens = client.users.login(
-                                email="jane.doe@example.com",
-                                password="secure_password123"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.users.login({
-                                    email: jane.doe@example.com",
-                                    password: "secure_password123"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/users/login" \\
-                                -H "Content-Type: application/x-www-form-urlencoded" \\
-                                -d "username=jane.doe@example.com&password=secure_password123"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def login(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -469,47 +276,6 @@ class UsersRouter(BaseRouterV3):
         @self.router.post(
             "/logout",
             response_model=WrappedGenericMessageResponse,
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # client.login(...)
-                            result = client.users.logout()
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.users.logout();
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/users/logout" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def logout(
@@ -523,50 +289,6 @@ class UsersRouter(BaseRouterV3):
         @self.router.post(
             "/refresh-token",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # client.login(...)
-
-                            new_tokens = client.users.refresh_token()
-                            # New tokens are automatically stored in the client"""
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.users.refreshAccessToken();
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/users/refresh-token" \\
-                                -H "Content-Type: application/json" \\
-                                -d '{
-                                    "refresh_token": "YOUR_REFRESH_TOKEN"
-                                }'"""
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def refresh_token(
@@ -582,57 +304,6 @@ class UsersRouter(BaseRouterV3):
             "/change-password",
             dependencies=[Depends(self.rate_limit_dependency)],
             response_model=WrappedGenericMessageResponse,
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # client.login(...)
-
-                            result = client.users.change_password(
-                                current_password="old_password123",
-                                new_password="new_secure_password456"
-                            )"""
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.users.changePassword({
-                                    currentPassword: "old_password123",
-                                    newPassword: "new_secure_password456"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/users/change-password" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" \\
-                                -H "Content-Type: application/json" \\
-                                -d '{
-                                    "current_password": "old_password123",
-                                    "new_password": "new_secure_password456"
-                                }'"""
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def change_password(
@@ -652,51 +323,6 @@ class UsersRouter(BaseRouterV3):
                 Depends(self.providers.auth.auth_wrapper(public=True))
             ],
             response_model=WrappedGenericMessageResponse,
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            result = client.users.request_password_reset(
-                                email="jane.doe@example.com"
-                            )"""
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.users.requestPasswordReset({
-                                    email: jane.doe@example.com",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/users/request-password-reset" \\
-                                -H "Content-Type: application/json" \\
-                                -d '{
-                                    "email": "jane.doe@example.com"
-                                }'"""
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def request_password_reset(
@@ -712,54 +338,6 @@ class UsersRouter(BaseRouterV3):
                 Depends(self.providers.auth.auth_wrapper(public=True))
             ],
             response_model=WrappedGenericMessageResponse,
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            result = client.users.reset_password(
-                                reset_token="reset_token_received_via_email",
-                                new_password="new_secure_password789"
-                            )"""
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.users.resetPassword({
-                                    resestToken: "reset_token_received_via_email",
-                                    newPassword: "new_secure_password789"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/users/reset-password" \\
-                                -H "Content-Type: application/json" \\
-                                -d '{
-                                    "reset_token": "reset_token_received_via_email",
-                                    "new_password": "new_secure_password789"
-                                }'"""
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def reset_password(
@@ -776,60 +354,6 @@ class UsersRouter(BaseRouterV3):
             "",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List Users",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # client.login(...)
-
-                            # List users with filters
-                            users = client.users.list(
-                                offset=0,
-                                limit=100,
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.users.list();
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse users list
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "Shell",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/users?offset=0&limit=100&username=john&email=john@example.com&is_active=true&is_superuser=false" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def list_users(
@@ -883,57 +407,6 @@ class UsersRouter(BaseRouterV3):
             "/me",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Get the Current User",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # client.login(...)
-
-                            # Get user details
-                            users = client.users.me()
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.users.retrieve();
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse users me
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "Shell",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/users/me" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_current_user(
@@ -948,61 +421,6 @@ class UsersRouter(BaseRouterV3):
             "/by-id/{id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Get User Details",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # client.login(...)
-
-                            # Get user details
-                            users = client.users.retrieve(
-                                id="b4ac4dd6-5f27-596e-a55b-7cf242ca30aa"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.users.retrieve({
-                                    id: "b4ac4dd6-5f27-596e-a55b-7cf242ca30aa"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse users retrieve b4ac4dd6-5f27-596e-a55b-7cf242ca30aa
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "Shell",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/users/550e8400-e29b-41d4-a716-446655440000" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_user(
@@ -1035,43 +453,6 @@ class UsersRouter(BaseRouterV3):
             "/by-id/{id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Delete User",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                        from fuse import FUSEClient
-
-                        client = FUSEClient()
-                        # client.login(...)
-
-                        # Delete user
-                        client.users.delete(id="550e8400-e29b-41d4-a716-446655440000", password="secure_password123")
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                        const { fuseClient } = require("fuse-js");
-
-                        const client = new fuseClient();
-
-                        function main() {
-                            const response = await client.users.delete({
-                                id: "550e8400-e29b-41d4-a716-446655440000",
-                                password: "secure_password123"
-                            });
-                        }
-
-                        main();
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def delete_user(
@@ -1109,65 +490,6 @@ class UsersRouter(BaseRouterV3):
             "/by-id/{id}/collections",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Get User Collections",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # client.login(...)
-
-                            # Get user collections
-                            collections = client.user.list_collections(
-                                "550e8400-e29b-41d4-a716-446655440000",
-                                offset=0,
-                                limit=100
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.users.listCollections({
-                                    id: "550e8400-e29b-41d4-a716-446655440000",
-                                    offset: 0,
-                                    limit: 100
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse users list-collections 550e8400-e29b-41d4-a716-446655440000
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "Shell",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/users/550e8400-e29b-41d4-a716-446655440000/collections?offset=0&limit=100" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_user_collections(
@@ -1212,63 +534,6 @@ class UsersRouter(BaseRouterV3):
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Add User to Collection",
             response_model=WrappedBooleanResponse,
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # client.login(...)
-
-                            # Add user to collection
-                            client.users.add_to_collection(
-                                id="550e8400-e29b-41d4-a716-446655440000",
-                                collection_id="750e8400-e29b-41d4-a716-446655440000"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.users.addToCollection({
-                                    id: "550e8400-e29b-41d4-a716-446655440000",
-                                    collectionId: "750e8400-e29b-41d4-a716-446655440000"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse users add-to-collection 550e8400-e29b-41d4-a716-446655440000 750e8400-e29b-41d4-a716-446655440000
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "Shell",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/users/550e8400-e29b-41d4-a716-446655440000/collections/750e8400-e29b-41d4-a716-446655440000" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def add_user_to_collection(
@@ -1296,63 +561,6 @@ class UsersRouter(BaseRouterV3):
             "/by-id/{id}/collections/{collection_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Remove User from Collection",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # client.login(...)
-
-                            # Remove user from collection
-                            client.users.remove_from_collection(
-                                id="550e8400-e29b-41d4-a716-446655440000",
-                                collection_id="750e8400-e29b-41d4-a716-446655440000"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.users.removeFromCollection({
-                                    id: "550e8400-e29b-41d4-a716-446655440000",
-                                    collectionId: "750e8400-e29b-41d4-a716-446655440000"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse users remove-from-collection 550e8400-e29b-41d4-a716-446655440000 750e8400-e29b-41d4-a716-446655440000
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "Shell",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X DELETE "https://api.example.com/users/550e8400-e29b-41d4-a716-446655440000/collections/750e8400-e29b-41d4-a716-446655440000" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def remove_user_from_collection(
@@ -1384,60 +592,6 @@ class UsersRouter(BaseRouterV3):
             "/by-id/{id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Update User",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # client.login(...)
-
-                            # Update user
-                            updated_user = client.update_user(
-                                "550e8400-e29b-41d4-a716-446655440000",
-                                name="John Doe"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.users.update({
-                                    id: "550e8400-e29b-41d4-a716-446655440000",
-                                    name: "John Doe"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "Shell",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/users/550e8400-e29b-41d4-a716-446655440000" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" \\
-                                -H "Content-Type: application/json" \\
-                                -d '{
-                                    "id": "550e8400-e29b-41d4-a716-446655440000",
-                                    "name": "John Doe",
-                                }'
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         # TODO - Modify update user to have synced params with user object
         @self.base_endpoint
@@ -1568,34 +722,6 @@ class UsersRouter(BaseRouterV3):
             "/by-id/{id}/api-keys",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List User API Keys",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # client.login(...)
-
-                            keys = client.users.list_api_keys(
-                                id="550e8400-e29b-41d4-a716-446655440000"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/users/550e8400-e29b-41d4-a716-446655440000/api-keys" \\
-                                -H "Authorization: Bearer YOUR_API_TOKEN"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def list_user_api_keys(
@@ -1625,36 +751,6 @@ class UsersRouter(BaseRouterV3):
             "/by-id/{id}/api-keys/{key_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Delete User API Key",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-                            from uuid import UUID
-
-                            client = FUSEClient()
-                            # client.login(...)
-
-                            response = client.users.delete_api_key(
-                                id="550e8400-e29b-41d4-a716-446655440000",
-                                key_id="d9c562d4-3aef-43e8-8f08-0cf7cd5e0a25"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X DELETE "https://api.example.com/users/550e8400-e29b-41d4-a716-446655440000/api-keys/d9c562d4-3aef-43e8-8f08-0cf7cd5e0a25" \\
-                                -H "Authorization: Bearer YOUR_API_TOKEN"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def delete_user_api_key(
@@ -1696,46 +792,6 @@ class UsersRouter(BaseRouterV3):
                     "description": "If the requesting user is neither the same user nor a superuser."
                 },
                 404: {"description": "If the user ID does not exist."},
-            },
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # client.login(...)
-
-                            user_limits = client.users.get_limits("550e8400-e29b-41d4-a716-446655440000")
-                        """,
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-                            // await client.users.login(...)
-
-                            async function main() {
-                                const userLimits = await client.users.getLimits({
-                                    id: "550e8400-e29b-41d4-a716-446655440000"
-                                });
-                                console.log(userLimits);
-                            }
-
-                            main();
-                        """,
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": """
-                            curl -X GET "https://api.example.com/v3/users/550e8400-e29b-41d4-a716-446655440000/limits" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                        """,
-                    },
-                ]
             },
         )
         @self.base_endpoint

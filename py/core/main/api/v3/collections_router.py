@@ -94,64 +94,6 @@ class CollectionsRouter(BaseRouterV3):
             "",
             summary="Create a new collection",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.create(
-                                name="My New Collection",
-                                description="This is a sample collection"
-                            )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.collections.create({
-                                    name: "My New Collection",
-                                    description: "This is a sample collection"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse collections create "My New Collection" --description="This is a sample collection"
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/collections" \\
-                                 -H "Content-Type: application/json" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY" \\
-                                 -d '{"name": "My New Collection", "description": "This is a sample collection"}'
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def create_collection(
@@ -303,59 +245,6 @@ class CollectionsRouter(BaseRouterV3):
             "",
             summary="List collections",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.list(
-                                offset=0,
-                                limit=10,
-                            )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.collections.list();
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse collections list
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/collections?offset=0&limit=10&name=Sample" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY"
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def list_collections(
@@ -412,56 +301,6 @@ class CollectionsRouter(BaseRouterV3):
             "/by-id/{id}",
             summary="Get collection details",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.retrieve("123e4567-e89b-12d3-a456-426614174000")
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.collections.retrieve({id: "123e4567-e89b-12d3-a456-426614174000"});
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse collections retrieve 123e4567-e89b-12d3-a456-426614174000
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/collections/123e4567-e89b-12d3-a456-426614174000" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY"
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_collection(
@@ -501,58 +340,6 @@ class CollectionsRouter(BaseRouterV3):
             "/by-id/{id}",
             summary="Update collection",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.update(
-                                "123e4567-e89b-12d3-a456-426614174000",
-                                name="Updated Collection Name",
-                                description="Updated description"
-                            )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.collections.update({
-                                    id: "123e4567-e89b-12d3-a456-426614174000",
-                                    name: "Updated Collection Name",
-                                    description: "Updated description"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/collections/123e4567-e89b-12d3-a456-426614174000" \\
-                                 -H "Content-Type: application/json" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY" \\
-                                 -d '{"name": "Updated Collection Name", "description": "Updated description"}'
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def update_collection(
@@ -599,56 +386,6 @@ class CollectionsRouter(BaseRouterV3):
             "/by-id/{id}",
             summary="Delete collection",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.delete("123e4567-e89b-12d3-a456-426614174000")
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.collections.delete({id: "123e4567-e89b-12d3-a456-426614174000"});
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse collections delete 123e4567-e89b-12d3-a456-426614174000
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X DELETE "https://api.example.com/v3/collections/123e4567-e89b-12d3-a456-426614174000" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY"
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def delete_collection(
@@ -676,54 +413,6 @@ class CollectionsRouter(BaseRouterV3):
             "/by-id/{id}/documents/{document_id}",
             summary="Add document to collection",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.add_document(
-                                "123e4567-e89b-12d3-a456-426614174000",
-                                "456e789a-b12c-34d5-e678-901234567890"
-                            )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.collections.addDocument({
-                                    id: "123e4567-e89b-12d3-a456-426614174000"
-                                    documentId: "456e789a-b12c-34d5-e678-901234567890"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/collections/123e4567-e89b-12d3-a456-426614174000/documents/456e789a-b12c-34d5-e678-901234567890" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY"
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def add_document_to_collection(
@@ -748,60 +437,6 @@ class CollectionsRouter(BaseRouterV3):
             "/by-id/{id}/documents",
             summary="List documents in collection",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.list_documents(
-                                "123e4567-e89b-12d3-a456-426614174000",
-                                offset=0,
-                                limit=10,
-                            )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.collections.listDocuments({id: "123e4567-e89b-12d3-a456-426614174000"});
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse collections list-documents 123e4567-e89b-12d3-a456-426614174000
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/collections/123e4567-e89b-12d3-a456-426614174000/documents?offset=0&limit=10" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY"
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_collection_documents(
@@ -847,54 +482,6 @@ class CollectionsRouter(BaseRouterV3):
             "/by-id/{id}/documents/{document_id}",
             summary="Remove document from collection",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.remove_document(
-                                "123e4567-e89b-12d3-a456-426614174000",
-                                "456e789a-b12c-34d5-e678-901234567890"
-                            )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.collections.removeDocument({
-                                    id: "123e4567-e89b-12d3-a456-426614174000"
-                                    documentId: "456e789a-b12c-34d5-e678-901234567890"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X DELETE "https://api.example.com/v3/collections/123e4567-e89b-12d3-a456-426614174000/documents/456e789a-b12c-34d5-e678-901234567890" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY"
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def remove_document_from_collection(
@@ -925,62 +512,6 @@ class CollectionsRouter(BaseRouterV3):
             "/by-id/{id}/users",
             summary="List users in collection",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.list_users(
-                                "123e4567-e89b-12d3-a456-426614174000",
-                                offset=0,
-                                limit=10,
-                            )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.collections.listUsers({
-                                    id: "123e4567-e89b-12d3-a456-426614174000"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse collections list-users 123e4567-e89b-12d3-a456-426614174000
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/collections/123e4567-e89b-12d3-a456-426614174000/users?offset=0&limit=10" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY"
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_collection_users(
@@ -1026,54 +557,6 @@ class CollectionsRouter(BaseRouterV3):
             "/by-id/{id}/users/{user_id}",
             summary="Add user to collection",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.add_user(
-                                "123e4567-e89b-12d3-a456-426614174000",
-                                "789a012b-c34d-5e6f-g789-012345678901"
-                            )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.collections.addUser({
-                                    id: "123e4567-e89b-12d3-a456-426614174000"
-                                    userId: "789a012b-c34d-5e6f-g789-012345678901"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/collections/123e4567-e89b-12d3-a456-426614174000/users/789a012b-c34d-5e6f-g789-012345678901" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY"
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def add_user_to_collection(
@@ -1104,54 +587,6 @@ class CollectionsRouter(BaseRouterV3):
             "/by-id/{id}/users/{user_id}",
             summary="Remove user from collection",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.remove_user(
-                                "123e4567-e89b-12d3-a456-426614174000",
-                                "789a012b-c34d-5e6f-g789-012345678901"
-                            )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.collections.removeUser({
-                                    id: "123e4567-e89b-12d3-a456-426614174000"
-                                    userId: "789a012b-c34d-5e6f-g789-012345678901"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X DELETE "https://api.example.com/v3/collections/123e4567-e89b-12d3-a456-426614174000/users/789a012b-c34d-5e6f-g789-012345678901" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY"
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def remove_user_from_collection(
