@@ -192,67 +192,6 @@ class DocumentsRouter(BaseRouterV3):
             dependencies=[Depends(self.rate_limit_dependency)],
             status_code=202,
             summary="Create a new document",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.documents.create(
-                                file_path="pg_essay_1.html",
-                                metadata={"metadata_1":"some random metadata"},
-                                id=None
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.documents.create({
-                                    file: { path: "examples/data/marmeladov.txt", name: "marmeladov.txt" },
-                                    metadata: { title: "marmeladov.txt" },
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse documents create /path/to/file.txt
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/documents" \\
-                            -H "Content-Type: multipart/form-data" \\
-                            -H "Authorization: Bearer YOUR_API_KEY" \\
-                            -F "file=@pg_essay_1.html;type=text/html" \\
-                            -F 'metadata={}' \\
-                            -F 'id=null'
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def create_document(
@@ -785,62 +724,6 @@ class DocumentsRouter(BaseRouterV3):
             "",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List documents",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.documents.list(
-                                limit=10,
-                                offset=0
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.documents.list({
-                                    limit: 10,
-                                    offset: 0,
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse documents create /path/to/file.txt
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/documents"  \\
-                            -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_documents(
@@ -907,60 +790,6 @@ class DocumentsRouter(BaseRouterV3):
             "/by-id/{id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Retrieve a document",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.documents.retrieve(
-                                id="b4ac4dd6-5f27-596e-a55b-7cf242ca30aa"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.documents.retrieve({
-                                    id: "b4ac4dd6-5f27-596e-a55b-7cf242ca30aa",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse documents retrieve b4ac4dd6-5f27-596e-a55b-7cf242ca30aa
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/documents/b4ac4dd6-5f27-596e-a55b-7cf242ca30aa"  \\
-                            -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_document(
@@ -1003,60 +832,6 @@ class DocumentsRouter(BaseRouterV3):
             "/by-id/{id}/chunks",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List document chunks",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.documents.list_chunks(
-                                id="32b6a70f-a995-5c51-85d2-834f06283a1e"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.documents.listChunks({
-                                    id: "32b6a70f-a995-5c51-85d2-834f06283a1e",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse documents list-chunks b4ac4dd6-5f27-596e-a55b-7cf242ca30aa
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/documents/b4ac4dd6-5f27-596e-a55b-7cf242ca30aa/chunks"  \\
-                            -H "Authorization: Bearer YOUR_API_KEY"\
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def list_chunks(
@@ -1137,52 +912,6 @@ class DocumentsRouter(BaseRouterV3):
             dependencies=[Depends(self.rate_limit_dependency)],
             response_class=StreamingResponse,
             summary="Download document content",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.documents.download(
-                                id="b4ac4dd6-5f27-596e-a55b-7cf242ca30aa"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.documents.download({
-                                    id: "b4ac4dd6-5f27-596e-a55b-7cf242ca30aa",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/documents/b4ac4dd6-5f27-596e-a55b-7cf242ca30aa/download"  \\
-                            -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_document_file(
@@ -1282,32 +1011,6 @@ class DocumentsRouter(BaseRouterV3):
             "/by-filter",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Delete documents by filter",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-                            response = client.documents.delete_by_filter(
-                                filters={"document_type": {"$eq": "txt"}}
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X DELETE "https://api.example.com/v3/documents/by-filter?filters=%7B%22document_type%22%3A%7B%22%24eq%22%3A%22text%22%7D%2C%22created_at%22%3A%7B%22%24lt%22%3A%222023-01-01T00%3A00%3A00Z%22%7D%7D" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def delete_document_by_filter(
@@ -1336,60 +1039,6 @@ class DocumentsRouter(BaseRouterV3):
             "/by-id/{id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Delete a document",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.documents.delete(
-                                id="b4ac4dd6-5f27-596e-a55b-7cf242ca30aa"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.documents.delete({
-                                    id: "b4ac4dd6-5f27-596e-a55b-7cf242ca30aa",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse documents delete b4ac4dd6-5f27-596e-a55b-7cf242ca30aa
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X DELETE "https://api.example.com/v3/documents/b4ac4dd6-5f27-596e-a55b-7cf242ca30aa" \\
-                            -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def delete_document_by_id(
@@ -1417,60 +1066,6 @@ class DocumentsRouter(BaseRouterV3):
             "/by-id/{id}/collections",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List document collections",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.documents.list_collections(
-                                id="b4ac4dd6-5f27-596e-a55b-7cf242ca30aa", offset=0, limit=10
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.documents.listCollections({
-                                    id: "b4ac4dd6-5f27-596e-a55b-7cf242ca30aa",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse documents list-collections b4ac4dd6-5f27-596e-a55b-7cf242ca30aa
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/documents/b4ac4dd6-5f27-596e-a55b-7cf242ca30aa/collections"  \\
-                            -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_document_collections(
@@ -2023,64 +1618,6 @@ class DocumentsRouter(BaseRouterV3):
             "/by-id/{id}/relationships",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List document relationships",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from fuse import FUSEClient
-
-                            client = FUSEClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.documents.list_relationships(
-                                id="b4ac4dd6-5f27-596e-a55b-7cf242ca30aa",
-                                offset=0,
-                                limit=100
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { fuseClient } = require("fuse-js");
-
-                            const client = new fuseClient();
-
-                            function main() {
-                                const response = await client.documents.listRelationships({
-                                    id: "b4ac4dd6-5f27-596e-a55b-7cf242ca30aa",
-                                    offset: 0,
-                                    limit: 100,
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            fuse documents list-relationships b4ac4dd6-5f27-596e-a55b-7cf242ca30aa
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/documents/b4ac4dd6-5f27-596e-a55b-7cf242ca30aa/relationships" \\
-                            -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_relationships(
