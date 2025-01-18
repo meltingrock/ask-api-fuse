@@ -15,9 +15,16 @@ curl -sSL https://install.python-poetry.org | python3 -
 echo "export PATH=\"\$HOME/.local/bin:\$PATH\"" >> ~/.bashrc
 source ~/.bashrc
 
+# Add poetry to venv activation script
+echo 'export PATH="$HOME/.local/bin:$PATH' >> venv/bin/activate
+
 # Verify installation
 poetry --version
 
+# Install dependencies
+poetry install --no-root
+
+#### To build a package do the following:
 Method 1: Build and Install from Wheel/Distribution
 1. Navigate to project's Python directory:
 cd ./py
@@ -28,5 +35,6 @@ poetry build
 3. Install the built package using pip:
 # Install from wheel (recommended)
 pip3 install  --force-reinstall dist/fuse-3.3.28-py3-none-any.whl
+
 
 
