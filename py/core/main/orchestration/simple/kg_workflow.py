@@ -4,7 +4,7 @@ import math
 import uuid
 
 from core import GenerationConfig, R2RException
-from core.base.abstractions import KGEnrichmentStatus
+from core.base.abstractions import KGEnrichmentStatus, KGExtractionStatus
 
 from ...services import GraphService
 
@@ -79,6 +79,13 @@ def simple_kg_factory(service: GraphService):
         )
 
         for _, document_id in enumerate(document_ids):
+
+            await service.providers.database.documents_handler.set_workflow_status(
+                id=document_id,
+                status_type="extraction_status",
+                status=KGExtractionStatus.PROCESSING,
+            )
+
             # Extract relationships from the document
             try:
                 extractions = []
@@ -94,6 +101,13 @@ def simple_kg_factory(service: GraphService):
                     document_id=document_id,
                     **input_data["graph_creation_settings"],
                 )
+
+                if (
+                    service.providers.database.config.graph_creation_settings.automatic_deduplication
+                ):
+                    logger.warning(
+                        "Automatic deduplication is not yet implemented for `simple` workflows."
+                    )
 
             except Exception as e:
                 logger.error(
@@ -174,8 +188,15 @@ def simple_kg_factory(service: GraphService):
             **input_data["graph_enrichment_settings"],
         )
 
+    async def deduplicate_document_entities(input_data):
+        input_data = get_input_data_dict(input_data)
+        await service.deduplicate_document_entities(
+            document_id=input_data.get("document_id", None),
+        )
+
     return {
         "extract-triples": extract_triples,
         "build-communities": enrich_graph,
         "kg-community-summary": kg_community_summary,
+        "deduplicate-document-entities": deduplicate_document_entities,
     }
