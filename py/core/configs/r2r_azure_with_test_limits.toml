@@ -1,4 +1,4 @@
-# A config which overrides all instances of `openai` with `azure` in the `r2r.toml` config
+# A config which overrides all instances of `openai` with `azure` in the `fuse.toml` config
 [agent]
   [agent.generation_config]
   model = "azure/gpt-4o"
@@ -43,7 +43,7 @@ base_dimension = 512
 provider = "postgres"
 
 [ingestion]
-provider = "r2r"
+provider = "fuse"
 chunking_strategy = "recursive"
 chunk_size = 1_024
 chunk_overlap = 512

@@ -1,0 +1,182 @@
+# FUSE RAG Chat Application Documentation
+
+## Project Structure
+```
+ask-web-fuse/
+├── api/
+│   ├── __init__.py          # API module initialization
+│   ├── exceptions.py        # Custom API exceptions
+│   └── rag_client.py        # RAG API client implementation
+├── components/
+│   ├── __init__.py          # Components module initialization
+│   ├── chat.py             # Chat interface components
+│   ├── settings.py         # Settings interface components
+│   └── sidebar.py          # Sidebar navigation component
+├── config/
+│   ├── __init__.py          # Configuration module initialization
+│   ├── config.json         # Application configuration file
+│   ├── constants.py        # Application constants
+│   └── settings.py         # Settings management
+├── models/
+│   ├── __init__.py          # Models module initialization
+│   ├── api.py              # API-related data models
+│   └── chat.py             # Chat-related data models
+└── main.py                 # Application entry point
+```
+
+## Flow Description for /agent API Call
+
+### 1. Entry Point (main.py)
+- Purpose: Application initialization and routing
+- Key Functions:
+  - Initializes settings
+  - Sets up logging
+  - Creates RAG client
+  - Renders main interface
+
+### 2. User Interface (components/chat.py)
+- Purpose: Handles chat interface and user interactions
+- Key Functions:
+  - render_chat_interface(): Displays chat UI
+  - handle_streaming_response(): Processes streaming responses
+  - initialize_chat_state(): Sets up chat state
+
+### 3. Settings Management (config/settings.py)
+- Purpose: Manages application settings
+- Key Functions:
+  - get_settings(): Retrieves current settings
+  - get_search_config(): Gets search configuration
+  - get_generation_config(): Gets generation configuration
+
+### 4. Data Models (models/chat.py)
+- Purpose: Defines data structures and validation
+- Key Models:
+  - Message: Chat message structure
+  - SearchConfig: Search settings structure
+  - GenerationConfig: Generation settings structure
+  - ChatResponse: Response structure
+
+### 5. API Client (api/rag_client.py)
+- Purpose: Handles API communication
+- Key Functions:
+  - chat(): Sends messages to API
+  - _make_request(): Makes HTTP requests
+  - handle_streaming_response(): Processes streams
+
+## Flow When Making an /agent API Call
+
+1. **User Input Phase**
+   ```plaintext
+   User types message -> components/chat.py (render_chat_interface)
+   -> Creates Message object -> Adds to session state
+   ```
+
+2. **Settings Preparation**
+   ```plaintext
+   config/settings.py (get_settings)
+   -> Loads search configuration
+   -> Loads generation configuration
+   -> Validates settings using models
+   ```
+
+3. **API Request Preparation**
+   ```plaintext
+   api/rag_client.py (chat method)
+   -> Creates Message object from user input
+   -> Gets configurations from settings
+   -> Builds request payload
+   ```
+
+4. **Request Execution**
+   ```plaintext
+   api/rag_client.py (_make_request)
+   -> Sends POST to /retrieval/agent
+   -> Handles authentication
+   -> Manages streaming
+   ```
+
+5. **Response Processing**
+   ```plaintext
+   components/chat.py (handle_streaming_response)
+   -> Receives streaming chunks
+   -> Updates UI with responses
+   -> Handles errors
+   ```
+
+## Key Files and Their Purposes
+
+1. **models/chat.py**
+   - Contains all data models using Pydantic
+   - Validates request/response structures
+   - Provides factory functions for creating messages
+
+2. **config/settings.py**
+   - Manages application settings
+   - Provides configuration validation
+   - Handles settings persistence
+
+3. **api/rag_client.py**
+   - Handles all API communication
+   - Manages authentication
+   - Handles streaming responses
+
+4. **components/chat.py**
+   - Manages chat UI
+   - Handles user interactions
+   - Processes responses
+
+## Debugging Guide
+
+1. **UI Issues**
+   - Check components/chat.py for UI rendering
+   - Verify session state in components/chat.py
+
+2. **API Issues**
+   - Check api/rag_client.py logs
+   - Verify request payload formation
+   - Check authentication headers
+
+3. **Settings Issues**
+   - Check config/settings.py for configuration
+   - Verify settings validation in models
+
+4. **Data Model Issues**
+   - Check models/chat.py for model definitions
+   - Verify payload matches API expectations
+
+## Common Error Points
+
+1. **422 Unprocessable Entity**
+   - Check request payload format in rag_client.py
+   - Verify Message object structure
+   - Check SearchConfig and GenerationConfig
+
+2. **401 Unauthorized**
+   - Check API key in settings
+   - Verify authentication header in rag_client.py
+
+3. **Streaming Issues**
+   - Check stream handling in rag_client.py
+   - Verify UI updates in components/chat.py
+
+## Key Configurations
+
+1. **Search Settings**
+   ```python
+   {
+       "search_mode": "advanced",
+       "use_semantic_search": True,
+       "use_hybrid_search": False,
+       "limit": 10
+   }
+   ```
+
+2. **Generation Settings**
+   ```python
+   {
+       "model": "gpt-4o-mini",
+       "temperature": 0.7,
+       "top_p": 0.9,
+       "max_tokens_to_sample": 1024
+   }
+   ```

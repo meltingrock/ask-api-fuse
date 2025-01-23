@@ -28,7 +28,7 @@ type RefreshTokenResponse = {
   };
 };
 
-interface R2RClientOptions {
+interface FUSEClientOptions {
   enableAutoRefresh?: boolean;
   getTokensCallback?: () => {
     accessToken: string | null;
@@ -41,7 +41,7 @@ interface R2RClientOptions {
   onRefreshFailedCallback?: () => void;
 }
 
-export class r2rClient extends BaseClient {
+export class fuseClient extends BaseClient {
   public readonly chunks: ChunksClient;
   public readonly collections: CollectionsClient;
   public readonly conversations: ConversationsClient;
@@ -53,18 +53,18 @@ export class r2rClient extends BaseClient {
   public readonly system: SystemClient;
   public readonly users: UsersClient;
 
-  private getTokensCallback?: R2RClientOptions["getTokensCallback"];
-  private setTokensCallback?: R2RClientOptions["setTokensCallback"];
-  private onRefreshFailedCallback?: R2RClientOptions["onRefreshFailedCallback"];
+  private getTokensCallback?: FUSEClientOptions["getTokensCallback"];
+  private setTokensCallback?: FUSEClientOptions["setTokensCallback"];
+  private onRefreshFailedCallback?: FUSEClientOptions["onRefreshFailedCallback"];
 
   constructor(
     baseURL: string,
     anonymousTelemetry = true,
-    options: R2RClientOptions = {},
+    options: FUSEClientOptions = {},
   ) {
     super(baseURL, "", anonymousTelemetry, options.enableAutoRefresh);
 
-    console.log("[r2rClient] Creating new client with baseURL =", baseURL);
+    console.log("[fuseClient] Creating new client with baseURL =", baseURL);
 
     this.chunks = new ChunksClient(this);
     this.collections = new CollectionsClient(this);
@@ -97,7 +97,7 @@ export class r2rClient extends BaseClient {
         const accessToken = tokenData?.accessToken || null;
         if (accessToken) {
           console.log(
-            `[r2rClient] Attaching access token to request: ${accessToken.slice(
+            `[fuseClient] Attaching access token to request: ${accessToken.slice(
               0,
               15,
             )}...`,
@@ -105,13 +105,13 @@ export class r2rClient extends BaseClient {
           config.headers["Authorization"] = `Bearer ${accessToken}`;
         } else {
           console.log(
-            "[r2rClient] No access token found, sending request without Authorization header",
+            "[fuseClient] No access token found, sending request without Authorization header",
           );
         }
         return config;
       },
       (error) => {
-        console.error("[r2rClient] Request interceptor error:", error);
+        console.error("[fuseClient] Request interceptor error:", error);
         return Promise.reject(error);
       },
     );
@@ -125,7 +125,7 @@ export class r2rClient extends BaseClient {
       (response) => response,
       async (error: AxiosError) => {
         console.warn(
-          "[r2rClient] Response interceptor caught an error:",
+          "[fuseClient] Response interceptor caught an error:",
           error,
         );
 
@@ -137,7 +137,7 @@ export class r2rClient extends BaseClient {
         };
 
         console.warn(
-          "[r2rClient] Failing request URL:",
+          "[fuseClient] Failing request URL:",
           failingUrl,
           "status =",
           status,
@@ -150,7 +150,7 @@ export class r2rClient extends BaseClient {
         // 1) If the refresh endpoint itself fails => don't try again
         if (failingUrl?.includes("/v3/users/refresh-token")) {
           console.error(
-            "[r2rClient] Refresh call itself returned 401/403 => logging out",
+            "[fuseClient] Refresh call itself returned 401/403 => logging out",
           );
           this.onRefreshFailedCallback?.();
           return Promise.reject(error);
@@ -181,21 +181,21 @@ export class r2rClient extends BaseClient {
           // Check if we have a refresh token
           const { refreshToken } = this.getTokensCallback();
           if (!refreshToken) {
-            console.error("[r2rClient] No refresh token found => logout");
+            console.error("[fuseClient] No refresh token found => logout");
             this.onRefreshFailedCallback?.();
             return Promise.reject(error);
           }
 
           // Attempt refresh
           try {
-            console.log("[r2rClient] Attempting token refresh...");
+            console.log("[fuseClient] Attempting token refresh...");
             const refreshResponse =
               (await this.users.refreshAccessToken()) as RefreshTokenResponse;
             const newAccessToken = refreshResponse.results.accessToken;
             const newRefreshToken = refreshResponse.results.refreshToken;
 
             console.log(
-              "[r2rClient] Refresh call succeeded; new access token:",
+              "[fuseClient] Refresh call succeeded; new access token:",
               newAccessToken.slice(0, 15),
               "...",
             );
@@ -208,17 +208,17 @@ export class r2rClient extends BaseClient {
               error.config.headers["Authorization"] =
                 `Bearer ${newAccessToken}`;
               console.log(
-                "[r2rClient] Retrying original request with new access token...",
+                "[fuseClient] Retrying original request with new access token...",
               );
               return this.axiosInstance.request(error.config);
             } else {
               console.warn(
-                "[r2rClient] No request config found to retry. Possibly manual re-fetch needed",
+                "[fuseClient] No request config found to retry. Possibly manual re-fetch needed",
               );
             }
           } catch (refreshError) {
             console.error(
-              "[r2rClient] Refresh attempt failed => logging out. Error was:",
+              "[fuseClient] Refresh attempt failed => logging out. Error was:",
               refreshError,
             );
             this.onRefreshFailedCallback?.();
@@ -228,7 +228,7 @@ export class r2rClient extends BaseClient {
 
         // 3) If not a 401/403 or it's a 401/403 that isn't token-related => just reject
         console.log(
-          "[r2rClient] Non-auth error or non-token 401/403 => rejecting",
+          "[fuseClient] Non-auth error or non-token 401/403 => rejecting",
         );
         return Promise.reject(error);
       },
@@ -240,7 +240,7 @@ export class r2rClient extends BaseClient {
     endpoint: string,
     options: any = {},
   ): Promise<T> {
-    console.log(`[r2rClient] makeRequest: ${method.toUpperCase()} ${endpoint}`);
+    console.log(`[fuseClient] makeRequest: ${method.toUpperCase()} ${endpoint}`);
     return this._makeRequest(method, endpoint, options, "v3");
   }
 
@@ -254,7 +254,7 @@ export class r2rClient extends BaseClient {
   ): void {
     // Optional: log the changes, but be careful not to log full tokens in prod
     console.log(
-      "[r2rClient] Setting tokens. Access token:",
+      "[fuseClient] Setting tokens. Access token:",
       accessToken?.slice(0, 15),
       "... refresh token:",
       refreshToken?.slice(0, 15),
@@ -265,4 +265,4 @@ export class r2rClient extends BaseClient {
   }
 }
 
-export default r2rClient;
+export default fuseClient;

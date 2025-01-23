@@ -1,4 +1,4 @@
-name: R2R Full Python Integration Test (ubuntu)
+name: FUSE Full Python Integration Test (ubuntu)
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ jobs:
 
     env:
       TELEMETRY_ENABLED: 'false'
-      R2R_PROJECT_NAME: r2r_default
+      FUSE_PROJECT_NAME: fuse_default
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       AZURE_API_KEY: ${{ secrets.AZURE_API_KEY }}
       AZURE_API_BASE: ${{ secrets.AZURE_API_BASE }}
@@ -30,7 +30,7 @@ jobs:
           os: ubuntu-latest
           python-version: '3.12'
           poetry-version: '1.7.1'
-          r2r-version: 'latest'
+          fuse-version: 'latest'
 
       - name: Setup and start Docker
         uses: ./.github/actions/setup-docker
@@ -42,8 +42,8 @@ jobs:
           docker_username: ${{ secrets.RAGTORICHES_DOCKER_UNAME }}
           docker_password: ${{ secrets.RAGTORICHES_DOCKER_TOKEN }}
 
-      - name: Start R2R Full server
-        uses: ./.github/actions/start-r2r-full
+      - name: Start FUSE Full server
+        uses: ./.github/actions/start-fuse-full
 
       - name: Wait for server to be ready
         run: |
@@ -58,7 +58,7 @@ jobs:
             timeout=$((timeout - 5))
           done
 
-      - name: Run R2R Full Python Integration Test
+      - name: Run FUSE Full Python Integration Test
         run: |
           cd py && poetry run pytest tests/unit \
             --verbose \
@@ -66,7 +66,7 @@ jobs:
             --log-cli-level=INFO \
             --junit-xml=test-results/junit.xml \
             --html=test-results/report.html
-      - name: Run R2R Full Python Integration Test
+      - name: Run FUSE Full Python Integration Test
         run: |
           cd py && poetry run pytest tests/integration \
             --verbose \

@@ -1,0 +1,59 @@
+sequenceDiagram
+    participant User
+    participant Chat as Chat Interface
+    participant Settings as Settings Manager
+    participant RAG as RAG Client
+    participant Models as Data Models
+    participant API as /retrieval/agent
+
+    User->>Chat: Enter message
+    activate Chat
+
+    Chat->>Settings: get_settings()
+    activate Settings
+    Settings-->>Chat: Return current settings
+    deactivate Settings
+
+    Chat->>Models: create_message(content)
+    activate Models
+    Models-->>Chat: Return Message object
+    deactivate Models
+
+    Chat->>RAG: chat(message)
+    activate RAG
+
+    RAG->>Models: Create request payload
+    activate Models
+    Models-->>RAG: Return validated payload
+    deactivate Models
+
+    RAG->>API: POST request
+    activate API
+
+    loop Streaming Response
+        API-->>RAG: Stream chunks
+        RAG-->>Chat: Process chunks
+        Chat->>Chat: Update UI
+    end
+
+    API-->>RAG: Complete response
+    deactivate API
+    RAG-->>Chat: Return final response
+    deactivate RAG
+
+    Chat->>Models: Create response message
+    activate Models
+    Models-->>Chat: Return Response object
+    deactivate Models
+
+    Chat->>Chat: Update chat history
+    deactivate Chat
+
+    Note over Chat,API: Error Flow
+    rect rgb(255, 240, 240)
+        Chat->>RAG: chat(message)
+        RAG->>API: POST request
+        API-->>RAG: Error (422)
+        RAG-->>Chat: APIError
+        Chat->>Chat: Show error
+    end

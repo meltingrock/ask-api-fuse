@@ -1,4 +1,4 @@
-import { r2rClient } from "../src/index";
+import { fuseClient } from "../src/index";
 import { describe, test, beforeAll, expect, afterAll } from "@jest/globals";
 import fs from "fs";
 import path from "path";
@@ -11,12 +11,12 @@ const TEST_OUTPUT_DIR = path.join(__dirname, "test-output");
  * The untitled document will have an id of 5556836e-a51c-57c7-916a-de76c79df2b6
  * The default collection id is 122fdf6a-e116-546b-a8f6-e4cb2e2c0a09
  */
-describe("r2rClient V3 Documents Integration Tests", () => {
-  let client: r2rClient;
+describe("fuseClient V3 Documents Integration Tests", () => {
+  let client: fuseClient;
   let documentId: string;
 
   beforeAll(async () => {
-    client = new r2rClient(baseUrl);
+    client = new fuseClient(baseUrl);
     await client.users.login({
       email: "admin@example.com",
       password: "change_me_immediately",

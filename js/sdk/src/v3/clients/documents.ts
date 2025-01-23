@@ -1,4 +1,4 @@
-import { r2rClient } from "../../r2rClient";
+import { fuseClient } from "../../fuseClient";
 import FormData from "form-data";
 import {
   WrappedBooleanResponse,
@@ -24,7 +24,7 @@ if (typeof window === "undefined") {
 type FileInput = string | File | { path: string; name: string };
 
 export class DocumentsClient {
-  constructor(private client: r2rClient) {}
+  constructor(private client: fuseClient) {}
 
   /**
    * Create a new document from either a file or content.

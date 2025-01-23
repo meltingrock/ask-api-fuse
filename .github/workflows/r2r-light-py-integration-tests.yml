@@ -1,4 +1,4 @@
-name: R2R Light Python Integration Test (ubuntu)
+name: FUSE Light Python Integration Test (ubuntu)
 
 on:
   push:
@@ -30,12 +30,12 @@ jobs:
       AZURE_API_BASE: ${{ secrets.AZURE_API_BASE }}
       AZURE_API_VERSION: ${{ secrets.AZURE_API_VERSION }}
       TELEMETRY_ENABLED: 'false'
-      R2R_POSTGRES_HOST: localhost
-      R2R_POSTGRES_DBNAME: postgres
-      R2R_POSTGRES_PORT: '5432'
-      R2R_POSTGRES_PASSWORD: postgres
-      R2R_POSTGRES_USER: postgres
-      R2R_PROJECT_NAME: r2r_default
+      FUSE_POSTGRES_HOST: localhost
+      FUSE_POSTGRES_DBNAME: postgres
+      FUSE_POSTGRES_PORT: '5432'
+      FUSE_POSTGRES_PASSWORD: postgres
+      FUSE_POSTGRES_USER: postgres
+      FUSE_PROJECT_NAME: fuse_default
       PYTHONUNBUFFERED: '1'
       PYTEST_ADDOPTS: '--color=yes'
 
@@ -56,7 +56,7 @@ jobs:
           os: ubuntu-latest
           python-version: '3.12'
           poetry-version: '1.7.1'
-          r2r-version: 'latest'
+          fuse-version: 'latest'
 
       - name: Setup and start PostgreSQL
         uses: ./.github/actions/setup-postgres-ext
@@ -68,8 +68,8 @@ jobs:
           pg_isready -h localhost -p 5432
           sudo -u postgres psql -c "\dx vector;"
 
-      - name: Start R2R Light server
-        uses: ./.github/actions/start-r2r-light
+      - name: Start FUSE Light server
+        uses: ./.github/actions/start-fuse-light
         id: start-server
 
       - name: Wait for server to be ready
@@ -85,7 +85,7 @@ jobs:
             timeout=$((timeout - 5))
           done
 
-      - name: Run R2R Light Python Integration Test
+      - name: Run FUSE Light Python Integration Test
         run: |
           cd py && poetry run pytest tests/unit \
             --verbose \
@@ -93,7 +93,7 @@ jobs:
             --log-cli-level=INFO \
             --junit-xml=test-results/junit.xml \
             --html=test-results/report.html
-      - name: Run R2R Full Python Integration Test
+      - name: Run FUSE Full Python Integration Test
         run: |
           cd py && poetry run pytest tests/integration \
             --verbose \
