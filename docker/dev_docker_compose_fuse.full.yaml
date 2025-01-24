@@ -26,43 +26,43 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /data/askfrankly/fuse/workspaces/matt_legal_case/hatchet_certs
+      device: /data/askfrankly/fuse/workspaces/matt_legal_case_01/hatchet_certs
       o: bind
   hatchet_config:
     driver: local
     driver_opts:
       type: none
-      device: /data/askfrankly/fuse/workspaces/matt_legal_case/hatchet_config
+      device: /data/askfrankly/fuse/workspaces/matt_legal_case_01/hatchet_config
       o: bind
   hatchet_api_key:
     driver: local
     driver_opts:
       type: none
-      device: /data/askfrankly/fuse/workspaces/matt_legal_case/hatchet_api_key
+      device: /data/askfrankly/fuse/workspaces/matt_legal_case_01/hatchet_api_key
       o: bind
   postgres_data:
     driver: local
     driver_opts:
       type: none
-      device: /data/askfrankly/fuse/workspaces/matt_legal_case/postgres_data
+      device: /data/askfrankly/fuse/workspaces/matt_legal_case_01/postgres_data
       o: bind
   hatchet_rabbitmq_data:
     driver: local
     driver_opts:
       type: none
-      device: /data/askfrankly/fuse/workspaces/matt_legal_case/hatchet_rabbitmq_data
+      device: /data/askfrankly/fuse/workspaces/matt_legal_case_01/hatchet_rabbitmq_data
       o: bind
   hatchet_rabbitmq_conf:
     driver: local
     driver_opts:
       type: none
-      device: /data/askfrankly/fuse/workspaces/matt_legal_case/hatchet_rabbitmq_conf
+      device: /data/askfrankly/fuse/workspaces/matt_legal_case_01/hatchet_rabbitmq_conf
       o: bind
   hatchet_postgres_data:
     driver: local
     driver_opts:
       type: none
-      device: /data/askfrankly/fuse/workspaces/matt_legal_case/
+      device: /data/askfrankly/fuse/workspaces/matt_legal_case_01/
       o: bind
 
 
@@ -429,7 +429,7 @@ services:
     restart: on-failure
     volumes:
       - type: bind
-        source: ${PWD}/../py
+        source: /data/askfrankly/ask-api-fuse/py
         target: /app/py
         read_only: false
       - ${FUSE_CONFIG_PATH:-/}:${FUSE_CONFIG_PATH:-/app/config}
