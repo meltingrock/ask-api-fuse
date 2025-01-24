@@ -206,7 +206,7 @@ class ChunksRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.get(
-            "/",
+            "",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List Chunks",
         )
