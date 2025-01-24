@@ -473,7 +473,7 @@ services:
       - "traefik.http.routers.${LB_API_SERVICE_NAME}-docs-router.rule=Host(`${LB_API_HOST}`) && PathPrefix(`${LB_API_VERSION}/${LB_API_ROUTE}/docs`)"
 
   fuse-dashboard:
-    image: emrgntcmplxty/fuse-dashboard:latest
+    image: emrgntcmplxty/r2r-dashboard:latest
     environment:
       - NEXT_PUBLIC_FUSE_DEPLOYMENT_URL=${FUSE_DEPLOYMENT_URL:-http://localhost:7272}
       - NEXT_PUBLIC_HATCHET_DASHBOARD_URL=${HATCHET_DASHBOARD_URL:-http://localhost:${FUSE_HATCHET_DASHBOARD_PORT:-7274}}
