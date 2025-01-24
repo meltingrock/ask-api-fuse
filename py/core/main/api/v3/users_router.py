@@ -418,7 +418,7 @@ class UsersRouter(BaseRouterV3):
             return auth_user
 
         @self.router.get(
-            "/by-id/{id}",
+            "/{id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Get User Details",
         )
@@ -450,7 +450,7 @@ class UsersRouter(BaseRouterV3):
             return users_overview_response["results"][0]
 
         @self.router.delete(
-            "/by-id/{id}",
+            "/{id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Delete User",
         )
@@ -487,7 +487,7 @@ class UsersRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.get(
-            "/by-id/{id}/collections",
+            "/{id}/collections",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Get User Collections",
         )
@@ -530,7 +530,7 @@ class UsersRouter(BaseRouterV3):
             }
 
         @self.router.post(
-            "/by-id/{id}/collections/{collection_id}",
+            "/{id}/collections/{collection_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Add User to Collection",
             response_model=WrappedBooleanResponse,
@@ -558,7 +558,7 @@ class UsersRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.delete(
-            "/by-id/{id}/collections/{collection_id}",
+            "/{id}/collections/{collection_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Remove User from Collection",
         )
@@ -589,7 +589,7 @@ class UsersRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.post(
-            "/by-id/{id}",
+            "/{id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Update User",
         )
@@ -653,7 +653,7 @@ class UsersRouter(BaseRouterV3):
             )
 
         @self.router.post(
-            "/by-id/{id}/api-keys",
+            "/{id}/api-keys",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Create User API Key",
             response_model=WrappedAPIKeyResponse,
@@ -719,7 +719,7 @@ class UsersRouter(BaseRouterV3):
             return api_key  # type: ignore
 
         @self.router.get(
-            "/by-id/{id}/api-keys",
+            "/{id}/api-keys",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List User API Keys",
         )
@@ -748,7 +748,7 @@ class UsersRouter(BaseRouterV3):
             return keys, {"total_entries": len(keys)}  # type: ignore
 
         @self.router.delete(
-            "/by-id/{id}/api-keys/{key_id}",
+            "/{id}/api-keys/{key_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Delete User API Key",
         )
@@ -782,7 +782,7 @@ class UsersRouter(BaseRouterV3):
             return {"success": True}  # type: ignore
 
         @self.router.get(
-            "/by-id/{id}/limits",
+            "/{id}/limits",
             summary="Fetch User Limits",
             responses={
                 200: {

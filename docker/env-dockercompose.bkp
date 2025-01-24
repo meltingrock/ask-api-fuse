@@ -1,23 +1,23 @@
 #############################################
 # FUSE environment variables
 #############################################
-FUSE_POSTGRES_USER=postgres
+FUSE_POSTGRES_USER=frankman
 FUSE_POSTGRES_PASSWORD=difficultPassw0rd
-FUSE_POSTGRES_HOST=pg.local.pincident.com
+FUSE_POSTGRES_HOST=pg.local.askfrankly.com
 FUSE_POSTGRES_PORT=5555
 FUSE_POSTGRES_DBNAME=matt_legal_case_01
 FUSE_PROJECT_NAME=matt_legal_case_01
 FUSE_PORT=7272
 
-POSTGRES_USER=postgres
+POSTGRES_USER=frankman
 POSTGRES_PASSWORD=difficultPassw0rd
-POSTGRES_HOST=pg.local.pincident.com
+POSTGRES_HOST=pg.local.askfrankly.com
 POSTGRES_PORT=5555
 POSTGRES_MAX_CONNECTIONS=2048
 PGPORT=5555
 
 # Hatchet environment variables
-HATCHET_POSTGRES_USER=postgres
+HATCHET_POSTGRES_USER=frankman
 HATCHET_POSTGRES_PASSWORD=difficultPassw0rd
 HATCHET_POSTGRES_DBNAME=hatchet
 

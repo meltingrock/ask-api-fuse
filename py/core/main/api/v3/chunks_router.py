@@ -79,7 +79,7 @@ class ChunksRouter(BaseRouterV3):
             return results["chunk_search_results"]
 
         @self.router.get(
-            "/by-id/{id}",
+            "/{id}",
             summary="Retrieve Chunk",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -117,7 +117,7 @@ class ChunksRouter(BaseRouterV3):
             )
 
         @self.router.post(
-            "/by-id/{id}",
+            "/{id}",
             summary="Update Chunk",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -169,7 +169,7 @@ class ChunksRouter(BaseRouterV3):
             )
 
         @self.router.delete(
-            "/by-id/{id}",
+            "/{id}",
             summary="Delete Chunk",
             dependencies=[Depends(self.rate_limit_dependency)],
         )

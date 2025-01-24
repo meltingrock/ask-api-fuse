@@ -130,7 +130,7 @@ class GraphRouter(BaseRouterV3):
             )
 
         @self.router.get(
-            "/by-id/{collection_id}",
+            "/{collection_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Retrieve graph details",
         )
@@ -161,7 +161,7 @@ class GraphRouter(BaseRouterV3):
             return list_graphs_response["results"][0]  # type: ignore
 
         @self.router.post(
-            "/by-id/{collection_id}/communities/build",
+            "/{collection_id}/communities/build",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
         @self.base_endpoint
@@ -258,7 +258,7 @@ class GraphRouter(BaseRouterV3):
                 }
 
         @self.router.post(
-            "/by-id/{collection_id}/reset",
+            "/{collection_id}/reset",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Reset a graph back to the initial state.",
         )
@@ -294,7 +294,7 @@ class GraphRouter(BaseRouterV3):
 
         # update graph
         @self.router.post(
-            "/by-id/{collection_id}",
+            "/{collection_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Update graph",
         )
@@ -339,7 +339,7 @@ class GraphRouter(BaseRouterV3):
             )
 
         @self.router.get(
-            "/by-id/{collection_id}/entities",
+            "/{collection_id}/entities",
             dependencies=[Depends(self.rate_limit_dependency)],
             openapi_extra={
                 "x-codeSamples": [
@@ -418,7 +418,7 @@ class GraphRouter(BaseRouterV3):
             }
 
         @self.router.post(
-            "/by-id/{collection_id}/entities/export",
+            "/{collection_id}/entities/export",
             summary="Export graph entities to CSV",
             dependencies=[Depends(self.rate_limit_dependency)],
             openapi_extra={
@@ -531,7 +531,7 @@ class GraphRouter(BaseRouterV3):
             )
 
         @self.router.post(
-            "/by-id/{collection_id}/entities",
+            "/{collection_id}/entities",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
         @self.base_endpoint
@@ -574,7 +574,7 @@ class GraphRouter(BaseRouterV3):
             )
 
         @self.router.post(
-            "/by-id/{collection_id}/relationships",
+            "/{collection_id}/relationships",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
         @self.base_endpoint
@@ -640,7 +640,7 @@ class GraphRouter(BaseRouterV3):
             )
 
         @self.router.post(
-            "/by-id/{collection_id}/relationships/export",
+            "/{collection_id}/relationships/export",
             summary="Export graph relationships to CSV",
             dependencies=[Depends(self.rate_limit_dependency)],
             openapi_extra={
@@ -753,7 +753,7 @@ class GraphRouter(BaseRouterV3):
             )
 
         @self.router.get(
-            "/by-id/{collection_id}/entities/{entity_id}",
+            "/{collection_id}/entities/{entity_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
         @self.base_endpoint
@@ -790,7 +790,7 @@ class GraphRouter(BaseRouterV3):
             return result[0][0]
 
         @self.router.post(
-            "/by-id/{collection_id}/entities/{entity_id}",
+            "/{collection_id}/entities/{entity_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
         @self.base_endpoint
@@ -840,7 +840,7 @@ class GraphRouter(BaseRouterV3):
             )
 
         @self.router.delete(
-            "/by-id/{collection_id}/entities/{entity_id}",
+            "/{collection_id}/entities/{entity_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Remove an entity",
         )
@@ -880,7 +880,7 @@ class GraphRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.get(
-            "/by-id/{collection_id}/relationships",
+            "/{collection_id}/relationships",
             dependencies=[Depends(self.rate_limit_dependency)],
             description="Lists all relationships in the graph with pagination support.",
             openapi_extra={
@@ -962,7 +962,7 @@ class GraphRouter(BaseRouterV3):
             }
 
         @self.router.get(
-            "/by-id/{collection_id}/relationships/{relationship_id}",
+            "/{collection_id}/relationships/{relationship_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             description="Retrieves a specific relationship by its ID.",
             openapi_extra={
@@ -1041,7 +1041,7 @@ class GraphRouter(BaseRouterV3):
             return results[0][0]
 
         @self.router.post(
-            "/by-id/{collection_id}/relationships/{relationship_id}",
+            "/{collection_id}/relationships/{relationship_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
         @self.base_endpoint
@@ -1109,7 +1109,7 @@ class GraphRouter(BaseRouterV3):
             )
 
         @self.router.delete(
-            "/by-id/{collection_id}/relationships/{relationship_id}",
+            "/{collection_id}/relationships/{relationship_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             description="Removes a relationship from the graph.",
             openapi_extra={
@@ -1187,7 +1187,7 @@ class GraphRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.post(
-            "/by-id/{collection_id}/communities",
+            "/{collection_id}/communities",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Create a new community",
             openapi_extra={
@@ -1296,7 +1296,7 @@ class GraphRouter(BaseRouterV3):
             )
 
         @self.router.get(
-            "/by-id/{collection_id}/communities",
+            "/{collection_id}/communities",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List communities",
         )
@@ -1343,7 +1343,7 @@ class GraphRouter(BaseRouterV3):
             }
 
         @self.router.get(
-            "/by-id/{collection_id}/communities/{community_id}",
+            "/{collection_id}/communities/{community_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Retrieve a community",
         )
@@ -1386,7 +1386,7 @@ class GraphRouter(BaseRouterV3):
             return results[0][0]
 
         @self.router.delete(
-            "/by-id/{collection_id}/communities/{community_id}",
+            "/{collection_id}/communities/{community_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Delete a community",
         )
@@ -1427,7 +1427,7 @@ class GraphRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.post(
-            "/by-id/{collection_id}/communities/export",
+            "/{collection_id}/communities/export",
             summary="Export document communities to CSV",
             dependencies=[Depends(self.rate_limit_dependency)],
             openapi_extra={
@@ -1540,7 +1540,7 @@ class GraphRouter(BaseRouterV3):
             )
 
         @self.router.post(
-            "/by-id/{collection_id}/communities/{community_id}",
+            "/{collection_id}/communities/{community_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Update community",
         )
@@ -1586,7 +1586,7 @@ class GraphRouter(BaseRouterV3):
             )
 
         @self.router.post(
-            "/by-id/{collection_id}/pull",
+            "/{collection_id}/pull",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Pull latest entities to the graph",
         )

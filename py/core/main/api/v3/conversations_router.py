@@ -318,7 +318,7 @@ class ConversationsRouter(BaseRouterV3):
             )
 
         @self.router.get(
-            "/by-id/{id}",
+            "/{id}",
             summary="Get conversation details",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -345,7 +345,7 @@ class ConversationsRouter(BaseRouterV3):
             return conversation
 
         @self.router.post(
-            "/by-id/{id}",
+            "/{id}",
             summary="Update conversation",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -373,7 +373,7 @@ class ConversationsRouter(BaseRouterV3):
             )
 
         @self.router.delete(
-            "/by-id/{id}",
+            "/{id}",
             summary="Delete conversation",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -401,7 +401,7 @@ class ConversationsRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.post(
-            "/by-id/{id}/messages",
+            "/{id}/messages",
             summary="Add message to conversation",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -442,7 +442,7 @@ class ConversationsRouter(BaseRouterV3):
             )
 
         @self.router.post(
-            "/by-id/{id}/messages/{message_id}",
+            "/{id}/messages/{message_id}",
             summary="Update message in conversation",
             dependencies=[Depends(self.rate_limit_dependency)],
         )

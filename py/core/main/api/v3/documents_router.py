@@ -787,7 +787,7 @@ class DocumentsRouter(BaseRouterV3):
             )
 
         @self.router.get(
-            "/by-id/{id}",
+            "/{id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Retrieve a document",
         )
@@ -803,7 +803,7 @@ class DocumentsRouter(BaseRouterV3):
             Retrieves detailed information about a specific document by its ID.
 
             This endpoint returns the document's metadata, status, and system information. It does not
-            return the document's content - use the `/by-id/{id}/download` endpoint for that.
+            return the document's content - use the `/{id}/download` endpoint for that.
 
             Users can only retrieve documents they own or have access to through collections.
             Superusers can retrieve any document.
@@ -829,7 +829,7 @@ class DocumentsRouter(BaseRouterV3):
             return results[0]
 
         @self.router.get(
-            "/by-id/{id}/chunks",
+            "/{id}/chunks",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List document chunks",
         )
@@ -908,7 +908,7 @@ class DocumentsRouter(BaseRouterV3):
             )
 
         @self.router.get(
-            "/by-id/{id}/download",
+            "/{id}/download",
             dependencies=[Depends(self.rate_limit_dependency)],
             response_class=StreamingResponse,
             summary="Download document content",
@@ -1036,7 +1036,7 @@ class DocumentsRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.delete(
-            "/by-id/{id}",
+            "/{id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Delete a document",
         )
@@ -1063,7 +1063,7 @@ class DocumentsRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.get(
-            "/by-id/{id}/collections",
+            "/{id}/collections",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List document collections",
         )
@@ -1114,7 +1114,7 @@ class DocumentsRouter(BaseRouterV3):
             }
 
         @self.router.post(
-            "/by-id/{id}/extract",
+            "/{id}/extract",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Extract entities and relationships",
             openapi_extra={
@@ -1247,7 +1247,7 @@ class DocumentsRouter(BaseRouterV3):
                 }
 
         @self.router.post(
-            "/by-id/{id}/deduplicate",
+            "/{id}/deduplicate",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Deduplicate entities",
             openapi_extra={
@@ -1403,7 +1403,7 @@ class DocumentsRouter(BaseRouterV3):
             return {"message": "Test endpoint works"}
 
         @self.router.get(
-            "/by-id/{id}/entities",
+            "/{id}/entities",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Lists the entities from the document",
             openapi_extra={
@@ -1502,7 +1502,7 @@ class DocumentsRouter(BaseRouterV3):
             return entities, {"total_entries": count}  # type: ignore
 
         @self.router.post(
-            "/by-id/{id}/entities/export",
+            "/{id}/entities/export",
             summary="Export document entities to CSV",
             dependencies=[Depends(self.rate_limit_dependency)],
             openapi_extra={
@@ -1615,7 +1615,7 @@ class DocumentsRouter(BaseRouterV3):
             )
 
         @self.router.get(
-            "/by-id/{id}/relationships",
+            "/{id}/relationships",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List document relationships",
         )
@@ -1700,7 +1700,7 @@ class DocumentsRouter(BaseRouterV3):
             return relationships, {"total_entries": count}  # type: ignore
 
         @self.router.post(
-            "/by-id/{id}/relationships/export",
+            "/{id}/relationships/export",
             summary="Export document relationships to CSV",
             dependencies=[Depends(self.rate_limit_dependency)],
             openapi_extra={
