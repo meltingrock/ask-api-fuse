@@ -74,18 +74,35 @@ class FUSEApp:
         self._setup_routes()
         self._apply_cors()
 
+        # Mount the FUSE application's FastAPI instance at your desired prefix
+        self.app.mount(path="/api/fuse/v3", app=self.app)
+
+        @self.app.exception_handler(FUSEException)
+        async def fuse_exception_handler(request: Request, exc: FUSEException):
+            return JSONResponse(
+                status_code=exc.status_code,
+                content={
+                    "message": exc.message,
+                    "error_type": type(exc).__name__,
+                },
+            )
+
+        self._setup_routes()
+        self._apply_cors()
+
     def _setup_routes(self):
-        self.app.include_router(self.chunks_router, prefix="/v3")
-        self.app.include_router(self.collections_router, prefix="/v3")
-        self.app.include_router(self.conversations_router, prefix="/v3")
-        self.app.include_router(self.documents_router, prefix="/v3")
-        self.app.include_router(self.graph_router, prefix="/v3")
-        self.app.include_router(self.indices_router, prefix="/v3")
-        self.app.include_router(self.logs_router, prefix="/v3")
-        self.app.include_router(self.prompts_router, prefix="/v3")
-        self.app.include_router(self.retrieval_router_v3, prefix="/v3")
-        self.app.include_router(self.system_router, prefix="/v3")
-        self.app.include_router(self.users_router, prefix="/v3")
+        self.app.include_router(self.chunks_router, prefix="/chunks", tags=["Chunks"])
+        self.app.include_router(self.collections_router, prefix="/collections", tags=["Collections"])
+        self.app.include_router(self.conversations_router, prefix="/conversations", tags=["Conversations"])
+        self.app.include_router(self.documents_router, prefix="/documents",
+                                tags=["Documents"])  # , include_in_schema=False
+        self.app.include_router(self.graph_router, prefix="/graphs", tags=["Graph"])
+        self.app.include_router(self.indices_router, prefix="/indices", tags=["Indices"])
+        self.app.include_router(self.logs_router, prefix="/logs", tags=["Logs"])
+        self.app.include_router(self.prompts_router, prefix="/prompts", tags=["Prompts"])
+        self.app.include_router(self.retrieval_router_v3, prefix="/retrieval", tags=["Retrieval"])
+        self.app.include_router(self.system_router, prefix="/v3", tags=["System"])
+        self.app.include_router(self.users_router, prefix="/users", tags=["Users"])
 
         @self.app.get("/openapi_spec", include_in_schema=False)
         async def openapi_spec():
