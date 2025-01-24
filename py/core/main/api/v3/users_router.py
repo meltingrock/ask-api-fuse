@@ -51,7 +51,7 @@ class UsersRouter(BaseRouterV3):
 
     def _setup_routes(self):
         @self.router.post(
-            "/users",
+            "",
             # dependencies=[Depends(self.rate_limit_dependency)],
             response_model=WrappedUserResponse,
         )
@@ -103,7 +103,7 @@ class UsersRouter(BaseRouterV3):
             return registration_response
 
         @self.router.post(
-            "/users/export",
+            "/export",
             summary="Export users to CSV",
             dependencies=[Depends(self.rate_limit_dependency)],
             openapi_extra={
@@ -209,7 +209,7 @@ class UsersRouter(BaseRouterV3):
             )
 
         @self.router.post(
-            "/users/verify-email",
+            "/verify-email",
             # dependencies=[Depends(self.rate_limit_dependency)],
             response_model=WrappedGenericMessageResponse,
         )
@@ -238,7 +238,7 @@ class UsersRouter(BaseRouterV3):
             return GenericMessageResponse(message=result["message"])  # type: ignore
 
         @self.router.post(
-            "/users/send-verification-email",
+            "/send-verification-email",
             dependencies=[
                 Depends(self.providers.auth.auth_wrapper(public=True))
             ],
@@ -264,7 +264,7 @@ class UsersRouter(BaseRouterV3):
             return GenericMessageResponse(message="A verification email has been sent.")  # type: ignore
 
         @self.router.post(
-            "/users/login",
+            "/login",
             # dependencies=[Depends(self.rate_limit_dependency)],
             response_model=WrappedTokenResponse,
         )
@@ -276,7 +276,7 @@ class UsersRouter(BaseRouterV3):
             )
 
         @self.router.post(
-            "/users/logout",
+            "/logout",
             response_model=WrappedGenericMessageResponse,
         )
         @self.base_endpoint
@@ -289,7 +289,7 @@ class UsersRouter(BaseRouterV3):
             return GenericMessageResponse(message=result["message"])  # type: ignore
 
         @self.router.post(
-            "/users/refresh-token",
+            "/refresh-token",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
         @self.base_endpoint
@@ -303,7 +303,7 @@ class UsersRouter(BaseRouterV3):
             return result
 
         @self.router.post(
-            "/users/change-password",
+            "/change-password",
             dependencies=[Depends(self.rate_limit_dependency)],
             response_model=WrappedGenericMessageResponse,
         )
@@ -320,7 +320,7 @@ class UsersRouter(BaseRouterV3):
             return GenericMessageResponse(message=result["message"])  # type: ignore
 
         @self.router.post(
-            "/users/request-password-reset",
+            "/request-password-reset",
             dependencies=[
                 Depends(self.providers.auth.auth_wrapper(public=True))
             ],
@@ -335,7 +335,7 @@ class UsersRouter(BaseRouterV3):
             return GenericMessageResponse(message=result["message"])  # type: ignore
 
         @self.router.post(
-            "/users/reset-password",
+            "/reset-password",
             dependencies=[
                 Depends(self.providers.auth.auth_wrapper(public=True))
             ],
@@ -353,7 +353,7 @@ class UsersRouter(BaseRouterV3):
             return GenericMessageResponse(message=result["message"])  # type: ignore
 
         @self.router.get(
-            "/users",
+            "",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List Users",
         )
@@ -406,7 +406,7 @@ class UsersRouter(BaseRouterV3):
             }
 
         @self.router.get(
-            "/users/me",
+            "/me",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Get the Current User",
         )
@@ -420,7 +420,7 @@ class UsersRouter(BaseRouterV3):
             return auth_user
 
         @self.router.get(
-            "/users/{id}",
+            "/by-id/{id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Get User Details",
         )
@@ -452,7 +452,7 @@ class UsersRouter(BaseRouterV3):
             return users_overview_response["results"][0]
 
         @self.router.delete(
-            "/users/{id}",
+            "/by-id/{id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Delete User",
         )
@@ -489,7 +489,7 @@ class UsersRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.get(
-            "/users/{id}/collections",
+            "/by-id/{id}/collections",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Get User Collections",
         )
@@ -532,7 +532,7 @@ class UsersRouter(BaseRouterV3):
             }
 
         @self.router.post(
-            "/users/{id}/collections/{collection_id}",
+            "/by-id/{id}/collections/{collection_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Add User to Collection",
             response_model=WrappedBooleanResponse,
@@ -560,7 +560,7 @@ class UsersRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.delete(
-            "/users/{id}/collections/{collection_id}",
+            "/by-id/{id}/collections/{collection_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Remove User from Collection",
         )
@@ -591,7 +591,7 @@ class UsersRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.post(
-            "/users/{id}",
+            "/by-id/{id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Update User",
         )
@@ -655,7 +655,7 @@ class UsersRouter(BaseRouterV3):
             )
 
         @self.router.post(
-            "/users/{id}/api-keys",
+            "/by-id/{id}/api-keys",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Create User API Key",
             response_model=WrappedAPIKeyResponse,
@@ -721,7 +721,7 @@ class UsersRouter(BaseRouterV3):
             return api_key  # type: ignore
 
         @self.router.get(
-            "/users/{id}/api-keys",
+            "/by-id/{id}/api-keys",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List User API Keys",
         )
@@ -750,7 +750,7 @@ class UsersRouter(BaseRouterV3):
             return keys, {"total_entries": len(keys)}  # type: ignore
 
         @self.router.delete(
-            "/users/{id}/api-keys/{key_id}",
+            "/by-id/{id}/api-keys/{key_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Delete User API Key",
         )
@@ -784,7 +784,7 @@ class UsersRouter(BaseRouterV3):
             return {"success": True}  # type: ignore
 
         @self.router.get(
-            "/users/{id}/limits",
+            "/by-id/{id}/limits",
             summary="Fetch User Limits",
             responses={
                 200: {
@@ -821,7 +821,7 @@ class UsersRouter(BaseRouterV3):
             )
             return limits_info
 
-        @self.router.get("/users/oauth/google/authorize")
+        @self.router.get("/oauth/google/authorize")
         async def google_authorize():
             """
             Redirect user to Google's OAuth 2.0 consent screen.
@@ -843,7 +843,7 @@ class UsersRouter(BaseRouterV3):
             return {"redirect_url": google_auth_url}
             # In a real app, you might return a RedirectResponse(google_auth_url)
 
-        @self.router.get("/users/oauth/google/callback")
+        @self.router.get("/oauth/google/callback")
         async def google_callback(
             code: str = Query(...), state: str = Query(...)
         ):
@@ -900,7 +900,7 @@ class UsersRouter(BaseRouterV3):
             return token_response
 
         # =============== GITHUB OAUTH ===============
-        @self.router.get("/users/oauth/github/authorize")
+        @self.router.get("/oauth/github/authorize")
         async def github_authorize():
             """
             Redirect user to GitHub's OAuth consent screen.
@@ -917,7 +917,7 @@ class UsersRouter(BaseRouterV3):
             github_auth_url = f"https://github.com/login/oauth/authorize?{urllib.parse.urlencode(params)}"
             return {"redirect_url": github_auth_url}
 
-        @self.router.get("/users/oauth/github/callback")
+        @self.router.get("/oauth/github/callback")
         async def github_callback(
             code: str = Query(...), state: str = Query(...)
         ):

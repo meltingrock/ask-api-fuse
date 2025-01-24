@@ -33,7 +33,7 @@ class IndicesRouter(BaseRouterV3):
     def _setup_routes(self):
         ## TODO - Allow developer to pass the index id with the request
         @self.router.post(
-            "/indices",
+            "",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Create Vector Index",
         )
@@ -107,7 +107,7 @@ class IndicesRouter(BaseRouterV3):
             return result  # type: ignore
 
         @self.router.get(
-            "/indices",
+            "",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List Vector Indices",
         )
@@ -149,7 +149,7 @@ class IndicesRouter(BaseRouterV3):
             return {"indices": indices["indices"]}, indices["page_info"]  # type: ignore
 
         @self.router.get(
-            "/indices/{table_name}/{index_name}",
+            "/{table_name}/{index_name}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Get Vector Index Details",
         )
@@ -200,7 +200,7 @@ class IndicesRouter(BaseRouterV3):
 
         # TODO - Implement update index
         #         @self.router.post(
-        #             "/indices/{name}",
+        #             "/{name}",
         #             summary="Update Vector Index",
         #             openapi_extra={
         #                 "x-codeSamples": [
@@ -258,7 +258,7 @@ class IndicesRouter(BaseRouterV3):
         #             pass
 
         @self.router.delete(
-            "/indices/{table_name}/{index_name}",
+            "/{table_name}/{index_name}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Delete Vector Index",
         )

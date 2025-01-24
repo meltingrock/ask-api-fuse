@@ -184,7 +184,7 @@ class DocumentsRouter(BaseRouterV3):
 
     def _setup_routes(self):
         @self.router.post(
-            "/documents",
+            "",
             dependencies=[Depends(self.rate_limit_dependency)],
             status_code=202,
             summary="Create a new document",
@@ -517,7 +517,7 @@ class DocumentsRouter(BaseRouterV3):
             }
 
         @self.router.post(
-            "/documents/export",
+            "/export",
             summary="Export documents to CSV",
             dependencies=[Depends(self.rate_limit_dependency)],
             openapi_extra={
@@ -623,7 +623,7 @@ class DocumentsRouter(BaseRouterV3):
             )
 
         @self.router.get(
-            "/documents/download_zip",
+            "/download_zip",
             dependencies=[Depends(self.rate_limit_dependency)],
             response_class=StreamingResponse,
             summary="Export multiple documents as zip",
@@ -723,7 +723,7 @@ class DocumentsRouter(BaseRouterV3):
             )
 
         @self.router.get(
-            "/documents",
+            "",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List documents",
         )
@@ -789,7 +789,7 @@ class DocumentsRouter(BaseRouterV3):
             )
 
         @self.router.get(
-            "/documents/{id}",
+            "/by-id/{id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Retrieve a document",
         )
@@ -805,7 +805,7 @@ class DocumentsRouter(BaseRouterV3):
             Retrieves detailed information about a specific document by its ID.
 
             This endpoint returns the document's metadata, status, and system information. It does not
-            return the document's content - use the `/documents/{id}/download` endpoint for that.
+            return the document's content - use the `/by-id/{id}/download` endpoint for that.
 
             Users can only retrieve documents they own or have access to through collections.
             Superusers can retrieve any document.
@@ -831,7 +831,7 @@ class DocumentsRouter(BaseRouterV3):
             return results[0]
 
         @self.router.get(
-            "/documents/{id}/chunks",
+            "/by-id/{id}/chunks",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List document chunks",
         )
@@ -910,7 +910,7 @@ class DocumentsRouter(BaseRouterV3):
             )
 
         @self.router.get(
-            "/documents/{id}/download",
+            "/by-id/{id}/download",
             dependencies=[Depends(self.rate_limit_dependency)],
             response_class=StreamingResponse,
             summary="Download document content",
@@ -1010,7 +1010,7 @@ class DocumentsRouter(BaseRouterV3):
             )
 
         @self.router.delete(
-            "/documents/by-filter",
+            "/by-filter",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Delete documents by filter",
         )
@@ -1038,7 +1038,7 @@ class DocumentsRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.delete(
-            "/documents/{id}",
+            "/by-id/{id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Delete a document",
         )
@@ -1065,7 +1065,7 @@ class DocumentsRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.get(
-            "/documents/{id}/collections",
+            "/by-id/{id}/collections",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List document collections",
         )
@@ -1116,7 +1116,7 @@ class DocumentsRouter(BaseRouterV3):
             }
 
         @self.router.post(
-            "/documents/{id}/extract",
+            "/by-id/{id}/extract",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Extract entities and relationships",
             openapi_extra={
@@ -1237,7 +1237,7 @@ class DocumentsRouter(BaseRouterV3):
             }
 
         @self.router.post(
-            "/documents/{id}/deduplicate",
+            "/by-id/{id}/deduplicate",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Deduplicate entities",
             openapi_extra={
@@ -1374,7 +1374,7 @@ class DocumentsRouter(BaseRouterV3):
                 }
 
         @self.router.get(
-            "/documents/{id}/entities",
+            "/by-id/{id}/entities",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Lists the entities from the document",
             openapi_extra={
@@ -1473,7 +1473,7 @@ class DocumentsRouter(BaseRouterV3):
             return entities, {"total_entries": count}  # type: ignore
 
         @self.router.post(
-            "/documents/{id}/entities/export",
+            "/by-id/{id}/entities/export",
             summary="Export document entities to CSV",
             dependencies=[Depends(self.rate_limit_dependency)],
             openapi_extra={
@@ -1586,7 +1586,7 @@ class DocumentsRouter(BaseRouterV3):
             )
 
         @self.router.get(
-            "/documents/{id}/relationships",
+            "/by-id/{id}/relationships",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List document relationships",
         )
@@ -1671,7 +1671,7 @@ class DocumentsRouter(BaseRouterV3):
             return relationships, {"total_entries": count}  # type: ignore
 
         @self.router.post(
-            "/documents/{id}/relationships/export",
+            "/by-id/{id}/relationships/export",
             summary="Export document relationships to CSV",
             dependencies=[Depends(self.rate_limit_dependency)],
             openapi_extra={
@@ -1784,7 +1784,7 @@ class DocumentsRouter(BaseRouterV3):
             )
 
         @self.router.post(
-            "/documents/search",
+            "/search",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Search document summaries",
         )

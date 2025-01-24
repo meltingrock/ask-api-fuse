@@ -59,7 +59,13 @@ class FUSEApp:
         self.system_router = system_router
         self.users_router = users_router
 
-        self.app = FastAPI()
+        self.app = FastAPI(
+            title="FUSE application API",
+            version="fuse",
+            openapi_url="/openapi.json",
+            docs_url="/docs",
+            root_path=""
+        )
 
         @self.app.exception_handler(FUSEException)
         async def fuse_exception_handler(request: Request, exc: FUSEException):

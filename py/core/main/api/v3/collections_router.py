@@ -95,7 +95,7 @@ class CollectionsRouter(BaseRouterV3):
 
     def _setup_routes(self):
         @self.router.post(
-            "/collections",
+            "",
             summary="Create a new collection",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -140,7 +140,7 @@ class CollectionsRouter(BaseRouterV3):
             return collection
 
         @self.router.post(
-            "/collections/export",
+            "/export",
             summary="Export collections to CSV",
             dependencies=[Depends(self.rate_limit_dependency)],
             openapi_extra={
@@ -246,7 +246,7 @@ class CollectionsRouter(BaseRouterV3):
             )
 
         @self.router.get(
-            "/collections",
+            "",
             summary="List collections",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -302,7 +302,7 @@ class CollectionsRouter(BaseRouterV3):
             )
 
         @self.router.get(
-            "/collections/{id}",
+            "/by-id/{id}",
             summary="Get collection details",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -341,7 +341,7 @@ class CollectionsRouter(BaseRouterV3):
             return overview[0]
 
         @self.router.post(
-            "/collections/{id}",
+            "/by-id/{id}",
             summary="Update collection",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -387,7 +387,7 @@ class CollectionsRouter(BaseRouterV3):
             )
 
         @self.router.delete(
-            "/collections/{id}",
+            "/by-id/{id}",
             summary="Delete collection",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -419,7 +419,7 @@ class CollectionsRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.post(
-            "/collections/{id}/documents/{document_id}",
+            "/by-id/{id}/documents/{document_id}",
             summary="Add document to collection",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -443,7 +443,7 @@ class CollectionsRouter(BaseRouterV3):
             )
 
         @self.router.get(
-            "/collections/{id}/documents",
+            "/by-id/{id}/documents",
             summary="List documents in collection",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -488,7 +488,7 @@ class CollectionsRouter(BaseRouterV3):
             }
 
         @self.router.delete(
-            "/collections/{id}/documents/{document_id}",
+            "/by-id/{id}/documents/{document_id}",
             summary="Remove document from collection",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -518,7 +518,7 @@ class CollectionsRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.get(
-            "/collections/{id}/users",
+            "/by-id/{id}/users",
             summary="List users in collection",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -563,7 +563,7 @@ class CollectionsRouter(BaseRouterV3):
             }
 
         @self.router.post(
-            "/collections/{id}/users/{user_id}",
+            "/by-id/{id}/users/{user_id}",
             summary="Add user to collection",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -593,7 +593,7 @@ class CollectionsRouter(BaseRouterV3):
             return GenericBooleanResponse(success=result)  # type: ignore
 
         @self.router.delete(
-            "/collections/{id}/users/{user_id}",
+            "/by-id/{id}/users/{user_id}",
             summary="Remove user from collection",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -625,7 +625,7 @@ class CollectionsRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.post(
-            "/collections/{id}/extract",
+            "/by-id/{id}/extract",
             summary="Extract entities and relationships",
             dependencies=[Depends(self.rate_limit_dependency)],
             openapi_extra={
