@@ -101,7 +101,39 @@ git checkout -b feature/new_branch origin/develop
 
 ---
 
-## 6. Clean Up Untracked Files (Optional)
+## 6. Remove a Branch
+### a. Remove a Local Branch
+```bash
+git branch -d <branch_name>
+```
+- Deletes a local branch. Will not delete if the branch has unmerged changes.
+
+```bash
+git branch -D <branch_name>
+```
+- Force deletes a local branch, even if it has unmerged changes.
+
+### Example:
+```bash
+git branch -D feature/develop_temp
+```
+- Force deletes the local `feature/develop_temp` branch.
+
+### b. Remove a Remote Branch
+```bash
+git push origin --delete <branch_name>
+```
+- Deletes the branch from the remote repository.
+
+### Example:
+```bash
+git push origin --delete feature/develop_temp
+```
+- Deletes the remote `feature/develop_temp` branch.
+
+---
+
+## 7. Clean Up Untracked Files (Optional)
 ```bash
 git clean -fd
 ```
