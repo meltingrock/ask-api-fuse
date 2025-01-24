@@ -429,7 +429,7 @@ services:
     restart: on-failure
     volumes:
       - type: bind
-        source: ${PWD}/../py
+        source: /data/askfrankly/ask-api-fuse/py
         target: /app/py
         read_only: false
       - ${FUSE_CONFIG_PATH:-/}:${FUSE_CONFIG_PATH:-/app/config}

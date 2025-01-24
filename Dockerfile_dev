@@ -67,5 +67,8 @@ COPY py/pyproject.toml /app/pyproject.toml
 # Riaan added
 WORKDIR /app/py
 
+## Keep the container running
+#CMD ["tail", "-f", "/dev/null"]
+
 # Run the application
 CMD ["sh", "-c", "uvicorn core.main.app_entry:app --host $FUSE_HOST --port $FUSE_PORT"]
