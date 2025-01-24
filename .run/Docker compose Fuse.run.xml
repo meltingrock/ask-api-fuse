@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Docker compose Fuse" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
+    <deployment type="docker-compose.yml">
+      <settings>
+        <option name="composeProjectName" value="ask-api-fuse" />
+        <option name="envFilePath" value="$PROJECT_DIR$/docker/env-dockercompose.bkp" />
+        <option name="sourceFilePath" value="docker/dev_docker_compose_fuse.full.yaml" />
+        <option name="upRemoveOrphans" value="true" />
+      </settings>
+    </deployment>
+    <method v="2" />
+  </configuration>
+</component>
