@@ -9,7 +9,7 @@ from uuid import UUID
 
 from fastapi import HTTPException
 
-from core import R2RRAGAgent, R2RStreamingRAGAgent
+from core import FUSERAGAgent, FUSEStreamingRAGAgent
 from core.base import (
     AggregateSearchResult,
     ChunkSearchResult,
@@ -23,7 +23,7 @@ from core.base import (
     GraphSearchResultType,
     IngestionStatus,
     Message,
-    R2RException,
+    FUSEException,
     SearchSettings,
     format_search_results_for_stream,
     to_async_generator,
@@ -32,8 +32,8 @@ from core.base.api.models import RAGResponse, User
 from core.telemetry.telemetry_decorator import telemetry_event
 from shared.api.models.management.responses import MessageResponse
 
-from ..abstractions import R2RProviders
-from ..config import R2RConfig
+from ..abstractions import FUSEProviders
+from ..config import FUSEConfig
 from .base import Service
 
 logger = logging.getLogger()
@@ -84,8 +84,8 @@ def num_tokens_from_messages(messages, model="gpt-4o"):
 class RetrievalService(Service):
     def __init__(
         self,
-        config: R2RConfig,
-        providers: R2RProviders,
+        config: FUSEConfig,
+        providers: FUSEProviders,
     ):
         super().__init__(
             config,
@@ -113,7 +113,7 @@ class RetrievalService(Service):
             search_settings.use_semantic_search
             and self.config.database.provider is None
         ):
-            raise R2RException(
+            raise FUSEException(
                 status_code=400,
                 message="Vector search is not enabled in the configuration.",
             )
@@ -126,7 +126,7 @@ class RetrievalService(Service):
             )
             or search_settings.use_hybrid_search
         ) and not search_settings.hybrid_settings:
-            raise R2RException(
+            raise FUSEException(
                 status_code=400,
                 message="Hybrid search settings must be specified in the input configuration.",
             )
@@ -614,13 +614,13 @@ class RetrievalService(Service):
     ):
         try:
             if message and messages:
-                raise R2RException(
+                raise FUSEException(
                     status_code=400,
                     message="Only one of message or messages should be provided",
                 )
 
             if not message and not messages:
-                raise R2RException(
+                raise FUSEException(
                     status_code=400,
                     message="Either message or messages should be provided",
                 )
@@ -630,7 +630,7 @@ class RetrievalService(Service):
                 if isinstance(message, dict):
                     message = Message.from_dict(message)
                 else:
-                    raise R2RException(
+                    raise FUSEException(
                         status_code=400,
                         message="""
                             Invalid message format. The expected format contains:
@@ -702,7 +702,7 @@ class RetrievalService(Service):
                 messages.append(message)
 
             if not messages:
-                raise R2RException(
+                raise FUSEException(
                     status_code=400,
                     message="No messages to process",
                 )
@@ -732,7 +732,7 @@ class RetrievalService(Service):
             )
 
             if use_extended_prompt and task_prompt_override:
-                raise R2RException(
+                raise FUSEException(
                     status_code=400,
                     message="Both use_extended_prompt and task_prompt_override cannot be True at the same time",
                 )
@@ -757,7 +757,7 @@ class RetrievalService(Service):
 
                 async def stream_response():
                     try:
-                        agent = R2RStreamingRAGAgent(
+                        agent = FUSEStreamingRAGAgent(
                             database_provider=self.providers.database,
                             llm_provider=self.providers.llm,
                             config=agent_config,
@@ -819,7 +819,7 @@ class RetrievalService(Service):
 
                 return stream_response()
 
-            agent = R2RRAGAgent(
+            agent = FUSERAGAgent(
                 database_provider=self.providers.database,
                 llm_provider=self.providers.llm,
                 config=agent_config,

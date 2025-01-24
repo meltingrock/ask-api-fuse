@@ -14,7 +14,7 @@ from core.base import (
     DocumentType,
     GenerationConfig,
     IngestionStatus,
-    R2RException,
+    FUSEException,
     RawChunk,
     UnprocessedChunk,
     Vector,
@@ -27,15 +27,15 @@ from core.base.abstractions import (
     ChunkEnrichmentSettings,
     IndexMeasure,
     IndexMethod,
-    R2RDocumentProcessingError,
+    FUSEDocumentProcessingError,
     VectorTableName,
 )
 from core.base.api.models import User
 from core.telemetry.telemetry_decorator import telemetry_event
 from shared.abstractions import PDFParsingError, PopperNotFoundError
 
-from ..abstractions import R2RProviders
-from ..config import R2RConfig
+from ..abstractions import FUSEProviders
+from ..config import FUSEConfig
 
 logger = logging.getLogger()
 STARTING_VERSION = "v0"
@@ -49,8 +49,8 @@ class IngestionService:
 
     def __init__(
         self,
-        config: R2RConfig,
-        providers: R2RProviders,
+        config: FUSEConfig,
+        providers: FUSEProviders,
     ) -> None:
         self.config = config
         self.providers = providers
@@ -73,11 +73,11 @@ class IngestionService:
         """
         try:
             if not file_data:
-                raise R2RException(
+                raise FUSEException(
                     status_code=400, message="No files provided for ingestion."
                 )
             if not file_data.get("filename"):
-                raise R2RException(
+                raise FUSEException(
                     status_code=400, message="File name not provided."
                 )
 
@@ -106,7 +106,7 @@ class IngestionService:
             if len(existing_document_info) > 0:
                 existing_doc = existing_document_info[0]
                 if existing_doc.ingestion_status == IngestionStatus.SUCCESS:
-                    raise R2RException(
+                    raise FUSEException(
                         status_code=409,
                         message=(
                             f"Document {document_id} already exists. "
@@ -115,7 +115,7 @@ class IngestionService:
                         ),
                     )
                 elif existing_doc.ingestion_status != IngestionStatus.FAILED:
-                    raise R2RException(
+                    raise FUSEException(
                         status_code=409,
                         message=(
                             f"Document {document_id} is currently ingesting "
@@ -132,8 +132,8 @@ class IngestionService:
             return {
                 "info": document_info,
             }
-        except R2RException as e:
-            logger.error(f"R2RException in ingest_file_ingress: {str(e)}")
+        except FUSEException as e:
+            logger.error(f"FUSEException in ingest_file_ingress: {str(e)}")
             raise
         except Exception as e:
             raise HTTPException(
@@ -153,7 +153,7 @@ class IngestionService:
             file_name.split(".")[-1].lower() if file_name != "N/A" else "txt"
         )
         if file_extension.upper() not in DocumentType.__members__:
-            raise R2RException(
+            raise FUSEException(
                 status_code=415,
                 message=f"'{file_extension}' is not a valid DocumentType.",
             )
@@ -239,7 +239,7 @@ class IngestionService:
             )
             if not retrieved:
                 # No file found in the DB, can't parse
-                raise R2RDocumentProcessingError(
+                raise FUSEDocumentProcessingError(
                     document_id=document_info.id,
                     error_message="No file content found in DB for this document.",
                 )
@@ -275,15 +275,15 @@ class IngestionService:
                 yield extraction
 
         except (PopperNotFoundError, PDFParsingError) as e:
-            raise R2RDocumentProcessingError(
+            raise FUSEDocumentProcessingError(
                 error_message=e.message,
                 document_id=document_info.id,
                 status_code=e.status_code,
             )
         except Exception as e:
-            if R2RException:
+            if FUSEException:
                 raise
-            raise R2RDocumentProcessingError(
+            raise FUSEDocumentProcessingError(
                 document_id=document_info.id,
                 error_message=f"Error parsing document: {str(e)}",
             )
@@ -554,7 +554,7 @@ class IngestionService:
         Directly ingest user-provided text chunks (rather than from a file).
         """
         if not chunks:
-            raise R2RException(
+            raise FUSEException(
                 status_code=400, message="No chunks provided for ingestion."
             )
         metadata = metadata or {}
@@ -579,7 +579,7 @@ class IngestionService:
         if len(existing_document_info) > 0:
             existing_doc = existing_document_info[0]
             if existing_doc.ingestion_status != IngestionStatus.FAILED:
-                raise R2RException(
+                raise FUSEException(
                     status_code=409,
                     message=(
                         f"Document {document_id} was already ingested "
@@ -615,7 +615,7 @@ class IngestionService:
             )
         )
         if not existing_chunks["results"]:
-            raise R2RException(
+            raise FUSEException(
                 status_code=404,
                 message=f"Chunk with chunk_id {chunk_id} not found.",
             )
@@ -624,7 +624,7 @@ class IngestionService:
             await self.providers.database.chunks_handler.get_chunk(chunk_id)
         )
         if not existing_chunk:
-            raise R2RException(
+            raise FUSEException(
                 status_code=404,
                 message=f"Chunk with id {chunk_id} not found",
             )
@@ -633,7 +633,7 @@ class IngestionService:
             str(existing_chunk["owner_id"]) != str(user.id)
             and not user.is_superuser
         ):
-            raise R2RException(
+            raise FUSEException(
                 status_code=403,
                 message="You don't have permission to modify this chunk.",
             )
@@ -850,7 +850,7 @@ class IngestionService:
             filter_user_ids=[user.id],
         )
         if not existing_document["results"]:
-            raise R2RException(
+            raise FUSEException(
                 status_code=404,
                 message=(
                     f"Document with id {document_id} not found "

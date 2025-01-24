@@ -1,5 +1,5 @@
 import { feature } from "../../feature";
-import { r2rClient } from "../../r2rClient";
+import { fuseClient } from "../../fuseClient";
 import {
   UnprocessedChunk,
   WrappedBooleanResponse,
@@ -9,7 +9,7 @@ import {
 import { ensureSnakeCase } from "../../utils";
 
 export class ChunksClient {
-  constructor(private client: r2rClient) {}
+  constructor(private client: fuseClient) {}
 
   /**
      * Create multiple chunks.

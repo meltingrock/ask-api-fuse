@@ -1,5 +1,5 @@
 """
-Tests document ingestion functionality in R2R across all supported file types and modes.
+Tests document ingestion functionality in FUSE across all supported file types and modes.
 
 Supported file types include:
 - Documents: .doc, .docx, .odt, .pdf, .rtf, .txt
@@ -26,11 +26,11 @@ from uuid import UUID
 
 import pytest
 
-from r2r import R2RClient, R2RException
+from fuse import FUSEClient, FUSEException
 
 
 def file_ingestion(
-    client: R2RClient,
+    client: FUSEClient,
     file_path: Optional[str] = None,
     ingestion_mode: Optional[str] = None,
     expected_status: str = "success",
@@ -46,7 +46,7 @@ def file_ingestion(
     Test ingestion of a file with the given parameters.
 
     Args:
-        client: R2RClient instance
+        client: FUSEClient instance
         file_path: Path to the file to ingest
         ingestion_mode: Optional ingestion mode ("fast", "hi-res", or None for default)
         expected_status: Expected final status of the document
@@ -106,7 +106,7 @@ def file_ingestion(
                         f"Document ingestion failed: {retrieval_response}"
                     )
 
-            except R2RException as e:
+            except FUSEException as e:
                 if e.status_code == 404:
                     # Document not yet available, continue polling if within timeout
                     if time.time() - start_time > timeout:
@@ -126,7 +126,7 @@ def file_ingestion(
     #     if cleanup and doc_id is not None:
     #         try:
     #             client.documents.delete(id=doc_id)
-    #         except R2RException:
+    #         except FUSEException:
     #             # Ignore cleanup errors
     #             pass
     #     return doc_id
@@ -145,7 +145,7 @@ def config():
 @pytest.fixture(scope="session")
 def client(config):
     """Create a client instance and log in as a superuser."""
-    client = R2RClient(config.base_url)
+    client = FUSEClient(config.base_url)
     client.users.login(config.superuser_email, config.superuser_password)
     return client
 
@@ -183,7 +183,7 @@ def client(config):
     ],
 )
 def test_file_type_ingestion(
-    client: R2RClient, file_type: str, file_path: str
+    client: FUSEClient, file_type: str, file_path: str
 ):
     """Test ingestion of specific file type."""
 
@@ -209,7 +209,7 @@ def test_file_type_ingestion(
         ("pptx", "core/examples/supported_file_types/pptx.pptx"),
     ],
 )
-def test_hires_ingestion(client: R2RClient, file_type: str, file_path: str):
+def test_hires_ingestion(client: FUSEClient, file_type: str, file_path: str):
     """Test hi-res ingestion with complex documents containing mixed content."""
     if file_type == "pdf":
         try:
@@ -221,7 +221,7 @@ def test_hires_ingestion(client: R2RClient, file_type: str, file_path: str):
                 wait_for_completion=True,
             )
             assert result is not None
-        except Exception as e:  # Changed from R2RException to Exception
+        except Exception as e:  # Changed from FUSEException to Exception
             if "PDF processing requires Poppler to be installed" in str(e):
                 pytest.skip(
                     "Skipping PDF test due to missing Poppler dependency"
@@ -238,10 +238,10 @@ def test_hires_ingestion(client: R2RClient, file_type: str, file_path: str):
         assert result is not None
 
 
-def test_custom_ingestion_config(client: R2RClient):
+def test_custom_ingestion_config(client: FUSEClient):
     """Test ingestion with custom configuration parameters."""
     custom_config = {
-        "provider": "r2r",
+        "provider": "fuse",
         "strategy": "auto",
         # "chunking_strategy": "by_title", Fixme: This was not implemented in the ingestion config
         "new_after_n_chars": 256,
@@ -265,7 +265,7 @@ def test_custom_ingestion_config(client: R2RClient):
         raise
 
 
-def test_raw_text_ingestion(client: R2RClient):
+def test_raw_text_ingestion(client: FUSEClient):
     """Test ingestion of raw text content."""
     text_content = "This is a test document.\nIt has multiple lines.\nTesting raw text ingestion."
 
@@ -285,7 +285,7 @@ def test_raw_text_ingestion(client: R2RClient):
             retrieval_response = client.documents.retrieve(id=doc_id)
             if retrieval_response["results"]["ingestion_status"] == "success":
                 break
-        except R2RException as e:
+        except FUSEException as e:
             if time.time() - start_time > 600:
                 raise TimeoutError("Ingestion didn't complete within timeout")
             time.sleep(2)
@@ -293,7 +293,7 @@ def test_raw_text_ingestion(client: R2RClient):
     client.documents.delete(id=doc_id)
 
 
-def test_chunks_ingestion(client: R2RClient):
+def test_chunks_ingestion(client: FUSEClient):
     """Test ingestion of pre-processed chunks."""
     chunks = ["This is chunk 1", "This is chunk 2", "This is chunk 3"]
 
@@ -306,7 +306,7 @@ def test_chunks_ingestion(client: R2RClient):
     client.documents.delete(id=response["results"]["document_id"])
 
 
-def test_metadata_handling(client: R2RClient):
+def test_metadata_handling(client: FUSEClient):
     """Test ingestion with metadata."""
     metadata = {
         "title": "Test Document",

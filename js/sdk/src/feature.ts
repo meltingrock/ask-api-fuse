@@ -23,7 +23,7 @@ export function initializeTelemetry(enableTelemetry: boolean = true) {
   }
 
   telemetryEnabled =
-    enableTelemetry && process.env.R2R_JS_DISABLE_TELEMETRY !== "true";
+    enableTelemetry && process.env.FUSE_JS_DISABLE_TELEMETRY !== "true";
 
   if (typeof window !== "undefined") {
     // Browser environment

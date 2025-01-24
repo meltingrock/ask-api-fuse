@@ -1,15 +1,15 @@
-import { r2rClient } from "../src/index";
+import { fuseClient } from "../src/index";
 import { describe, test, beforeAll, expect } from "@jest/globals";
 
 const baseUrl = "http://localhost:7272";
 
-describe("r2rClient V3 System Integration Tests User", () => {
-  let client: r2rClient;
+describe("fuseClient V3 System Integration Tests User", () => {
+  let client: fuseClient;
   let userId: string;
   let name: string | undefined;
 
   beforeAll(async () => {
-    client = new r2rClient(baseUrl);
+    client = new fuseClient(baseUrl);
   });
 
   test("Register a new user", async () => {

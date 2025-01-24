@@ -10,7 +10,7 @@ from shared.abstractions import (
     WebSearchResult,
 )
 from shared.abstractions.llm import LLMChatCompletion
-from shared.api.models.base import R2RResults
+from shared.api.models.base import FUSEResults
 
 
 class RAGResponse(BaseModel):
@@ -110,10 +110,10 @@ class DocumentSearchResult(BaseModel):
     )
 
 
-WrappedCompletionResponse = R2RResults[LLMChatCompletion]
+WrappedCompletionResponse = FUSEResults[LLMChatCompletion]
 # Create wrapped versions of the responses
-WrappedVectorSearchResponse = R2RResults[list[ChunkSearchResult]]
-WrappedSearchResponse = R2RResults[AggregateSearchResult]
-WrappedDocumentSearchResponse = R2RResults[list[DocumentSearchResult]]
-WrappedRAGResponse = R2RResults[RAGResponse]
-WrappedAgentResponse = R2RResults[AgentResponse]
+WrappedVectorSearchResponse = FUSEResults[list[ChunkSearchResult]]
+WrappedSearchResponse = FUSEResults[AggregateSearchResult]
+WrappedDocumentSearchResponse = FUSEResults[list[DocumentSearchResult]]
+WrappedRAGResponse = FUSEResults[RAGResponse]
+WrappedAgentResponse = FUSEResults[AgentResponse]

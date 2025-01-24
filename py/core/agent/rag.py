@@ -3,7 +3,7 @@ from typing import Any, Callable, Optional, Tuple
 
 import tiktoken
 
-from core.agent import R2RAgent, R2RStreamingAgent
+from core.agent import FUSEAgent, FUSEStreamingAgent
 from core.base import (
     format_search_results_for_llm,
     format_search_results_for_stream,
@@ -33,7 +33,7 @@ def num_tokens(text, model="gpt-4o"):
 class RAGAgentMixin:
     """
     A Mixin for adding local_search, web_search, and content tools
-    to your R2R Agents. This allows your agent to:
+    to your FUSE Agents. This allows your agent to:
       - call local_search_method (semantic/hybrid search)
       - call content_method (fetch entire doc/chunk structures)
       - call an external web search API
@@ -85,7 +85,7 @@ class RAGAgentMixin:
         return Tool(
             name="search",
             description=(
-                "Search your local knowledge base using the R2R system. "
+                "Search your local knowledge base using the FUSE system. "
                 "Use this when you want relevant text chunks or knowledge graph data."
             ),
             results_function=self._local_search_function,
@@ -427,7 +427,7 @@ class RAGAgentMixin:
 # ------------------------------------------------------------------------------
 
 
-class R2RRAGAgent(RAGAgentMixin, R2RAgent):
+class FUSERAGAgent(RAGAgentMixin, FUSEAgent):
     """
     Non-streaming RAG Agent that supports local_search, content, web_search.
     """
@@ -443,8 +443,8 @@ class R2RRAGAgent(RAGAgentMixin, R2RAgent):
         content_method: Optional[Callable] = None,
         max_tool_context_length: int = 10_000,
     ):
-        # Initialize base R2RAgent
-        R2RAgent.__init__(
+        # Initialize base FUSEAgent
+        FUSEAgent.__init__(
             self,
             database_provider=database_provider,
             llm_provider=llm_provider,
@@ -465,7 +465,7 @@ class R2RRAGAgent(RAGAgentMixin, R2RAgent):
         )
 
 
-class R2RStreamingRAGAgent(RAGAgentMixin, R2RStreamingAgent):
+class FUSEStreamingRAGAgent(RAGAgentMixin, FUSEStreamingAgent):
     """
     Streaming-capable RAG Agent that supports local_search, content, web_search.
     """
@@ -484,8 +484,8 @@ class R2RStreamingRAGAgent(RAGAgentMixin, R2RStreamingAgent):
         # Force streaming on
         config.stream = True
 
-        # Initialize base R2RStreamingAgent
-        R2RStreamingAgent.__init__(
+        # Initialize base FUSEStreamingAgent
+        FUSEStreamingAgent.__init__(
             self,
             database_provider=database_provider,
             llm_provider=llm_provider,

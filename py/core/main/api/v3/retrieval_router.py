@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 from core.base import (
     GenerationConfig,
     Message,
-    R2RException,
+    FUSEException,
     SearchMode,
     SearchSettings,
     select_search_filters,
@@ -21,7 +21,7 @@ from core.base.api.models import (
     WrappedSearchResponse,
 )
 
-from ...abstractions import R2RProviders, R2RServices
+from ...abstractions import FUSEProviders, FUSEServices
 from .base_router import BaseRouterV3
 
 
@@ -44,8 +44,8 @@ def merge_search_settings(
 class RetrievalRouterV3(BaseRouterV3):
     def __init__(
         self,
-        providers: R2RProviders,
-        services: R2RServices,
+        providers: FUSEProviders,
+        services: FUSEServices,
     ):
         logging.info("Initializing RetrievalRouterV3")
         super().__init__(providers, services)
@@ -85,112 +85,7 @@ class RetrievalRouterV3(BaseRouterV3):
         @self.router.post(
             "/retrieval/search",
             dependencies=[Depends(self.rate_limit_dependency)],
-            summary="Search R2R",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # if using auth, do client.login(...)
-
-                            # Basic mode, no overrides
-                            response = client.retrieval.search(
-                                query="Who is Aristotle?",
-                                search_mode="basic"
-                            )
-
-                            # Advanced mode with overrides
-                            response = client.retrieval.search(
-                                query="Who is Aristotle?",
-                                search_mode="advanced",
-                                search_settings={
-                                    "filters": {"document_id": {"$eq": "3e157b3a-..."}},
-                                    "limit": 5
-                                }
-                            )
-
-                            # Custom mode with full control
-                            response = client.retrieval.search(
-                                query="Who is Aristotle?",
-                                search_mode="custom",
-                                search_settings={
-                                    "use_semantic_search": True,
-                                    "filters": {"category": {"$like": "%philosophy%"}},
-                                    "limit": 20,
-                                    "chunk_settings": {"limit": 20},
-                                    "graph_settings": {"enabled": True}
-                                }
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.search({
-                                    query: "Who is Aristotle?",
-                                    search_settings: {
-                                        filters: {"document_id": {"$eq": "3e157b3a-8469-51db-90d9-52e7d896b49b"}},
-                                        useSemanticSearch: true,
-                                        chunkSettings: {
-                                            limit: 20, # separate limit for chunk vs. graph
-                                            enabled: true
-                                        },
-                                        graphSettings: {
-                                            enabled: true,
-                                        }
-                                    }
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r retrieval search --query "Who is Aristotle?"
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "Shell",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/retrieval/search" \\
-                                -H "Content-Type: application/json" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" \\
-                                -d '{
-                                "query": "Who is Aristotle?",
-                                "search_settings": {
-                                    filters: {"document_id": {"$eq": "3e157b3a-8469-51db-90d9-52e7d896b49b"}},
-                                    use_semantic_search: true,
-                                    chunk_settings: {
-                                        limit: 20, # separate limit for chunk vs. graph
-                                        enabled: true
-                                    },
-                                    graph_settings: {
-                                        enabled: true,
-                                    }
-                                }
-                            }'
-                            """
-                        ),
-                    },
-                ]
-            },
+            summary="Search FUSE",
         )
         @self.base_endpoint
         async def search_app(
@@ -254,7 +149,7 @@ class RetrievalRouterV3(BaseRouterV3):
             Provide the entire `search_settings` to define your search exactly as you want it.
             """
             if query == "":
-                raise R2RException("Query cannot be empty", 400)
+                raise FUSEException("Query cannot be empty", 400)
             effective_settings = self._prepare_search_settings(
                 auth_user, search_mode, search_settings
             )
@@ -269,112 +164,6 @@ class RetrievalRouterV3(BaseRouterV3):
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="RAG Query",
             response_model=None,
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            response =client.retrieval.rag(
-                                query="Who is Aristotle?",
-                                search_settings={
-                                    "use_semantic_search": True,
-                                    "filters": {"document_id": {"$eq": "3e157b3a-8469-51db-90d9-52e7d896b49b"}},
-                                    "limit": 10,
-                                    chunk_settings={
-                                        "limit": 20, # separate limit for chunk vs. graph
-                                    },
-                                    graph_settings={
-                                        "enabled": True,
-                                    },
-                                },
-                                rag_generation_config: {
-                                    stream: false,
-                                    temperature: 0.7,
-                                    max_tokens: 150
-                                }
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.retrieval.rag({
-                                    query: "Who is Aristotle?",
-                                    search_settings: {
-                                        filters: {"document_id": {"$eq": "3e157b3a-8469-51db-90d9-52e7d896b49b"}},
-                                        useSemanticSearch: true,
-                                        chunkSettings: {
-                                            limit: 20, # separate limit for chunk vs. graph
-                                            enabled: true
-                                        },
-                                        graphSettings: {
-                                            enabled: true,
-                                        },
-                                    },
-                                    ragGenerationConfig: {
-                                        stream: false,
-                                        temperature: 0.7,
-                                        maxTokens: 150
-                                    }
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r retrieval search --query "Who is Aristotle?" --stream
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "Shell",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/retrieval/rag" \\
-                                -H "Content-Type: application/json" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" \\
-                                -d '{
-                                "query": "Who is Aristotle?",
-                                "search_settings": {
-                                    "use_semantic_search": True,
-                                    "filters": {"document_id": {"$eq": "3e157b3a-8469-51db-90d9-52e7d896b49b"}},
-                                    "limit": 10,
-                                    chunk_settings={
-                                        "limit": 20, # separate limit for chunk vs. graph
-                                    },
-                                    graph_settings={
-                                        "enabled": True,
-                                    },
-                                },
-                                "rag_generation_config": {
-                                    stream: false,
-                                    temperature: 0.7,
-                                    max_tokens: 150
-                                }
-                            }'
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def rag_app(
@@ -459,114 +248,6 @@ class RetrievalRouterV3(BaseRouterV3):
             "/retrieval/agent",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="RAG-powered Conversational Agent",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                        from r2r import R2RClient
-
-                        client = R2RClient()
-                        # when using auth, do client.login(...)
-
-                        response =client.retrieval.agent(
-                            message={
-                                "role": "user",
-                                "content": "What were the key contributions of Aristotle to logic and how did they influence later philosophers?"
-                            },
-                            search_settings={
-                                "use_semantic_search": True,
-                                "filters": {"document_id": {"$eq": "3e157b3a-8469-51db-90d9-52e7d896b49b"}},
-                                "limit": 10,
-                                chunk_settings={
-                                    "limit": 20, # separate limit for chunk vs. graph
-                                },
-                                graph_settings={
-                                    "enabled": True,
-                                },
-                            },
-                            rag_generation_config: {
-                                stream: false,
-                                temperature: 0.7,
-                                max_tokens: 150
-                            }
-                            include_title_if_available=True,
-                            conversation_id="550e8400-e29b-41d4-a716-446655440000"  # Optional for conversation continuity
-                        )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.retrieval.agent({
-                                    message: {
-                                        role: "user",
-                                        content: "What were the key contributions of Aristotle to logic and how did they influence later philosophers?"
-                                    },
-                                    searchSettings: {
-                                        filters: {"document_id": {"$eq": "3e157b3a-8469-51db-90d9-52e7d896b49b"}},
-                                        useSemanticSearch: true,
-                                        chunkSettings: {
-                                            limit: 20, # separate limit for chunk vs. graph
-                                            enabled: true
-                                        },
-                                        graphSettings: {
-                                            enabled: true,
-                                        },
-                                    },
-                                    ragGenerationConfig: {
-                                        stream: false,
-                                        temperature: 0.7,
-                                        maxTokens: 150
-                                    },
-                                    includeTitleIfAvailable: true,
-                                    conversationId: "550e8400-e29b-41d4-a716-446655440000"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "Shell",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/retrieval/agent" \\
-                                -H "Content-Type: application/json" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" \\
-                                -d '{
-                                "message": {
-                                    "role": "user",
-                                    "content": "What were the key contributions of Aristotle to logic and how did they influence later philosophers?"
-                                },
-                                "search_settings": {
-                                    "use_semantic_search": True,
-                                    "filters": {"document_id": {"$eq": "3e157b3a-8469-51db-90d9-52e7d896b49b"}},
-                                    "limit": 10,
-                                    chunk_settings={
-                                        "limit": 20, # separate limit for chunk vs. graph
-                                    },
-                                    graph_settings={
-                                        "enabled": True,
-                                    },
-                                },
-                                "include_title_if_available": true,
-                                "conversation_id": "550e8400-e29b-41d4-a716-446655440000"
-                                }'
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def agent_app(
@@ -695,7 +376,7 @@ class RetrievalRouterV3(BaseRouterV3):
                 else:
                     return response
             except Exception as e:
-                raise R2RException(str(e), 500)
+                raise FUSEException(str(e), 500)
 
         @self.router.post(
             "/retrieval/completion",
@@ -707,9 +388,9 @@ class RetrievalRouterV3(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from r2r import R2RClient
+                            from fuse import FUSEClient
 
-                            client = R2RClient()
+                            client = FUSEClient()
                             # when using auth, do client.login(...)
 
                             response =client.completion(
@@ -733,9 +414,9 @@ class RetrievalRouterV3(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { r2rClient } = require("r2r-js");
+                            const { fuseClient } = require("fuse-js");
 
-                            const client = new r2rClient();
+                            const client = new fuseClient();
 
                             function main() {
                                 const response = await client.completion({
@@ -838,56 +519,6 @@ class RetrievalRouterV3(BaseRouterV3):
             "/retrieval/embedding",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Generate Embeddings",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.retrieval.embedding(
-                                text="Who is Aristotle?",
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.retrieval.embedding({
-                                    text: "Who is Aristotle?",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "Shell",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/retrieval/embedding" \\
-                                -H "Content-Type: application/json" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" \\
-                                -d '{
-                                "text": "Who is Aristotle?",
-                                }'
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def embedding(

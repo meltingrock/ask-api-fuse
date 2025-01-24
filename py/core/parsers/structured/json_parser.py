@@ -3,7 +3,7 @@ import asyncio
 import json
 from typing import AsyncGenerator
 
-from core.base import R2RException
+from core.base import FUSEException
 from core.base.parsers.base_parser import AsyncParser
 from core.base.providers import (
     CompletionProvider,
@@ -45,7 +45,7 @@ class JSONParser(AsyncParser[str | bytes]):
                 None, self._parse_json, parsed_json
             )
         except json.JSONDecodeError as e:
-            raise R2RException(
+            raise FUSEException(
                 message=f"Failed to parse JSON data, likely due to invalid JSON: {str(e)}",
                 status_code=400,
             )

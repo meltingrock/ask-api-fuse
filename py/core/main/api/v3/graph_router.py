@@ -7,7 +7,7 @@ from fastapi import Body, Depends, Path, Query
 from fastapi.background import BackgroundTasks
 from fastapi.responses import FileResponse
 
-from core.base import KGEnrichmentStatus, R2RException, Workflow
+from core.base import KGEnrichmentStatus, FUSEException, Workflow
 from core.base.abstractions import StoreType
 from core.base.api.models import (
     GenericBooleanResponse,
@@ -26,7 +26,7 @@ from core.utils import (
     update_settings_from_dict,
 )
 
-from ...abstractions import R2RProviders, R2RServices
+from ...abstractions import FUSEProviders, FUSEServices
 from .base_router import BaseRouterV3
 
 logger = logging.getLogger()
@@ -35,8 +35,8 @@ logger = logging.getLogger()
 class GraphRouter(BaseRouterV3):
     def __init__(
         self,
-        providers: R2RProviders,
-        services: R2RServices,
+        providers: FUSEProviders,
+        services: FUSEServices,
     ):
         logging.info("Initializing GraphRouter")
         super().__init__(providers, services)
@@ -84,39 +84,6 @@ class GraphRouter(BaseRouterV3):
             "/graphs",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List graphs",
-            openapi_extra={
-                "x-codeSamples": [
-                    {  # TODO: Verify
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.list()
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.graphs.list({});
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def list_graphs(
@@ -167,50 +134,6 @@ class GraphRouter(BaseRouterV3):
             "/graphs/{collection_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Retrieve graph details",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.get(
-                                collection_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                            )"""
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.graphs.retrieve({
-                                    collectionId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/graphs/d09dedb1-b2ab-48a5-b950-6e1f464d83e7" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_graph(
@@ -225,7 +148,7 @@ class GraphRouter(BaseRouterV3):
                 collection_id
                 not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the specified collection associated with the given graph.",
                     403,
                 )
@@ -282,14 +205,14 @@ class GraphRouter(BaseRouterV3):
                 )
             )["results"]
             if len(collections_overview_response) == 0:
-                raise R2RException("Collection not found.", 404)
+                raise FUSEException("Collection not found.", 404)
 
             # Check user permissions for graph
             if (
                 not auth_user.is_superuser
                 and collections_overview_response[0].owner_id != auth_user.id
             ):
-                raise R2RException(
+                raise FUSEException(
                     "Only superusers can `build communities` for a graph they do not own.",
                     403,
                 )
@@ -337,50 +260,6 @@ class GraphRouter(BaseRouterV3):
             "/graphs/{collection_id}/reset",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Reset a graph back to the initial state.",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.reset(
-                                collection_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                            )"""
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.graphs.reset({
-                                    collectionId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/graphs/d09dedb1-b2ab-48a5-b950-6e1f464d83e7/reset" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def reset(
@@ -396,14 +275,14 @@ class GraphRouter(BaseRouterV3):
             and are managed through the document lifecycle.
             """
             if not auth_user.is_superuser:
-                raise R2RException("Only superusers can reset a graph", 403)
+                raise FUSEException("Only superusers can reset a graph", 403)
 
             if (
                 # not auth_user.is_superuser
                 collection_id
                 not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
                     403,
                 )
@@ -417,48 +296,6 @@ class GraphRouter(BaseRouterV3):
             "/graphs/{collection_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Update graph",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.update(
-                                collection_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                graph={
-                                    "name": "New Name",
-                                    "description": "New Description"
-                                }
-                            )"""
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.graphs.update({
-                                    collection_id: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                    name: "New Name",
-                                    description: "New Description",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def update_graph(
@@ -481,7 +318,7 @@ class GraphRouter(BaseRouterV3):
             The user must have appropriate permissions to modify the collection.
             """
             if not auth_user.is_superuser:
-                raise R2RException(
+                raise FUSEException(
                     "Only superusers can update graph details", 403
                 )
 
@@ -489,7 +326,7 @@ class GraphRouter(BaseRouterV3):
                 not auth_user.is_superuser
                 and id not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
                     403,
                 )
@@ -509,9 +346,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from r2r import R2RClient
+                            from fuse import FUSEClient
 
-                            client = R2RClient()
+                            client = FUSEClient()
                             # when using auth, do client.login(...)
 
                             response = client.graphs.list_entities(collection_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7")
@@ -522,9 +359,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { r2rClient } = require("r2r-js");
+                            const { fuseClient } = require("fuse-js");
 
-                            const client = new r2rClient();
+                            const client = new fuseClient();
 
                             function main() {
                                 const response = await client.graphs.listEntities({
@@ -564,7 +401,7 @@ class GraphRouter(BaseRouterV3):
                 collection_id
                 not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
                     403,
                 )
@@ -589,9 +426,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from r2r import R2RClient
+                            from fuse import FUSEClient
 
-                            client = R2RClient("http://localhost:7272")
+                            client = FUSEClient("http://localhost:7272")
                             # when using auth, do client.login(...)
 
                             response = client.graphs.export_entities(
@@ -607,9 +444,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { r2rClient } = require("r2r-js");
+                            const { fuseClient } = require("fuse-js");
 
-                            const client = new r2rClient("http://localhost:7272");
+                            const client = new fuseClient("http://localhost:7272");
 
                             function main() {
                                 await client.graphs.exportEntities({
@@ -670,7 +507,7 @@ class GraphRouter(BaseRouterV3):
             """
 
             if not auth_user.is_superuser:
-                raise R2RException(
+                raise FUSEException(
                     "Only a superuser can export data.",
                     403,
                 )
@@ -722,7 +559,7 @@ class GraphRouter(BaseRouterV3):
                 collection_id
                 not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
                     403,
                 )
@@ -776,7 +613,7 @@ class GraphRouter(BaseRouterV3):
         ) -> WrappedRelationshipResponse:
             """Creates a new relationship in the graph."""
             if not auth_user.is_superuser:
-                raise R2RException(
+                raise FUSEException(
                     "Only superusers can create relationships.", 403
                 )
 
@@ -785,7 +622,7 @@ class GraphRouter(BaseRouterV3):
                 collection_id
                 not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
                     403,
                 )
@@ -811,9 +648,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from r2r import R2RClient
+                            from fuse import FUSEClient
 
-                            client = R2RClient("http://localhost:7272")
+                            client = FUSEClient("http://localhost:7272")
                             # when using auth, do client.login(...)
 
                             response = client.graphs.export_entities(
@@ -829,9 +666,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { r2rClient } = require("r2r-js");
+                            const { fuseClient } = require("fuse-js");
 
-                            const client = new r2rClient("http://localhost:7272");
+                            const client = new fuseClient("http://localhost:7272");
 
                             function main() {
                                 await client.graphs.exportEntities({
@@ -892,7 +729,7 @@ class GraphRouter(BaseRouterV3):
             """
 
             if not auth_user.is_superuser:
-                raise R2RException(
+                raise FUSEException(
                     "Only a superuser can export data.",
                     403,
                 )
@@ -917,45 +754,6 @@ class GraphRouter(BaseRouterV3):
         @self.router.get(
             "/graphs/{collection_id}/entities/{entity_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.get_entity(
-                                collection_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                entity_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.graphs.get_entity({
-                                    collectionId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                    entityId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_entity(
@@ -974,7 +772,7 @@ class GraphRouter(BaseRouterV3):
                 collection_id
                 not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
                     403,
                 )
@@ -987,7 +785,7 @@ class GraphRouter(BaseRouterV3):
                 entity_ids=[entity_id],
             )
             if len(result) == 0 or len(result[0]) == 0:
-                raise R2RException("Entity not found", 404)
+                raise FUSEException("Entity not found", 404)
             return result[0][0]
 
         @self.router.post(
@@ -1019,7 +817,7 @@ class GraphRouter(BaseRouterV3):
         ) -> WrappedEntityResponse:
             """Updates an existing entity in the graph."""
             if not auth_user.is_superuser:
-                raise R2RException(
+                raise FUSEException(
                     "Only superusers can update graph entities.", 403
                 )
             if (
@@ -1027,7 +825,7 @@ class GraphRouter(BaseRouterV3):
                 collection_id
                 not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
                     403,
                 )
@@ -1044,45 +842,6 @@ class GraphRouter(BaseRouterV3):
             "/graphs/{collection_id}/entities/{entity_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Remove an entity",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.remove_entity(
-                                collection_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                entity_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.graphs.removeEntity({
-                                    collectionId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                    entityId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def delete_entity(
@@ -1098,7 +857,7 @@ class GraphRouter(BaseRouterV3):
         ) -> WrappedBooleanResponse:
             """Removes an entity from the graph."""
             if not auth_user.is_superuser:
-                raise R2RException(
+                raise FUSEException(
                     "Only superusers can delete graph details.", 403
                 )
 
@@ -1107,7 +866,7 @@ class GraphRouter(BaseRouterV3):
                 collection_id
                 not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
                     403,
                 )
@@ -1129,9 +888,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from r2r import R2RClient
+                            from fuse import FUSEClient
 
-                            client = R2RClient()
+                            client = FUSEClient()
                             # when using auth, do client.login(...)
 
                             response = client.graphs.list_relationships(collection_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7")
@@ -1142,9 +901,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { r2rClient } = require("r2r-js");
+                            const { fuseClient } = require("fuse-js");
 
-                            const client = new r2rClient();
+                            const client = new fuseClient();
 
                             function main() {
                                 const response = await client.graphs.listRelationships({
@@ -1186,7 +945,7 @@ class GraphRouter(BaseRouterV3):
                 collection_id
                 not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
                     403,
                 )
@@ -1211,9 +970,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from r2r import R2RClient
+                            from fuse import FUSEClient
 
-                            client = R2RClient()
+                            client = FUSEClient()
                             # when using auth, do client.login(...)
 
                             response = client.graphs.get_relationship(
@@ -1227,9 +986,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { r2rClient } = require("r2r-js");
+                            const { fuseClient } = require("fuse-js");
 
-                            const client = new r2rClient();
+                            const client = new fuseClient();
 
                             function main() {
                                 const response = await client.graphs.getRelationship({
@@ -1262,7 +1021,7 @@ class GraphRouter(BaseRouterV3):
                 collection_id
                 not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
                     403,
                 )
@@ -1277,7 +1036,7 @@ class GraphRouter(BaseRouterV3):
                 )
             )
             if len(results) == 0 or len(results[0]) == 0:
-                raise R2RException("Relationship not found", 404)
+                raise FUSEException("Relationship not found", 404)
             return results[0][0]
 
         @self.router.post(
@@ -1322,7 +1081,7 @@ class GraphRouter(BaseRouterV3):
         ) -> WrappedRelationshipResponse:
             """Updates an existing relationship in the graph."""
             if not auth_user.is_superuser:
-                raise R2RException(
+                raise FUSEException(
                     "Only superusers can update graph details", 403
                 )
 
@@ -1331,7 +1090,7 @@ class GraphRouter(BaseRouterV3):
                 collection_id
                 not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
                     403,
                 )
@@ -1358,9 +1117,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from r2r import R2RClient
+                            from fuse import FUSEClient
 
-                            client = R2RClient()
+                            client = FUSEClient()
                             # when using auth, do client.login(...)
 
                             response = client.graphs.delete_relationship(
@@ -1374,9 +1133,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { r2rClient } = require("r2r-js");
+                            const { fuseClient } = require("fuse-js");
 
-                            const client = new r2rClient();
+                            const client = new fuseClient();
 
                             function main() {
                                 const response = await client.graphs.deleteRelationship({
@@ -1406,7 +1165,7 @@ class GraphRouter(BaseRouterV3):
         ) -> WrappedBooleanResponse:
             """Removes a relationship from the graph."""
             if not auth_user.is_superuser:
-                raise R2RException(
+                raise FUSEException(
                     "Only superusers can delete a relationship.", 403
                 )
 
@@ -1414,7 +1173,7 @@ class GraphRouter(BaseRouterV3):
                 not auth_user.is_superuser
                 and collection_id not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
                     403,
                 )
@@ -1436,9 +1195,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from r2r import R2RClient
+                            from fuse import FUSEClient
 
-                            client = R2RClient()
+                            client = FUSEClient()
                             # when using auth, do client.login(...)
 
                             response = client.graphs.create_community(
@@ -1456,9 +1215,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { r2rClient } = require("r2r-js");
+                            const { fuseClient } = require("fuse-js");
 
-                            const client = new r2rClient();
+                            const client = new fuseClient();
 
                             function main() {
                                 const response = await client.graphs.createCommunity({
@@ -1513,7 +1272,7 @@ class GraphRouter(BaseRouterV3):
             in the graph's community structure.
             """
             if not auth_user.is_superuser:
-                raise R2RException(
+                raise FUSEException(
                     "Only superusers can create a community.", 403
                 )
 
@@ -1521,7 +1280,7 @@ class GraphRouter(BaseRouterV3):
                 not auth_user.is_superuser
                 and collection_id not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
                     403,
                 )
@@ -1539,41 +1298,6 @@ class GraphRouter(BaseRouterV3):
             "/graphs/{collection_id}/communities",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List communities",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.list_communities(collection_id="9fbe403b-c11c-5aae-8ade-ef22980c3ad1")
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.graphs.listCommunities({
-                                    collectionId: "9fbe403b-c11c-5aae-8ade-ef22980c3ad1",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_communities(
@@ -1602,7 +1326,7 @@ class GraphRouter(BaseRouterV3):
                 collection_id
                 not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
                     403,
                 )
@@ -1621,41 +1345,6 @@ class GraphRouter(BaseRouterV3):
             "/graphs/{collection_id}/communities/{community_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Retrieve a community",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.get_community(collection_id="9fbe403b-c11c-5aae-8ade-ef22980c3ad1")
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.graphs.getCommunity({
-                                    collectionId: "9fbe403b-c11c-5aae-8ade-ef22980c3ad1",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_community(
@@ -1677,7 +1366,7 @@ class GraphRouter(BaseRouterV3):
                 collection_id
                 not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
                     403,
                 )
@@ -1692,52 +1381,13 @@ class GraphRouter(BaseRouterV3):
                 )
             )
             if len(results) == 0 or len(results[0]) == 0:
-                raise R2RException("Community not found", 404)
+                raise FUSEException("Community not found", 404)
             return results[0][0]
 
         @self.router.delete(
             "/graphs/{collection_id}/communities/{community_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Delete a community",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.delete_community(
-                                collection_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                community_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.graphs.deleteCommunity({
-                                    collectionId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                    communityId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def delete_community(
@@ -1755,7 +1405,7 @@ class GraphRouter(BaseRouterV3):
                 not auth_user.is_superuser
                 and collection_id not in auth_user.graph_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "Only superusers can delete communities", 403
                 )
 
@@ -1764,7 +1414,7 @@ class GraphRouter(BaseRouterV3):
                 collection_id
                 not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
                     403,
                 )
@@ -1785,9 +1435,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from r2r import R2RClient
+                            from fuse import FUSEClient
 
-                            client = R2RClient("http://localhost:7272")
+                            client = FUSEClient("http://localhost:7272")
                             # when using auth, do client.login(...)
 
                             response = client.graphs.export_communities(
@@ -1803,9 +1453,9 @@ class GraphRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { r2rClient } = require("r2r-js");
+                            const { fuseClient } = require("fuse-js");
 
-                            const client = new r2rClient("http://localhost:7272");
+                            const client = new fuseClient("http://localhost:7272");
 
                             function main() {
                                 await client.graphs.exportCommunities({
@@ -1866,7 +1516,7 @@ class GraphRouter(BaseRouterV3):
             """
 
             if not auth_user.is_superuser:
-                raise R2RException(
+                raise FUSEException(
                     "Only a superuser can export data.",
                     403,
                 )
@@ -1892,55 +1542,6 @@ class GraphRouter(BaseRouterV3):
             "/graphs/{collection_id}/communities/{community_id}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Update community",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.update_community(
-                                collection_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                community_update={
-                                    "metadata": {
-                                        "topic": "Technology",
-                                        "description": "Tech companies and products"
-                                    }
-                                }
-                            )"""
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            async function main() {
-                                const response = await client.graphs.updateCommunity({
-                                    collectionId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                    communityId: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7",
-                                    communityUpdate: {
-                                        metadata: {
-                                            topic: "Technology",
-                                            description: "Tech companies and products"
-                                        }
-                                    }
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def update_community(
@@ -1960,7 +1561,7 @@ class GraphRouter(BaseRouterV3):
                 not auth_user.is_superuser
                 and collection_id not in auth_user.graph_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "Only superusers can update communities.", 403
                 )
 
@@ -1969,7 +1570,7 @@ class GraphRouter(BaseRouterV3):
                 collection_id
                 not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
                     403,
                 )
@@ -1987,42 +1588,6 @@ class GraphRouter(BaseRouterV3):
             "/graphs/{collection_id}/pull",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Pull latest entities to the graph",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            response = client.graphs.pull(
-                                collection_id="d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                            )"""
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            async function main() {
-                                const response = await client.graphs.pull({
-                                    collection_id: "d09dedb1-b2ab-48a5-b950-6e1f464d83e7"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def pull(
@@ -2068,21 +1633,21 @@ class GraphRouter(BaseRouterV3):
                 )
             )["results"]
             if len(collections_overview_response) == 0:
-                raise R2RException("Collection not found.", 404)
+                raise FUSEException("Collection not found.", 404)
 
             # Check user permissions for graph
             if (
                 not auth_user.is_superuser
                 and collections_overview_response[0].owner_id != auth_user.id
             ):
-                raise R2RException("Only superusers can `pull` a graph.", 403)
+                raise FUSEException("Only superusers can `pull` a graph.", 403)
 
             if (
                 # not auth_user.is_superuser
                 collection_id
                 not in auth_user.collection_ids
             ):
-                raise R2RException(
+                raise FUSEException(
                     "The currently authenticated user does not have access to the collection associated with the given graph.",
                     403,
                 )
@@ -2094,7 +1659,7 @@ class GraphRouter(BaseRouterV3):
                 limit=1,
             )
             if len(list_graphs_response["results"]) == 0:
-                raise R2RException("Graph not found", 404)
+                raise FUSEException("Graph not found", 404)
             collection_id = list_graphs_response["results"][0].collection_id
             documents = []
             document_req = (

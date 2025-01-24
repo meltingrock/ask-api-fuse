@@ -7,7 +7,7 @@ from fastapi import Body, Depends, Path, Query
 from fastapi.background import BackgroundTasks
 from fastapi.responses import FileResponse
 
-from core.base import Message, R2RException
+from core.base import Message, FUSEException
 from core.base.api.models import (
     GenericBooleanResponse,
     WrappedBooleanResponse,
@@ -17,7 +17,7 @@ from core.base.api.models import (
     WrappedMessageResponse,
 )
 
-from ...abstractions import R2RProviders, R2RServices
+from ...abstractions import FUSEProviders, FUSEServices
 from .base_router import BaseRouterV3
 
 logger = logging.getLogger()
@@ -26,8 +26,8 @@ logger = logging.getLogger()
 class ConversationsRouter(BaseRouterV3):
     def __init__(
         self,
-        providers: R2RProviders,
-        services: R2RServices,
+        providers: FUSEProviders,
+        services: FUSEServices,
     ):
         logging.info("Initializing ConversationsRouter")
         super().__init__(providers, services)
@@ -37,56 +37,6 @@ class ConversationsRouter(BaseRouterV3):
             "/conversations",
             summary="Create a new conversation",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.conversations.create()
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.conversations.create();
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r conversations create
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/conversations" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def create_conversation(
@@ -111,59 +61,6 @@ class ConversationsRouter(BaseRouterV3):
             "/conversations",
             summary="List conversations",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.conversations.list(
-                                offset=0,
-                                limit=10,
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.conversations.list();
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r conversations list
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/conversations?offset=0&limit=10" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def list_conversations(
@@ -219,9 +116,9 @@ class ConversationsRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from r2r import R2RClient
+                            from fuse import FUSEClient
 
-                            client = R2RClient("http://localhost:7272")
+                            client = FUSEClient("http://localhost:7272")
                             # when using auth, do client.login(...)
 
                             response = client.conversations.export(
@@ -236,9 +133,9 @@ class ConversationsRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { r2rClient } = require("r2r-js");
+                            const { fuseClient } = require("fuse-js");
 
-                            const client = new r2rClient("http://localhost:7272");
+                            const client = new fuseClient("http://localhost:7272");
 
                             function main() {
                                 await client.conversations.export({
@@ -294,7 +191,7 @@ class ConversationsRouter(BaseRouterV3):
             """
 
             if not auth_user.is_superuser:
-                raise R2RException(
+                raise FUSEException(
                     "Only a superuser can export data.",
                     403,
                 )
@@ -325,9 +222,9 @@ class ConversationsRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from r2r import R2RClient
+                            from fuse import FUSEClient
 
-                            client = R2RClient("http://localhost:7272")
+                            client = FUSEClient("http://localhost:7272")
                             # when using auth, do client.login(...)
 
                             response = client.conversations.export_messages(
@@ -342,9 +239,9 @@ class ConversationsRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { r2rClient } = require("r2r-js");
+                            const { fuseClient } = require("fuse-js");
 
-                            const client = new r2rClient("http://localhost:7272");
+                            const client = new fuseClient("http://localhost:7272");
 
                             function main() {
                                 await client.conversations.exportMessages({
@@ -400,7 +297,7 @@ class ConversationsRouter(BaseRouterV3):
             """
 
             if not auth_user.is_superuser:
-                raise R2RException(
+                raise FUSEException(
                     "Only a superuser can export data.",
                     403,
                 )
@@ -425,60 +322,6 @@ class ConversationsRouter(BaseRouterV3):
             "/conversations/{id}",
             summary="Get conversation details",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.conversations.get(
-                                "123e4567-e89b-12d3-a456-426614174000"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.conversations.retrieve({
-                                    id: "123e4567-e89b-12d3-a456-426614174000",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r conversations retrieve 123e4567-e89b-12d3-a456-426614174000
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/conversations/123e4567-e89b-12d3-a456-426614174000" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_conversation(
@@ -506,61 +349,6 @@ class ConversationsRouter(BaseRouterV3):
             "/conversations/{id}",
             summary="Update conversation",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.conversations.update("123e4567-e89b-12d3-a456-426614174000", "new_name")
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.conversations.update({
-                                    id: "123e4567-e89b-12d3-a456-426614174000",
-                                    name: "new_name",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r conversations delete 123e4567-e89b-12d3-a456-426614174000
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/conversations/123e4567-e89b-12d3-a456-426614174000" \
-                                -H "Authorization: Bearer YOUR_API_KEY" \
-                                -H "Content-Type: application/json" \
-                                -d '{"name": "new_name"}'
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def update_conversation(
@@ -589,58 +377,6 @@ class ConversationsRouter(BaseRouterV3):
             "/conversations/{id}",
             summary="Delete conversation",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.conversations.delete("123e4567-e89b-12d3-a456-426614174000")
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.conversations.delete({
-                                    id: "123e4567-e89b-12d3-a456-426614174000",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r conversations delete 123e4567-e89b-12d3-a456-426614174000
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X DELETE "https://api.example.com/v3/conversations/123e4567-e89b-12d3-a456-426614174000" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def delete_conversation(
@@ -669,61 +405,6 @@ class ConversationsRouter(BaseRouterV3):
             "/conversations/{id}/messages",
             summary="Add message to conversation",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.conversations.add_message(
-                                "123e4567-e89b-12d3-a456-426614174000",
-                                content="Hello, world!",
-                                role="user",
-                                parent_id="parent_message_id",
-                                metadata={"key": "value"}
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.conversations.addMessage({
-                                    id: "123e4567-e89b-12d3-a456-426614174000",
-                                    content: "Hello, world!",
-                                    role: "user",
-                                    parentId: "parent_message_id",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/conversations/123e4567-e89b-12d3-a456-426614174000/messages" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" \\
-                                -H "Content-Type: application/json" \\
-                                -d '{"content": "Hello, world!", "parent_id": "parent_message_id", "metadata": {"key": "value"}}'
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def add_message(
@@ -750,9 +431,9 @@ class ConversationsRouter(BaseRouterV3):
             This endpoint adds a new message to an existing conversation.
             """
             if content == "":
-                raise R2RException("Content cannot be empty", status_code=400)
+                raise FUSEException("Content cannot be empty", status_code=400)
             if role not in ["user", "assistant", "system"]:
-                raise R2RException("Invalid role", status_code=400)
+                raise FUSEException("Invalid role", status_code=400)
             message = Message(role=role, content=content)
             return await self.services.management.add_message(
                 conversation_id=id,
@@ -765,58 +446,6 @@ class ConversationsRouter(BaseRouterV3):
             "/conversations/{id}/messages/{message_id}",
             summary="Update message in conversation",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.conversations.update_message(
-                                "123e4567-e89b-12d3-a456-426614174000",
-                                "message_id_to_update",
-                                content="Updated content"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.conversations.updateMessage({
-                                    id: "123e4567-e89b-12d3-a456-426614174000",
-                                    messageId: "message_id_to_update",
-                                    content: "Updated content",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/conversations/123e4567-e89b-12d3-a456-426614174000/messages/message_id_to_update" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" \\
-                                -H "Content-Type: application/json" \\
-                                -d '{"content": "Updated content"}'
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def update_message(

@@ -1,32 +1,32 @@
-# R2R JavaScript SDK Documentation
+# FUSE JavaScript SDK Documentation
 
-For the complete look at the R2R JavaScript SDK, [visit our documentation.](https://r2r-docs.sciphi.ai/api-and-sdks/introduction)
+For the complete look at the FUSE JavaScript SDK, [visit our documentation.](https://fuse-docs.sciphi.ai/api-and-sdks/introduction)
 
 ## Installation
 
-Before starting, make sure you have completed the [R2R installation](https://r2r-docs.sciphi.ai/documentation/installation/overview).
+Before starting, make sure you have completed the [FUSE installation](https://fuse-docs.sciphi.ai/documentation/installation/overview).
 
-Install the R2R JavaScript SDK:
+Install the FUSE JavaScript SDK:
 
 ```bash
-npm install r2r-js
+npm install fuse-js
 ```
 
 ## Getting Started
 
-1. Import the R2R client:
+1. Import the FUSE client:
 
 ```javascript
-const { r2rClient } = require('r2r-js');
+const { fuseClient } = require('fuse-js');
 ```
 
 2. Initialize the client:
 
 ```javascript
-const client = new r2rClient('http://localhost:7272');
+const client = new fuseClient('http://localhost:7272');
 ```
 
-3. Check if R2R is running correctly:
+3. Check if FUSE is running correctly:
 
 ```javascript
 const healthResponse = await client.health();

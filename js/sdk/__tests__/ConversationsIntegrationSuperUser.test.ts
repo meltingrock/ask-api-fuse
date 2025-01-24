@@ -1,4 +1,4 @@
-import { r2rClient } from "../src/index";
+import { fuseClient } from "../src/index";
 import { describe, test, beforeAll, expect, afterAll } from "@jest/globals";
 import fs from "fs";
 import path from "path";
@@ -6,13 +6,13 @@ import path from "path";
 const baseUrl = "http://localhost:7272";
 const TEST_OUTPUT_DIR = path.join(__dirname, "test-output");
 
-describe("r2rClient V3 Collections Integration Tests", () => {
-  let client: r2rClient;
+describe("fuseClient V3 Collections Integration Tests", () => {
+  let client: fuseClient;
   let conversationId: string;
   let messageId: string;
 
   beforeAll(async () => {
-    client = new r2rClient(baseUrl);
+    client = new fuseClient(baseUrl);
     await client.users.login({
       email: "admin@example.com",
       password: "change_me_immediately",

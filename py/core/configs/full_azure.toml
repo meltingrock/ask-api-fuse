@@ -1,8 +1,8 @@
-# A config which overrides all instances of `openai` with `azure` in the `r2r.toml` config
+# A config which overrides all instances of `openai` with `azure` in the `fuse.toml` config
 [completion]
 provider = "litellm"
 concurrent_request_limit = 128
-fast_llm = "azure/gpt-4o-mini" # used inside R2R for `fast` completions, like document summaries
+fast_llm = "azure/gpt-4o-mini" # used inside FUSE for `fast` completions, like document summaries
 
   [completion.generation_config]
   model = "azure/gpt-4o"

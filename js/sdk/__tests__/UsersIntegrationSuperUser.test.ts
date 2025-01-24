@@ -1,4 +1,4 @@
-import { r2rClient } from "../src/index";
+import { fuseClient } from "../src/index";
 import { describe, test, beforeAll, expect, afterAll } from "@jest/globals";
 import fs from "fs";
 import path from "path";
@@ -6,15 +6,15 @@ import path from "path";
 const baseUrl = "http://localhost:7272";
 const TEST_OUTPUT_DIR = path.join(__dirname, "test-output");
 
-describe("r2rClient V3 Users Integration Tests", () => {
-  let client: r2rClient;
-  let superUserClient: r2rClient;
+describe("fuseClient V3 Users Integration Tests", () => {
+  let client: fuseClient;
+  let superUserClient: fuseClient;
   let userId: string;
   let name: string | undefined;
 
   beforeAll(async () => {
-    client = new r2rClient(baseUrl);
-    superUserClient = new r2rClient(baseUrl);
+    client = new fuseClient(baseUrl);
+    superUserClient = new fuseClient(baseUrl);
 
     await superUserClient.users.login({
       email: "admin@example.com",

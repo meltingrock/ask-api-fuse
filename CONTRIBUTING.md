@@ -1,4 +1,4 @@
-# R2R Contribution Guide
+# FUSE Contribution Guide
 
 ## Quick Start
 

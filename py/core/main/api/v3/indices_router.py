@@ -8,14 +8,14 @@ from typing import Optional
 
 from fastapi import Body, Depends, Path, Query
 
-from core.base import IndexConfig, R2RException
+from core.base import IndexConfig, FUSEException
 from core.base.abstractions import VectorTableName
 from core.base.api.models import (
     WrappedGenericMessageResponse,
     WrappedListVectorIndicesResponse,
 )
 
-from ...abstractions import R2RProviders, R2RServices
+from ...abstractions import FUSEProviders, FUSEServices
 from .base_router import BaseRouterV3
 
 logger = logging.getLogger()
@@ -24,8 +24,8 @@ logger = logging.getLogger()
 class IndicesRouter(BaseRouterV3):
     def __init__(
         self,
-        providers: R2RProviders,
-        services: R2RServices,
+        providers: FUSEProviders,
+        services: FUSEServices,
     ):
         logging.info("Initializing IndicesRouter")
         super().__init__(providers, services)
@@ -36,132 +36,6 @@ class IndicesRouter(BaseRouterV3):
             "/indices",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Create Vector Index",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            # Create an HNSW index for efficient similarity search
-                            result = client.indices.create(
-                                config={
-                                    "table_name": "chunks",  # The table containing vector embeddings
-                                    "index_method": "hnsw",   # Hierarchical Navigable Small World graph
-                                    "index_measure": "cosine_distance",  # Similarity measure
-                                    "index_arguments": {
-                                        "m": 16,              # Number of connections per layer
-                                        "ef_construction": 64,# Size of dynamic candidate list for construction
-                                        "ef": 40,            # Size of dynamic candidate list for search
-                                    },
-                                    "index_name": "my_document_embeddings_idx",
-                                    "index_column": "embedding",
-                                    "concurrently": True     # Build index without blocking table writes
-                                },
-                                run_with_orchestration=True  # Run as orchestrated task for large indices
-                            )
-
-                            # Create an IVF-Flat index for balanced performance
-                            result = client.indices.create(
-                                config={
-                                    "table_name": "chunks",
-                                    "index_method": "ivf_flat", # Inverted File with Flat storage
-                                    "index_measure": "l2_distance",
-                                    "index_arguments": {
-                                        "lists": 100,         # Number of cluster centroids
-                                        "probe": 10,          # Number of clusters to search
-                                    },
-                                    "index_name": "my_ivf_embeddings_idx",
-                                    "index_column": "embedding",
-                                    "concurrently": True
-                                }
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.indicies.create({
-                                    config: {
-                                        tableName: "vectors",
-                                        indexMethod: "hnsw",
-                                        indexMeasure: "cosine_distance",
-                                        indexArguments: {
-                                            m: 16,
-                                            ef_construction: 64,
-                                            ef: 40
-                                        },
-                                        indexName: "my_document_embeddings_idx",
-                                        indexColumn: "embedding",
-                                        concurrently: true
-                                    },
-                                    runWithOrchestration: true
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "Shell",
-                        "source": textwrap.dedent(
-                            """
-                            # Create HNSW Index
-                            curl -X POST "https://api.example.com/indices" \\
-                                -H "Content-Type: application/json" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" \\
-                                -d '{
-                                "config": {
-                                    "table_name": "vectors",
-                                    "index_method": "hnsw",
-                                    "index_measure": "cosine_distance",
-                                    "index_arguments": {
-                                    "m": 16,
-                                    "ef_construction": 64,
-                                    "ef": 40
-                                    },
-                                    "index_name": "my_document_embeddings_idx",
-                                    "index_column": "embedding",
-                                    "concurrently": true
-                                },
-                                "run_with_orchestration": true
-                                }'
-
-                            # Create IVF-Flat Index
-                            curl -X POST "https://api.example.com/indices" \\
-                                -H "Content-Type: application/json" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" \\
-                                -d '{
-                                "config": {
-                                    "table_name": "vectors",
-                                    "index_method": "ivf_flat",
-                                    "index_measure": "l2_distance",
-                                    "index_arguments": {
-                                    "lists": 100,
-                                    "probe": 10
-                                    },
-                                    "index_name": "my_ivf_embeddings_idx",
-                                    "index_column": "embedding",
-                                    "concurrently": true
-                                }
-                                }'
-                                """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def create_index(
@@ -236,68 +110,6 @@ class IndicesRouter(BaseRouterV3):
             "/indices",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List Vector Indices",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-
-                            # List all indices
-                            indices = client.indices.list(
-                                offset=0,
-                                limit=10
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.indicies.list({
-                                    offset: 0,
-                                    limit: 10,
-                                    filters: { table_name: "vectors" }
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r indices list
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "Shell",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/indices?offset=0&limit=10" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" \\
-                                -H "Content-Type: application/json"
-
-                            # With filters
-                            curl -X GET "https://api.example.com/indices?offset=0&limit=10&filters={\"table_name\":\"vectors\"}" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" \\
-                                -H "Content-Type: application/json"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def list_indices(
@@ -340,61 +152,6 @@ class IndicesRouter(BaseRouterV3):
             "/indices/{table_name}/{index_name}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Get Vector Index Details",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-
-                            # Get detailed information about a specific index
-                            index = client.indices.retrieve("index_1")
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.indicies.retrieve({
-                                    indexName: "index_1",
-                                    tableName: "vectors"
-                                });
-
-                                console.log(response);
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r indices retrieve index_1 vectors
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "Shell",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/indices/vectors/index_1" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_index(
@@ -436,7 +193,7 @@ class IndicesRouter(BaseRouterV3):
                 )
             )
             if len(indices["indices"]) != 1:
-                raise R2RException(
+                raise FUSEException(
                     f"Index '{index_name}' not found", status_code=404
                 )
             return {"index": indices["indices"][0]}
@@ -450,9 +207,9 @@ class IndicesRouter(BaseRouterV3):
         #                     {
         #                         "lang": "Python",
         #                         "source": """
-        # from r2r import R2RClient
+        # from fuse import FUSEClient
 
-        # client = R2RClient()
+        # client = FUSEClient()
 
         # # Update HNSW index parameters
         # result = client.indices.update(
@@ -504,66 +261,6 @@ class IndicesRouter(BaseRouterV3):
             "/indices/{table_name}/{index_name}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Delete Vector Index",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-
-                            # Delete an index with orchestration for cleanup
-                            result = client.indices.delete(
-                                index_name="index_1",
-                                table_name="vectors",
-                                run_with_orchestration=True
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.indicies.delete({
-                                    indexName: "index_1"
-                                    tableName: "vectors"
-                                });
-
-                                console.log(response);
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r indices delete index_1 vectors
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "Shell",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X DELETE "https://api.example.com/indices/index_1" \\
-                                -H "Content-Type: application/json" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def delete_index(

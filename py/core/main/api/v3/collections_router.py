@@ -7,7 +7,7 @@ from fastapi import Body, Depends, Path, Query
 from fastapi.background import BackgroundTasks
 from fastapi.responses import FileResponse
 
-from core.base import KGCreationSettings, R2RException
+from core.base import KGCreationSettings, FUSEException
 from core.base.api.models import (
     GenericBooleanResponse,
     WrappedBooleanResponse,
@@ -22,7 +22,7 @@ from core.utils import (
     update_settings_from_dict,
 )
 
-from ...abstractions import R2RProviders, R2RServices
+from ...abstractions import FUSEProviders, FUSEServices
 from .base_router import BaseRouterV3
 
 logger = logging.getLogger()
@@ -31,7 +31,7 @@ logger = logging.getLogger()
 from enum import Enum
 from uuid import UUID
 
-from core.base import R2RException
+from core.base import FUSEException
 
 
 class CollectionAction(str, Enum):
@@ -65,7 +65,7 @@ async def authorize_collection_action(
         )
     )["results"]
     if len(results) == 0:
-        raise R2RException("The specified collection does not exist.", 404)
+        raise FUSEException("The specified collection does not exist.", 404)
     details = results[0]
     owner_id = details.owner_id
 
@@ -80,16 +80,16 @@ async def authorize_collection_action(
         if action == CollectionAction.VIEW:
             return True
         else:
-            raise R2RException(
+            raise FUSEException(
                 "Insufficient permissions for this action.", 403
             )
 
     # User is neither owner nor member
-    raise R2RException("You do not have access to this collection.", 403)
+    raise FUSEException("You do not have access to this collection.", 403)
 
 
 class CollectionsRouter(BaseRouterV3):
-    def __init__(self, providers: R2RProviders, services: R2RServices):
+    def __init__(self, providers: FUSEProviders, services: FUSEServices):
         logging.info("Initializing CollectionsRouter")
         super().__init__(providers, services)
 
@@ -98,64 +98,6 @@ class CollectionsRouter(BaseRouterV3):
             "/collections",
             summary="Create a new collection",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.create(
-                                name="My New Collection",
-                                description="This is a sample collection"
-                            )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.collections.create({
-                                    name: "My New Collection",
-                                    description: "This is a sample collection"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r collections create "My New Collection" --description="This is a sample collection"
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/collections" \\
-                                 -H "Content-Type: application/json" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY" \\
-                                 -d '{"name": "My New Collection", "description": "This is a sample collection"}'
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def create_collection(
@@ -182,7 +124,7 @@ class CollectionsRouter(BaseRouterV3):
                 )
             )
             if (user_collections_count + 1) >= user_max_collections:
-                raise R2RException(
+                raise FUSEException(
                     f"User has reached the maximum number of collections allowed ({user_max_collections}).",
                     400,
                 )
@@ -207,9 +149,9 @@ class CollectionsRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from r2r import R2RClient
+                            from fuse import FUSEClient
 
-                            client = R2RClient("http://localhost:7272")
+                            client = FUSEClient("http://localhost:7272")
                             # when using auth, do client.login(...)
 
                             response = client.collections.export(
@@ -224,9 +166,9 @@ class CollectionsRouter(BaseRouterV3):
                         "lang": "JavaScript",
                         "source": textwrap.dedent(
                             """
-                            const { r2rClient } = require("r2r-js");
+                            const { fuseClient } = require("fuse-js");
 
-                            const client = new r2rClient("http://localhost:7272");
+                            const client = new fuseClient("http://localhost:7272");
 
                             function main() {
                                 await client.collections.export({
@@ -282,7 +224,7 @@ class CollectionsRouter(BaseRouterV3):
             """
 
             if not auth_user.is_superuser:
-                raise R2RException(
+                raise FUSEException(
                     "Only a superuser can export data.",
                     403,
                 )
@@ -307,59 +249,6 @@ class CollectionsRouter(BaseRouterV3):
             "/collections",
             summary="List collections",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.list(
-                                offset=0,
-                                limit=10,
-                            )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.collections.list();
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r collections list
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/collections?offset=0&limit=10&name=Sample" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY"
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def list_collections(
@@ -416,56 +305,6 @@ class CollectionsRouter(BaseRouterV3):
             "/collections/{id}",
             summary="Get collection details",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.retrieve("123e4567-e89b-12d3-a456-426614174000")
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.collections.retrieve({id: "123e4567-e89b-12d3-a456-426614174000"});
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r collections retrieve 123e4567-e89b-12d3-a456-426614174000
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/collections/123e4567-e89b-12d3-a456-426614174000" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY"
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_collection(
@@ -495,7 +334,7 @@ class CollectionsRouter(BaseRouterV3):
             overview = collections_overview_response["results"]
 
             if len(overview) == 0:
-                raise R2RException(
+                raise FUSEException(
                     "The specified collection does not exist.",
                     404,
                 )
@@ -505,58 +344,6 @@ class CollectionsRouter(BaseRouterV3):
             "/collections/{id}",
             summary="Update collection",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.update(
-                                "123e4567-e89b-12d3-a456-426614174000",
-                                name="Updated Collection Name",
-                                description="Updated description"
-                            )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.collections.update({
-                                    id: "123e4567-e89b-12d3-a456-426614174000",
-                                    name: "Updated Collection Name",
-                                    description: "Updated description"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/collections/123e4567-e89b-12d3-a456-426614174000" \\
-                                 -H "Content-Type: application/json" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY" \\
-                                 -d '{"name": "Updated Collection Name", "description": "Updated description"}'
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def update_collection(
@@ -587,7 +374,7 @@ class CollectionsRouter(BaseRouterV3):
             )
 
             if generate_description and description is not None:
-                raise R2RException(
+                raise FUSEException(
                     "Cannot provide both a description and request to synthetically generate a new one.",
                     400,
                 )
@@ -603,56 +390,6 @@ class CollectionsRouter(BaseRouterV3):
             "/collections/{id}",
             summary="Delete collection",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.delete("123e4567-e89b-12d3-a456-426614174000")
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.collections.delete({id: "123e4567-e89b-12d3-a456-426614174000"});
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r collections delete 123e4567-e89b-12d3-a456-426614174000
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X DELETE "https://api.example.com/v3/collections/123e4567-e89b-12d3-a456-426614174000" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY"
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def delete_collection(
@@ -670,7 +407,7 @@ class CollectionsRouter(BaseRouterV3):
             Deleting a collection removes all associations but does not delete the documents within it.
             """
             if id == generate_default_user_collection_id(auth_user.id):
-                raise R2RException(
+                raise FUSEException(
                     "Cannot delete the default user collection.",
                     400,
                 )
@@ -685,54 +422,6 @@ class CollectionsRouter(BaseRouterV3):
             "/collections/{id}/documents/{document_id}",
             summary="Add document to collection",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.add_document(
-                                "123e4567-e89b-12d3-a456-426614174000",
-                                "456e789a-b12c-34d5-e678-901234567890"
-                            )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.collections.addDocument({
-                                    id: "123e4567-e89b-12d3-a456-426614174000"
-                                    documentId: "456e789a-b12c-34d5-e678-901234567890"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/collections/123e4567-e89b-12d3-a456-426614174000/documents/456e789a-b12c-34d5-e678-901234567890" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY"
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def add_document_to_collection(
@@ -757,60 +446,6 @@ class CollectionsRouter(BaseRouterV3):
             "/collections/{id}/documents",
             summary="List documents in collection",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.list_documents(
-                                "123e4567-e89b-12d3-a456-426614174000",
-                                offset=0,
-                                limit=10,
-                            )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.collections.listDocuments({id: "123e4567-e89b-12d3-a456-426614174000"});
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r collections list-documents 123e4567-e89b-12d3-a456-426614174000
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/collections/123e4567-e89b-12d3-a456-426614174000/documents?offset=0&limit=10" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY"
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_collection_documents(
@@ -856,54 +491,6 @@ class CollectionsRouter(BaseRouterV3):
             "/collections/{id}/documents/{document_id}",
             summary="Remove document from collection",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.remove_document(
-                                "123e4567-e89b-12d3-a456-426614174000",
-                                "456e789a-b12c-34d5-e678-901234567890"
-                            )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.collections.removeDocument({
-                                    id: "123e4567-e89b-12d3-a456-426614174000"
-                                    documentId: "456e789a-b12c-34d5-e678-901234567890"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X DELETE "https://api.example.com/v3/collections/123e4567-e89b-12d3-a456-426614174000/documents/456e789a-b12c-34d5-e678-901234567890" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY"
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def remove_document_from_collection(
@@ -934,62 +521,6 @@ class CollectionsRouter(BaseRouterV3):
             "/collections/{id}/users",
             summary="List users in collection",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.list_users(
-                                "123e4567-e89b-12d3-a456-426614174000",
-                                offset=0,
-                                limit=10,
-                            )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.collections.listUsers({
-                                    id: "123e4567-e89b-12d3-a456-426614174000"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r collections list-users 123e4567-e89b-12d3-a456-426614174000
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X GET "https://api.example.com/v3/collections/123e4567-e89b-12d3-a456-426614174000/users?offset=0&limit=10" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY"
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_collection_users(
@@ -1035,54 +566,6 @@ class CollectionsRouter(BaseRouterV3):
             "/collections/{id}/users/{user_id}",
             summary="Add user to collection",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.add_user(
-                                "123e4567-e89b-12d3-a456-426614174000",
-                                "789a012b-c34d-5e6f-g789-012345678901"
-                            )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.collections.addUser({
-                                    id: "123e4567-e89b-12d3-a456-426614174000"
-                                    userId: "789a012b-c34d-5e6f-g789-012345678901"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/collections/123e4567-e89b-12d3-a456-426614174000/users/789a012b-c34d-5e6f-g789-012345678901" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY"
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def add_user_to_collection(
@@ -1113,54 +596,6 @@ class CollectionsRouter(BaseRouterV3):
             "/collections/{id}/users/{user_id}",
             summary="Remove user from collection",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.collections.remove_user(
-                                "123e4567-e89b-12d3-a456-426614174000",
-                                "789a012b-c34d-5e6f-g789-012345678901"
-                            )
-                        """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.collections.removeUser({
-                                    id: "123e4567-e89b-12d3-a456-426614174000"
-                                    userId: "789a012b-c34d-5e6f-g789-012345678901"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X DELETE "https://api.example.com/v3/collections/123e4567-e89b-12d3-a456-426614174000/users/789a012b-c34d-5e6f-g789-012345678901" \\
-                                 -H "Authorization: Bearer YOUR_API_KEY"
-                        """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def remove_user_from_collection(
@@ -1199,9 +634,9 @@ class CollectionsRouter(BaseRouterV3):
                         "lang": "Python",
                         "source": textwrap.dedent(
                             """
-                            from r2r import R2RClient
+                            from fuse import FUSEClient
 
-                            client = R2RClient()
+                            client = FUSEClient()
                             # when using auth, do client.login(...)
 
                             result = client.documents.extract(

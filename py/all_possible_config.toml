@@ -10,18 +10,18 @@
 # [auth] section
 # -------------------------------------
 [auth]
-provider = "r2r"                       # Supported values: "r2r", "supabase"
-                                      # - "r2r": uses R2RAuthProvider in auth/r2r_auth.py
+provider = "fuse"                       # Supported values: "fuse", "supabase"
+                                      # - "fuse": uses FUSEAuthProvider in auth/fuse_auth.py
                                       # - "supabase": uses SupabaseAuthProvider in auth/supabase.py
                                       #
                                       # Default: (none) - must be specified
 access_token_lifetime_in_minutes = 60  # Lifetime of access token in minutes
                                       # Default from code: 3600 if not set
-                                      # Also can read from env: R2R_ACCESS_LIFE_IN_MINUTES
+                                      # Also can read from env: FUSE_ACCESS_LIFE_IN_MINUTES
 
 refresh_token_lifetime_in_days = 7     # Lifetime of refresh token in days
                                       # Default from code: 7 if not set
-                                      # Also can read from env: R2R_REFRESH_LIFE_IN_DAYS
+                                      # Also can read from env: FUSE_REFRESH_LIFE_IN_DAYS
 
 require_authentication = true          # If true, all requests must provide valid auth
 require_email_verification = false     # If true, newly created users must verify email
@@ -49,7 +49,7 @@ provider = "bcrypt"             # or "nacl"
                                # "nacl":   uses NaClCryptoProvider   (crypto/nacl.py)
 
 secret_key = "YOUR_SECRET_KEY"  # Master key for JWT token signing
-                               # Default fallback from env: R2R_SECRET_KEY
+                               # Default fallback from env: FUSE_SECRET_KEY
                                # If not set, code may use a built-in default (NOT RECOMMENDED for production)
 
 api_key_bytes = 32             # Length (in bytes) of raw API keys when generated
@@ -100,17 +100,17 @@ provider = "smtp"  # "smtp", "sendgrid", or "console_mock"
                    # - "console_mock": uses ConsoleMockEmailProvider (email/console_mock.py)
 
 from_email = "no-reply@example.com"    # Sender address
-                                      # If not set, code may fallback to env R2R_FROM_EMAIL
+                                      # If not set, code may fallback to env FUSE_FROM_EMAIL
 
 frontend_url = "https://your-frontend.example.com"  # Used to generate links in emails
                                                    # e.g., password reset or verification links
 
   # SMTP-specific settings (provider="smtp")
   [email.smtp]
-  smtp_server = "smtp.example.com"        # or env R2R_SMTP_SERVER
-  smtp_port = 587                         # or env R2R_SMTP_PORT
-  smtp_username = "smtp_user@example.com" # or env R2R_SMTP_USERNAME
-  smtp_password = "secure_smtp_password"  # or env R2R_SMTP_PASSWORD
+  smtp_server = "smtp.example.com"        # or env FUSE_SMTP_SERVER
+  smtp_port = 587                         # or env FUSE_SMTP_PORT
+  smtp_username = "smtp_user@example.com" # or env FUSE_SMTP_USERNAME
+  smtp_password = "secure_smtp_password"  # or env FUSE_SMTP_PASSWORD
 
   # SendGrid-specific settings (provider="sendgrid")
   [email.sendgrid]
@@ -260,7 +260,7 @@ provider = "postgres"          # "postgres", "local", "s3", etc. if implemented
 # [ingestion] section
 # -------------------------------------
 [ingestion]
-provider = "r2r"                        # "r2r", "unstructured_local", "unstructured_api"
+provider = "fuse"                        # "fuse", "unstructured_local", "unstructured_api"
 strategy = "auto"                       # Could be "auto", "by_title", "recursive", etc.
 chunking_strategy = "recursive"         # "recursive", "by_title", "character", etc.
 
@@ -332,19 +332,19 @@ kg_concurrency_limit = 8           # used if "hatchet" orchestrator
 # For security and convenience, environment variables can override any config above.
 # Example usage in production or CI/CD pipelines:
 #
-# R2R_ACCESS_LIFE_IN_MINUTES=60
-# R2R_REFRESH_LIFE_IN_DAYS=7
-# R2R_SECRET_KEY=your_secret_key
+# FUSE_ACCESS_LIFE_IN_MINUTES=60
+# FUSE_REFRESH_LIFE_IN_DAYS=7
+# FUSE_SECRET_KEY=your_secret_key
 # OPENAI_API_KEY=your_openai_api_key
 # SUPABASE_URL=https://your-supabase-url.com
 # SUPABASE_KEY=your_supabase_key
 # SENDGRID_API_KEY=your_sendgrid_api_key
-# R2R_SMTP_SERVER=smtp.example.com
-# R2R_SMTP_PORT=587
-# R2R_SMTP_USERNAME=smtp_user
-# R2R_SMTP_PASSWORD=smtp_password
-# R2R_FROM_EMAIL=no-reply@example.com
-# R2R_FRONTEND_URL=https://your-frontend-url.com
+# FUSE_SMTP_SERVER=smtp.example.com
+# FUSE_SMTP_PORT=587
+# FUSE_SMTP_USERNAME=smtp_user
+# FUSE_SMTP_PASSWORD=smtp_password
+# FUSE_FROM_EMAIL=no-reply@example.com
+# FUSE_FRONTEND_URL=https://your-frontend-url.com
 # UNSTRUCTURED_API_KEY=your_unstructured_api_key
 # UNSTRUCTURED_API_URL=https://unstructured-api-url.com
 # UNSTRUCTURED_SERVICE_URL=http://localhost:8000

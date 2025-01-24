@@ -1,4 +1,4 @@
-import { r2rClient } from "../../r2rClient";
+import { fuseClient } from "../../fuseClient";
 
 import { feature } from "../../feature";
 import {
@@ -10,7 +10,7 @@ import {
 import { ensureSnakeCase } from "../../utils";
 
 export class RetrievalClient {
-  constructor(private client: r2rClient) {}
+  constructor(private client: fuseClient) {}
 
   /**
    * Perform a search query on the vector database and knowledge graph and

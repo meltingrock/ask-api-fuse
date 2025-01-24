@@ -1,5 +1,5 @@
 import { feature } from "../../feature";
-import { r2rClient } from "../../r2rClient";
+import { fuseClient } from "../../fuseClient";
 import {
   WrappedBooleanResponse,
   WrappedGenericMessageResponse,
@@ -8,7 +8,7 @@ import {
 } from "../../types";
 
 export class PromptsClient {
-  constructor(private client: r2rClient) {}
+  constructor(private client: fuseClient) {}
 
   /**
    * Create a new prompt with the given configuration.

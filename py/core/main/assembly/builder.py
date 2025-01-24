@@ -1,7 +1,7 @@
 import logging
 from typing import Any, Type
 
-from ..abstractions import R2RProviders, R2RServices
+from ..abstractions import FUSEProviders, FUSEServices
 from ..api.v3.chunks_router import ChunksRouter
 from ..api.v3.collections_router import CollectionsRouter
 from ..api.v3.conversations_router import ConversationsRouter
@@ -13,39 +13,39 @@ from ..api.v3.prompts_router import PromptsRouter
 from ..api.v3.retrieval_router import RetrievalRouterV3
 from ..api.v3.system_router import SystemRouter
 from ..api.v3.users_router import UsersRouter
-from ..app import R2RApp
-from ..config import R2RConfig
+from ..app import FUSEApp
+from ..config import FUSEConfig
 from ..services.auth_service import AuthService
 from ..services.graph_service import GraphService
 from ..services.ingestion_service import IngestionService
 from ..services.management_service import ManagementService
 from ..services.retrieval_service import RetrievalService
-from .factory import R2RProviderFactory
+from .factory import FUSEProviderFactory
 
 logger = logging.getLogger()
 
 
-class R2RBuilder:
+class FUSEBuilder:
     _SERVICES = ["auth", "ingestion", "management", "retrieval", "graph"]
 
-    def __init__(self, config: R2RConfig):
+    def __init__(self, config: FUSEConfig):
         self.config = config
 
     async def _create_providers(
-        self, provider_factory: Type[R2RProviderFactory], *args, **kwargs
+        self, provider_factory: Type[FUSEProviderFactory], *args, **kwargs
     ) -> Any:
         factory = provider_factory(self.config)
         return await factory.create_providers(*args, **kwargs)
 
-    async def build(self, *args, **kwargs) -> R2RApp:
-        provider_factory = R2RProviderFactory
+    async def build(self, *args, **kwargs) -> FUSEApp:
+        provider_factory = FUSEProviderFactory
 
         try:
             providers = await self._create_providers(
                 provider_factory, *args, **kwargs
             )
         except Exception as e:
-            logger.error(f"Error {e} while creating R2RProviders.")
+            logger.error(f"Error {e} while creating FUSEProviders.")
             raise
 
         service_params = {
@@ -102,7 +102,7 @@ class R2RBuilder:
             ).get_router(),
         }
 
-        return R2RApp(
+        return FUSEApp(
             config=self.config,
             orchestration_provider=providers.orchestration,
             services=services,
@@ -110,17 +110,17 @@ class R2RBuilder:
         )
 
     async def _create_providers(
-        self, provider_factory: Type[R2RProviderFactory], *args, **kwargs
-    ) -> R2RProviders:
+        self, provider_factory: Type[FUSEProviderFactory], *args, **kwargs
+    ) -> FUSEProviders:
         factory = provider_factory(self.config)
         return await factory.create_providers(*args, **kwargs)
 
-    def _create_services(self, service_params: dict[str, Any]) -> R2RServices:
-        services = R2RBuilder._SERVICES
+    def _create_services(self, service_params: dict[str, Any]) -> FUSEServices:
+        services = FUSEBuilder._SERVICES
         service_instances = {}
 
         for service_type in services:
             service_class = globals()[f"{service_type.capitalize()}Service"]
             service_instances[service_type] = service_class(**service_params)
 
-        return R2RServices(**service_instances)
+        return FUSEServices(**service_instances)

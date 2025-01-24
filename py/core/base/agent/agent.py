@@ -13,7 +13,7 @@ from core.base.abstractions import (
     LLMChatCompletion,
     Message,
     MessageType,
-    R2RException,
+    FUSEException,
 )
 from core.base.providers import CompletionProvider, DatabaseProvider
 
@@ -237,7 +237,7 @@ class Agent(ABC):
                     )
                 )
 
-                raise R2RException(
+                raise FUSEException(
                     message=f"Error parsing function arguments: {e}, agent likely produced invalid tool inputs.",
                     status_code=400,
                 )

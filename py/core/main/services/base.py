@@ -1,14 +1,14 @@
 from abc import ABC
 
-from ..abstractions import R2RProviders
-from ..config import R2RConfig
+from ..abstractions import FUSEProviders
+from ..config import FUSEConfig
 
 
 class Service(ABC):
     def __init__(
         self,
-        config: R2RConfig,
-        providers: R2RProviders,
+        config: FUSEConfig,
+        providers: FUSEProviders,
     ):
         self.config = config
         self.providers = providers

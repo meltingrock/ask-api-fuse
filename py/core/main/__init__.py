@@ -1,21 +1,21 @@
-from .abstractions import R2RProviders
+from .abstractions import FUSEProviders
 from .api import *
 from .app import *
 
-# from .app_entry import r2r_app
+# from .app_entry import fuse_app
 from .assembly import *
 from .orchestration import *
 from .services import *
 
 __all__ = [
-    # R2R Primary
-    "R2RProviders",
-    "R2RApp",
-    "R2RBuilder",
-    "R2RConfig",
+    # FUSE Primary
+    "FUSEProviders",
+    "FUSEApp",
+    "FUSEBuilder",
+    "FUSEConfig",
     # Factory
-    "R2RProviderFactory",
-    ## R2R SERVICES
+    "FUSEProviderFactory",
+    ## FUSE SERVICES
     "AuthService",
     "IngestionService",
     "ManagementService",

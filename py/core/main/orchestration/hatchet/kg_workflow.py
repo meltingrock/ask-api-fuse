@@ -9,7 +9,7 @@ import uuid
 from hatchet_sdk import ConcurrencyLimitStrategy, Context
 
 from core import GenerationConfig
-from core.base import OrchestrationProvider, R2RException
+from core.base import OrchestrationProvider, FUSEException
 from core.base.abstractions import (
     KGEnrichmentStatus,
     KGExtraction,
@@ -276,7 +276,7 @@ def hatchet_kg_factory(
             )
 
             if workflow_status == KGEnrichmentStatus.SUCCESS:
-                raise R2RException(
+                raise FUSEException(
                     "Communities have already been built for this collection. To build communities again, first reset the graph.",
                     400,
                 )
@@ -292,7 +292,7 @@ def hatchet_kg_factory(
                 num_communities = kg_clustering_results["num_communities"][0]
 
                 if num_communities == 0:
-                    raise R2RException("No communities found", 400)
+                    raise FUSEException("No communities found", 400)
 
                 logger.info(
                     f"Successfully ran kg clustering: {json.dumps(kg_clustering_results)}"

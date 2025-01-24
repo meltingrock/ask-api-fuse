@@ -1,3 +1,3 @@
-export { r2rClient } from "./r2rClient";
+export { fuseClient } from "./fuseClient";
 export * from "./types";
 export { feature, initializeTelemetry } from "./feature";

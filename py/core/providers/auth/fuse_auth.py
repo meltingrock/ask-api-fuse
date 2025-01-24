@@ -13,7 +13,7 @@ from core.base import (
     CollectionResponse,
     CryptoProvider,
     EmailProvider,
-    R2RException,
+    FUSEException,
     Token,
     TokenData,
 )
@@ -42,7 +42,7 @@ def normalize_email(email: str) -> str:
     return email.lower() if email else None
 
 
-class R2RAuthProvider(AuthProvider):
+class FUSEAuthProvider(AuthProvider):
     def __init__(
         self,
         config: AuthConfig,
@@ -54,18 +54,18 @@ class R2RAuthProvider(AuthProvider):
             config, crypto_provider, database_provider, email_provider
         )
         self.database_provider: PostgresDatabaseProvider = database_provider
-        logger.debug(f"Initializing R2RAuthProvider with config: {config}")
+        logger.debug(f"Initializing FUSEAuthProvider with config: {config}")
 
         # We no longer use a local secret_key or defaults here.
         # All key handling is done in the crypto_provider.
         self.access_token_lifetime_in_minutes = (
             config.access_token_lifetime_in_minutes
-            or os.getenv("R2R_ACCESS_LIFE_IN_MINUTES")
+            or os.getenv("FUSE_ACCESS_LIFE_IN_MINUTES")
             or DEFAULT_ACCESS_LIFETIME_IN_MINUTES
         )
         self.refresh_token_lifetime_in_days = (
             config.refresh_token_lifetime_in_days
-            or os.getenv("R2R_REFRESH_LIFE_IN_DAYS")
+            or os.getenv("FUSE_REFRESH_LIFE_IN_DAYS")
             or DEFAULT_REFRESH_LIFETIME_IN_DAYS
         )
         self.config: AuthConfig = config
@@ -80,7 +80,7 @@ class R2RAuthProvider(AuthProvider):
             await self.database_provider.users_handler.mark_user_as_superuser(
                 id=user.id
             )
-        except R2RException:
+        except FUSEException:
             logger.info("Default admin user already exists.")
 
     def create_access_token(self, data: dict) -> str:
@@ -109,14 +109,14 @@ class R2RAuthProvider(AuthProvider):
         if await self.database_provider.token_handler.is_token_blacklisted(
             token=token
         ):
-            raise R2RException(
+            raise FUSEException(
                 status_code=401, message="Token has been invalidated"
             )
 
         # Verify token using crypto_provider
         payload = self.crypto_provider.verify_secure_token(token=token)
         if payload is None:
-            raise R2RException(
+            raise FUSEException(
                 status_code=401, message="Invalid or expired token"
             )
 
@@ -125,7 +125,7 @@ class R2RAuthProvider(AuthProvider):
         exp = payload.get("exp")
 
         if email is None or token_type is None or exp is None:
-            raise R2RException(status_code=401, message="Invalid token claims")
+            raise FUSEException(status_code=401, message="Invalid token claims")
 
         email_str: str = email
         token_type_str: str = token_type
@@ -133,7 +133,7 @@ class R2RAuthProvider(AuthProvider):
 
         exp_datetime = datetime.fromtimestamp(exp_float, tz=timezone.utc)
         if exp_datetime < datetime.now(timezone.utc):
-            raise R2RException(status_code=401, message="Token has expired")
+            raise FUSEException(status_code=401, message="Token has expired")
 
         return TokenData(
             email=normalize_email(email_str),
@@ -144,12 +144,12 @@ class R2RAuthProvider(AuthProvider):
     async def authenticate_api_key(self, api_key: str) -> Optional[User]:
         """
         Authenticate using an API key of the form "public_key.raw_key".
-        Returns a User if successful, or raises R2RException if not.
+        Returns a User if successful, or raises FUSEException if not.
         """
         try:
             key_id, raw_key = api_key.split(".", 1)
         except ValueError:
-            raise R2RException(
+            raise FUSEException(
                 status_code=401, message="Invalid API key format"
             )
 
@@ -159,18 +159,18 @@ class R2RAuthProvider(AuthProvider):
             )
         )
         if not key_record:
-            raise R2RException(status_code=401, message="Invalid API key")
+            raise FUSEException(status_code=401, message="Invalid API key")
 
         if not self.crypto_provider.verify_api_key(
             raw_api_key=raw_key, hashed_key=key_record["hashed_key"]
         ):
-            raise R2RException(status_code=401, message="Invalid API key")
+            raise FUSEException(status_code=401, message="Invalid API key")
 
         user = await self.database_provider.users_handler.get_user_by_id(
             id=key_record["user_id"]
         )
         if not user.is_active:
-            raise R2RException(
+            raise FUSEException(
                 status_code=401, message="User account is inactive"
             )
 
@@ -184,7 +184,7 @@ class R2RAuthProvider(AuthProvider):
         try:
             token_data = await self.decode_token(token=token)
             if not token_data.email:
-                raise R2RException(
+                raise FUSEException(
                     status_code=401, message="Could not validate credentials"
                 )
             user = (
@@ -193,12 +193,12 @@ class R2RAuthProvider(AuthProvider):
                 )
             )
             if user is None:
-                raise R2RException(
+                raise FUSEException(
                     status_code=401,
                     message="Invalid authentication credentials",
                 )
             return user
-        except R2RException:
+        except FUSEException:
             # If JWT fails, try API key auth
             # OAuth2PasswordBearer provides token as "Bearer xxx", strip it if needed
             token = token.removeprefix("Bearer ")
@@ -208,7 +208,7 @@ class R2RAuthProvider(AuthProvider):
         self, current_user: User = Depends(user)
     ) -> User:
         if not current_user.is_active:
-            raise R2RException(status_code=400, message="Inactive user")
+            raise FUSEException(status_code=400, message="Inactive user")
         return current_user
 
     async def register(
@@ -225,18 +225,18 @@ class R2RAuthProvider(AuthProvider):
     ) -> User:
         if account_type == "password":
             if not password:
-                raise R2RException(
+                raise FUSEException(
                     status_code=400,
                     message="Password is required for password accounts",
                 )
         else:
             if github_id and google_id:
-                raise R2RException(
+                raise FUSEException(
                     status_code=400,
                     message="Cannot register OAuth with both GitHub and Google IDs",
                 )
             if not github_id and not google_id:
-                raise R2RException(
+                raise FUSEException(
                     status_code=400,
                     message="Invalid OAuth specification without GitHub or Google ID",
                 )
@@ -297,7 +297,7 @@ class R2RAuthProvider(AuthProvider):
                 )
             )
             if not user:
-                raise R2RException(status_code=404, message="User not found")
+                raise FUSEException(status_code=404, message="User not found")
 
         verification_code = self.crypto_provider.generate_verification_code()
         expiry = datetime.now(timezone.utc) + timedelta(hours=24)
@@ -347,7 +347,7 @@ class R2RAuthProvider(AuthProvider):
             logger.warning(
                 f"Password login not allowed for {user.account_type} accounts: {email}"
             )
-            raise R2RException(
+            raise FUSEException(
                 status_code=401,
                 message=f"This account is configured for {user.account_type} login, not password.",
             )
@@ -377,13 +377,13 @@ class R2RAuthProvider(AuthProvider):
 
         if not password_verified:
             logger.warning(f"Invalid password for user: {email}")
-            raise R2RException(
+            raise FUSEException(
                 status_code=401, message="Incorrect email or password"
             )
 
         if not user.is_verified and self.config.require_email_verification:
             logger.warning(f"Unverified user attempted login: {email}")
-            raise R2RException(status_code=401, message="Email not verified")
+            raise FUSEException(status_code=401, message="Email not verified")
 
         access_token = self.create_access_token(
             data={"sub": normalize_email(user.email)}
@@ -401,7 +401,7 @@ class R2RAuthProvider(AuthProvider):
     ) -> dict[str, Token]:
         token_data = await self.decode_token(refresh_token)
         if token_data.token_type != "refresh":
-            raise R2RException(
+            raise FUSEException(
                 status_code=401, message="Invalid refresh token"
             )
 
@@ -439,7 +439,7 @@ class R2RAuthProvider(AuthProvider):
             plain_password=current_password,
             hashed_password=user.hashed_password,
         ):
-            raise R2RException(
+            raise FUSEException(
                 status_code=400, message="Incorrect current password"
             )
 
@@ -492,7 +492,7 @@ class R2RAuthProvider(AuthProvider):
             return {
                 "message": "If the email exists, a reset link has been sent"
             }
-        except R2RException as e:
+        except FUSEException as e:
             if e.status_code == 404:
                 # User doesn't exist; return a success message anyway
                 return {
@@ -508,7 +508,7 @@ class R2RAuthProvider(AuthProvider):
             reset_token=reset_token
         )
         if not user_id:
-            raise R2RException(
+            raise FUSEException(
                 status_code=400, message="Invalid or expired reset token"
             )
 
@@ -625,7 +625,7 @@ class R2RAuthProvider(AuthProvider):
                     )
                     # If user found, check if user.google_id matches or is null. If null, update it
                     if user and not user.google_id:
-                        raise R2RException(
+                        raise FUSEException(
                             status_code=401,
                             message="User already exists and is not linked to Google account",
                         )
@@ -645,7 +645,7 @@ class R2RAuthProvider(AuthProvider):
                     )
                     # If user found, check if user.google_id matches or is null. If null, update it
                     if user and not user.github_id:
-                        raise R2RException(
+                        raise FUSEException(
                             status_code=401,
                             message="User already exists and is not linked to Github account",
                         )
@@ -660,15 +660,15 @@ class R2RAuthProvider(AuthProvider):
                     )
             # else handle other providers
 
-        except R2RException:
+        except FUSEException:
             # If no user found or creation fails
-            raise R2RException(
+            raise FUSEException(
                 status_code=401, message="Could not create or fetch user"
             )
 
         # If user is inactive, etc.
         if not user.is_active:
-            raise R2RException(
+            raise FUSEException(
                 status_code=401, message="User account is inactive"
             )
 

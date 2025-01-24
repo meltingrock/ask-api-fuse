@@ -23,8 +23,8 @@ depends_on = None
 
 logger = logging.getLogger("alembic.runtime.migration")
 
-# Get project name from environment variable, defaulting to 'r2r_default'
-project_name = os.getenv("R2R_PROJECT_NAME", "r2r_default")
+# Get project name from environment variable, defaulting to 'fuse_default'
+project_name = os.getenv("FUSE_PROJECT_NAME", "fuse_default")
 
 
 def count_tokens_for_text(text: str, model: str = "gpt-3.5-turbo") -> int:
@@ -105,7 +105,7 @@ def upgrade() -> None:
         f"Updating total_tokens in {pages} batches of up to {BATCH_SIZE} documents..."
     )
 
-    default_model = os.getenv("R2R_TOKCOUNT_MODEL", "gpt-3.5-turbo")
+    default_model = os.getenv("FUSE_TOKCOUNT_MODEL", "gpt-3.5-turbo")
 
     offset = 0
     for page_idx in range(pages):

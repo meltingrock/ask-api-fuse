@@ -1,5 +1,5 @@
 import { feature } from "../../feature";
-import { r2rClient } from "../../r2rClient";
+import { fuseClient } from "../../fuseClient";
 import {
   WrappedGenericMessageResponse,
   WrappedServerStatsResponse,
@@ -7,10 +7,10 @@ import {
 } from "../../types";
 
 export class SystemClient {
-  constructor(private client: r2rClient) {}
+  constructor(private client: fuseClient) {}
 
   /**
-   * Check the health of the R2R server.
+   * Check the health of the FUSE server.
    */
   @feature("system.health")
   async health(): Promise<WrappedGenericMessageResponse> {
@@ -18,7 +18,7 @@ export class SystemClient {
   }
 
   /**
-   * Get the configuration settings for the R2R server.
+   * Get the configuration settings for the FUSE server.
    * @returns
    */
   @feature("system.settings")

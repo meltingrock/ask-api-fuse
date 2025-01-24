@@ -1,5 +1,5 @@
 import { feature } from "../../feature";
-import { r2rClient } from "../../r2rClient";
+import { fuseClient } from "../../fuseClient";
 import {
   WrappedAPIKeyResponse,
   WrappedAPIKeysResponse,
@@ -20,7 +20,7 @@ if (typeof window === "undefined") {
 }
 
 export class UsersClient {
-  constructor(private client: r2rClient) {}
+  constructor(private client: fuseClient) {}
 
   /**
    * Create a new user.

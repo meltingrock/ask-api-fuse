@@ -1,5 +1,5 @@
 import { feature } from "../../feature";
-import { r2rClient } from "../../r2rClient";
+import { fuseClient } from "../../fuseClient";
 import {
   WrappedBooleanResponse,
   WrappedConversationMessagesResponse,
@@ -16,7 +16,7 @@ if (typeof window === "undefined") {
   });
 }
 export class ConversationsClient {
-  constructor(private client: r2rClient) {}
+  constructor(private client: fuseClient) {}
 
   /**
    * Create a new conversation.

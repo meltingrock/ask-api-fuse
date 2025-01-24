@@ -9,7 +9,7 @@ from uuid import UUID, uuid4
 
 from pydantic import Field
 
-from .base import R2RSerializable
+from .base import FUSESerializable
 
 logger = logging.getLogger()
 
@@ -88,7 +88,7 @@ class DocumentType(str, Enum):
     XML = "xml"
 
 
-class Document(R2RSerializable):
+class Document(FUSESerializable):
     id: UUID = Field(default_factory=uuid4)
     collection_ids: list[UUID]
     owner_id: UUID
@@ -173,7 +173,7 @@ class KGEnrichmentStatus(str, Enum):
         return "id"
 
 
-class DocumentResponse(R2RSerializable):
+class DocumentResponse(FUSESerializable):
     """Base class for document information handling."""
 
     id: UUID
@@ -222,7 +222,7 @@ class DocumentResponse(R2RSerializable):
         }
 
 
-class UnprocessedChunk(R2RSerializable):
+class UnprocessedChunk(FUSESerializable):
     """An extraction from a document."""
 
     id: Optional[UUID] = None
@@ -232,7 +232,7 @@ class UnprocessedChunk(R2RSerializable):
     text: str
 
 
-class UpdateChunk(R2RSerializable):
+class UpdateChunk(FUSESerializable):
     """An extraction from a document."""
 
     id: UUID
@@ -240,7 +240,7 @@ class UpdateChunk(R2RSerializable):
     text: str
 
 
-class DocumentChunk(R2RSerializable):
+class DocumentChunk(FUSESerializable):
     """An extraction from a document."""
 
     id: UUID
@@ -251,7 +251,7 @@ class DocumentChunk(R2RSerializable):
     metadata: dict
 
 
-class RawChunk(R2RSerializable):
+class RawChunk(FUSESerializable):
     text: str
 
 
@@ -264,7 +264,7 @@ class IngestionMode(str, Enum):
 from .llm import GenerationConfig
 
 
-class ChunkEnrichmentSettings(R2RSerializable):
+class ChunkEnrichmentSettings(FUSESerializable):
     """
     Settings for chunk enrichment.
     """
@@ -286,8 +286,8 @@ class ChunkEnrichmentSettings(R2RSerializable):
 ## TODO - Move ingestion config
 
 
-class IngestionConfig(R2RSerializable):
-    provider: str = "r2r"
+class IngestionConfig(FUSESerializable):
+    provider: str = "fuse"
     excluded_parsers: list[str] = ["mp4"]
     chunking_strategy: str = "recursive"
     chunk_enrichment_settings: ChunkEnrichmentSettings = (
@@ -311,7 +311,7 @@ class IngestionConfig(R2RSerializable):
 
     @property
     def supported_providers(self) -> list[str]:
-        return ["r2r", "unstructured_local", "unstructured_api"]
+        return ["fuse", "unstructured_local", "unstructured_api"]
 
     def validate_config(self) -> None:
         if self.provider not in self.supported_providers:
@@ -323,7 +323,7 @@ class IngestionConfig(R2RSerializable):
         if mode == "hi-res":
             # More thorough parsing, no skipping summaries, possibly larger `chunks_for_document_summary`.
             return cls(
-                provider="r2r",
+                provider="fuse",
                 excluded_parsers=["mp4"],
                 chunk_enrichment_settings=ChunkEnrichmentSettings(),  # default
                 extra_parsers={},
@@ -341,7 +341,7 @@ class IngestionConfig(R2RSerializable):
         elif mode == "fast":
             # Skip summaries and other enrichment steps for speed.
             return cls(
-                provider="r2r",
+                provider="fuse",
                 excluded_parsers=["mp4"],
                 chunk_enrichment_settings=ChunkEnrichmentSettings(),  # default
                 extra_parsers={},

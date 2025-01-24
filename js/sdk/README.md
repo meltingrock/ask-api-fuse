@@ -1,22 +1,22 @@
 <p align="left">
-  <a href="https://r2r-docs.sciphi.ai"><img src="https://img.shields.io/badge/docs.sciphi.ai-3F16E4" alt="Docs"></a>
+  <a href="https://fuse-docs.sciphi.ai"><img src="https://img.shields.io/badge/docs.sciphi.ai-3F16E4" alt="Docs"></a>
   <a href="https://discord.gg/p6KqD2kjtB"><img src="https://img.shields.io/discord/1120774652915105934?style=social&logo=discord" alt="Discord"></a>
-  <a href="https://github.com/SciPhi-AI/R2R"><img src="https://img.shields.io/github/stars/SciPhi-AI/R2R" alt="Github Stars"></a>
-  <a href="https://github.com/SciPhi-AI/R2R/pulse"><img src="https://img.shields.io/github/commit-activity/w/SciPhi-AI/R2R" alt="Commits-per-week"></a>
+  <a href="https://github.com/SciPhi-AI/FUSE"><img src="https://img.shields.io/github/stars/SciPhi-AI/FUSE" alt="Github Stars"></a>
+  <a href="https://github.com/SciPhi-AI/FUSE/pulse"><img src="https://img.shields.io/github/commit-activity/w/SciPhi-AI/FUSE" alt="Commits-per-week"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-purple.svg" alt="License: MIT"></a>
-  <a href="https://www.npmjs.com/package/r2r-js"><img src="https://img.shields.io/npm/v/r2r-js.svg" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/fuse-js"><img src="https://img.shields.io/npm/v/fuse-js.svg" alt="npm version"></a>
 </p>
 
-<img src="https://raw.githubusercontent.com/SciPhi-AI/R2R/main/assets/r2r.png" alt="R2R JavaScript Client">
+<img src="https://raw.githubusercontent.com/SciPhi-AI/FUSE/main/assets/fuse.png" alt="FUSE JavaScript Client">
 <h3 align="center">
 The ultimate open source RAG answer engine - JavaScript Client
 </h3>
 
 # About
 
-The official JavaScript client for R2R (Retrieval-Augmented Generation to Riches). R2R is designed to bridge the gap between local LLM experimentation and scalable, state of the art Retrieval-Augmented Generation (RAG). This JavaScript client provides a seamless interface to interact with the R2R RESTful API.
+The official JavaScript client for FUSE (Retrieval-Augmented Generation to Riches). FUSE is designed to bridge the gap between local LLM experimentation and scalable, state of the art Retrieval-Augmented Generation (RAG). This JavaScript client provides a seamless interface to interact with the FUSE RESTful API.
 
-For a more complete view of R2R, check out the [full documentation](https://r2r-docs.sciphi.ai/).
+For a more complete view of FUSE, check out the [full documentation](https://fuse-docs.sciphi.ai/).
 
 ## Key Features
 
@@ -27,29 +27,29 @@ For a more complete view of R2R, check out the [full documentation](https://r2r-
 - **🌐 Client-Server**: RESTful API support out of the box.
 - **🧩 Configurable**: Provision your application using intuitive configuration files.
 - **🔌 Extensible**: Develop your application further with easy builder + factory pattern.
-- **🖥️ Dashboard**: Use the [R2R Dashboard](https://github.com/SciPhi-AI/R2R-Dashboard), an open-source React+Next.js app for a user-friendly interaction with R2R.
+- **🖥️ Dashboard**: Use the [FUSE Dashboard](https://github.com/SciPhi-AI/FUSE-Dashboard), an open-source React+Next.js app for a user-friendly interaction with FUSE.
 
 ## Table of Contents
 
 1. [Install](#install)
-2. [R2R JavaScript Client Quickstart](#r2r-javascript-client-quickstart)
+2. [FUSE JavaScript Client Quickstart](#fuse-javascript-client-quickstart)
 3. [Community and Support](#community-and-support)
 4. [Contributing](#contributing)
 
 # Install
 
 ```bash
-npm install r2r-js
+npm install fuse-js
 ```
 
-# R2R JavaScript Client Quickstart
+# FUSE JavaScript Client Quickstart
 
-## Initialize the R2R client
+## Initialize the FUSE client
 
 ```javascript
-const { r2rClient } = require("r2r-js");
+const { fuseClient } = require("fuse-js");
 
-const client = new r2rClient("http://localhost:7272");
+const client = new fuseClient("http://localhost:7272");
 ```
 
 ## Login
@@ -129,19 +129,19 @@ if (streamingRagResult instanceof ReadableStream) {
 # Community and Support
 
 - [Discord](https://discord.gg/p6KqD2kjtB): Chat live with maintainers and community members
-- [Github Issues](https://github.com/SciPhi-AI/R2R-js/issues): Report bugs and request features
+- [Github Issues](https://github.com/SciPhi-AI/FUSE-js/issues): Report bugs and request features
 
-**Explore our [R2R Docs](https://r2r-docs.sciphi.ai/) for tutorials and cookbooks on various R2R features and integrations.**
+**Explore our [FUSE Docs](https://fuse-docs.sciphi.ai/) for tutorials and cookbooks on various FUSE features and integrations.**
 
 # Contributing
 
 We welcome contributions of all sizes! Here's how you can help:
 
 - Open a PR for new features, improvements, or better documentation.
-- Submit a [feature request](https://github.com/SciPhi-AI/R2R-js/issues/new?assignees=&labels=&projects=&template=feature_request.md&title=) or [bug report](https://github.com/SciPhi-AI/R2R-js/issues/new?assignees=&labels=&projects=&template=bug_report.md&title=)
+- Submit a [feature request](https://github.com/SciPhi-AI/FUSE-js/issues/new?assignees=&labels=&projects=&template=feature_request.md&title=) or [bug report](https://github.com/SciPhi-AI/FUSE-js/issues/new?assignees=&labels=&projects=&template=bug_report.md&title=)
 
 ### Our Contributors
 
-<a href="https://github.com/SciPhi-AI/R2R/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=SciPhi-AI/R2R" />
+<a href="https://github.com/SciPhi-AI/FUSE/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=SciPhi-AI/FUSE" />
 </a>

@@ -9,7 +9,7 @@ from litellm import AuthenticationError
 from core.base import (
     DocumentChunk,
     KGEnrichmentStatus,
-    R2RException,
+    FUSEException,
     increment_version,
 )
 from core.utils import (
@@ -230,7 +230,7 @@ def simple_ingestion_factory(service: IngestionService):
                 await service.update_document_status(
                     document_info, status=IngestionStatus.FAILED
                 )
-            raise R2RException(
+            raise FUSEException(
                 status_code=401,
                 message="Authentication error: Invalid API key or credentials.",
             )
@@ -239,7 +239,7 @@ def simple_ingestion_factory(service: IngestionService):
                 await service.update_document_status(
                     document_info, status=IngestionStatus.FAILED
                 )
-            if isinstance(e, R2RException):
+            if isinstance(e, FUSEException):
                 raise
             raise HTTPException(
                 status_code=500, detail=f"Error during ingestion: {str(e)}"
@@ -260,11 +260,11 @@ def simple_ingestion_factory(service: IngestionService):
         file_sizes_in_bytes = parsed_data["file_sizes_in_bytes"]
 
         if not file_datas:
-            raise R2RException(
+            raise FUSEException(
                 status_code=400, message="No files provided for update."
             )
         if len(document_ids) != len(file_datas):
-            raise R2RException(
+            raise FUSEException(
                 status_code=400,
                 message="Number of ids does not match number of files.",
             )
@@ -279,7 +279,7 @@ def simple_ingestion_factory(service: IngestionService):
         )["results"]
 
         if len(documents_overview) != len(document_ids):
-            raise R2RException(
+            raise FUSEException(
                 status_code=404,
                 message="One or more documents not found.",
             )
@@ -324,7 +324,7 @@ def simple_ingestion_factory(service: IngestionService):
 
         await asyncio.gather(*results)
         if service.providers.ingestion.config.automatic_extraction:
-            raise R2RException(
+            raise FUSEException(
                 status_code=501,
                 message="Automatic extraction not yet implemented for `simple` ingestion workflows.",
             )
@@ -452,7 +452,7 @@ def simple_ingestion_factory(service: IngestionService):
                         )
 
                     if service.providers.ingestion.config.automatic_extraction:
-                        raise R2RException(
+                        raise FUSEException(
                             status_code=501,
                             message="Automatic extraction not yet implemented for `simple` ingestion workflows.",
                         )

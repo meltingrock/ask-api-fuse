@@ -28,7 +28,7 @@ type RefreshTokenResponse = {
   };
 };
 
-interface R2RClientOptions {
+interface FUSEClientOptions {
   enableAutoRefresh?: boolean;
   getTokensCallback?: () => {
     accessToken: string | null;
@@ -41,7 +41,7 @@ interface R2RClientOptions {
   onRefreshFailedCallback?: () => void;
 }
 
-export class r2rClient extends BaseClient {
+export class fuseClient extends BaseClient {
   public readonly chunks: ChunksClient;
   public readonly collections: CollectionsClient;
   public readonly conversations: ConversationsClient;
@@ -53,14 +53,14 @@ export class r2rClient extends BaseClient {
   public readonly system: SystemClient;
   public readonly users: UsersClient;
 
-  private getTokensCallback?: R2RClientOptions["getTokensCallback"];
-  private setTokensCallback?: R2RClientOptions["setTokensCallback"];
-  private onRefreshFailedCallback?: R2RClientOptions["onRefreshFailedCallback"];
+  private getTokensCallback?: FUSEClientOptions["getTokensCallback"];
+  private setTokensCallback?: FUSEClientOptions["setTokensCallback"];
+  private onRefreshFailedCallback?: FUSEClientOptions["onRefreshFailedCallback"];
 
   constructor(
     baseURL: string,
     anonymousTelemetry = true,
-    options: R2RClientOptions = {},
+    options: FUSEClientOptions = {},
   ) {
     super(baseURL, "", anonymousTelemetry, options.enableAutoRefresh);
 
@@ -99,7 +99,7 @@ export class r2rClient extends BaseClient {
         return config;
       },
       (error) => {
-        console.error("[r2rClient] Request interceptor error:", error);
+        console.error("[fuseClient] Request interceptor error:", error);
         return Promise.reject(error);
       },
     );
@@ -122,7 +122,7 @@ export class r2rClient extends BaseClient {
         // 1) If the refresh endpoint itself fails => don't try again
         if (failingUrl?.includes("/v3/users/refresh-token")) {
           console.error(
-            "[r2rClient] Refresh call itself returned 401/403 => logging out",
+            "[fuseClient] Refresh call itself returned 401/403 => logging out",
           );
           this.onRefreshFailedCallback?.();
           return Promise.reject(error);
@@ -153,7 +153,7 @@ export class r2rClient extends BaseClient {
           // Check if we have a refresh token
           const { refreshToken } = this.getTokensCallback();
           if (!refreshToken) {
-            console.error("[r2rClient] No refresh token found => logout");
+            console.error("[fuseClient] No refresh token found => logout");
             this.onRefreshFailedCallback?.();
             return Promise.reject(error);
           }
@@ -175,12 +175,12 @@ export class r2rClient extends BaseClient {
               return this.axiosInstance.request(error.config);
             } else {
               console.warn(
-                "[r2rClient] No request config found to retry. Possibly manual re-fetch needed",
+                "[fuseClient] No request config found to retry. Possibly manual re-fetch needed",
               );
             }
           } catch (refreshError) {
             console.error(
-              "[r2rClient] Refresh attempt failed => logging out. Error was:",
+              "[fuseClient] Refresh attempt failed => logging out. Error was:",
               refreshError,
             );
             this.onRefreshFailedCallback?.();
@@ -215,4 +215,4 @@ export class r2rClient extends BaseClient {
   }
 }
 
-export default r2rClient;
+export default fuseClient;

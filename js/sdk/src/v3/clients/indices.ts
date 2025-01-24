@@ -1,5 +1,5 @@
 import { feature } from "../../feature";
-import { r2rClient } from "../../r2rClient";
+import { fuseClient } from "../../fuseClient";
 import {
   IndexConfig,
   WrappedGenericMessageResponse,
@@ -7,7 +7,7 @@ import {
 } from "../../types";
 
 export class IndiciesClient {
-  constructor(private client: r2rClient) {}
+  constructor(private client: fuseClient) {}
 
   /**
    * Create a new vector similarity search index in the database.

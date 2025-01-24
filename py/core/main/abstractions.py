@@ -14,8 +14,8 @@ from core.providers import (
     OpenAICompletionProvider,
     OpenAIEmbeddingProvider,
     PostgresDatabaseProvider,
-    R2RAuthProvider,
-    R2RIngestionProvider,
+    FUSEAuthProvider,
+    FUSEIngestionProvider,
     SendGridEmailProvider,
     SimpleOrchestrationProvider,
     SupabaseAuthProvider,
@@ -30,10 +30,10 @@ if TYPE_CHECKING:
     from core.main.services.retrieval_service import RetrievalService
 
 
-class R2RProviders(BaseModel):
-    auth: R2RAuthProvider | SupabaseAuthProvider | JwtAuthProvider
+class FUSEProviders(BaseModel):
+    auth: FUSEAuthProvider | SupabaseAuthProvider | JwtAuthProvider
     database: PostgresDatabaseProvider
-    ingestion: R2RIngestionProvider | UnstructuredIngestionProvider
+    ingestion: FUSEIngestionProvider | UnstructuredIngestionProvider
     embedding: (
         LiteLLMEmbeddingProvider
         | OpenAIEmbeddingProvider
@@ -52,7 +52,7 @@ class R2RProviders(BaseModel):
 
 
 @dataclass
-class R2RServices:
+class FUSEServices:
     auth: "AuthService"
     ingestion: "IngestionService"
     management: "ManagementService"

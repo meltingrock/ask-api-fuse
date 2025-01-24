@@ -12,7 +12,7 @@ from core.base import (
     AuthProvider,
     CryptoProvider,
     EmailProvider,
-    R2RException,
+    FUSEException,
     Token,
     TokenData,
 )
@@ -64,7 +64,7 @@ class JwtAuthProvider(AuthProvider):
         # use JWT library to validate and decode JWT token
         jwtSecret = os.getenv("JWT_SECRET")
         if jwtSecret is None:
-            raise R2RException(
+            raise FUSEException(
                 status_code=500,
                 message="JWT_SECRET environment variable is not set",
             )
@@ -72,7 +72,7 @@ class JwtAuthProvider(AuthProvider):
             user = jwt.decode(token, jwtSecret, algorithms=["HS256"])
         except Exception as e:
             logger.info(f"JWT verification failed: {e}")
-            raise R2RException(
+            raise FUSEException(
                 status_code=401, message="Invalid JWT token", detail=e
             )
         if user:
@@ -93,7 +93,7 @@ class JwtAuthProvider(AuthProvider):
                     )
                 except Exception as e:
                     logger.error(f"Error creating user: {e}")
-                    raise R2RException(
+                    raise FUSEException(
                         status_code=500, message="Failed to create user"
                     )
             return TokenData(
@@ -102,7 +102,7 @@ class JwtAuthProvider(AuthProvider):
                 exp=user.get("exp"),
             )
         else:
-            raise R2RException(status_code=401, message="Invalid JWT token")
+            raise FUSEException(status_code=401, message="Invalid JWT token")
 
     async def refresh_access_token(
         self, refresh_token: str
@@ -114,7 +114,7 @@ class JwtAuthProvider(AuthProvider):
     ) -> User:
         # Check if user is active
         if not current_user.is_active:
-            raise R2RException(status_code=400, message="Inactive user")
+            raise FUSEException(status_code=400, message="Inactive user")
         return current_user
 
     async def logout(self, token: str) -> dict[str, str]:

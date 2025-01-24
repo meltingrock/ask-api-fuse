@@ -15,8 +15,8 @@ from core.base import (
     OrchestrationConfig,
 )
 
-from ..abstractions import R2RProviders
-from ..config import R2RConfig
+from ..abstractions import FUSEProviders
+from ..config import FUSEConfig
 
 logger = logging.getLogger()
 from core.providers import (
@@ -34,9 +34,9 @@ from core.providers import (
     OpenAICompletionProvider,
     OpenAIEmbeddingProvider,
     PostgresDatabaseProvider,
-    R2RAuthProvider,
-    R2RIngestionConfig,
-    R2RIngestionProvider,
+    FUSEAuthProvider,
+    FUSEIngestionConfig,
+    FUSEIngestionProvider,
     SendGridEmailProvider,
     SimpleOrchestrationProvider,
     SupabaseAuthProvider,
@@ -45,8 +45,8 @@ from core.providers import (
 )
 
 
-class R2RProviderFactory:
-    def __init__(self, config: R2RConfig):
+class FUSEProviderFactory:
+    def __init__(self, config: FUSEConfig):
         self.config = config
 
     @staticmethod
@@ -61,13 +61,13 @@ class R2RProviderFactory:
         ),
         *args,
         **kwargs,
-    ) -> R2RAuthProvider | SupabaseAuthProvider | JwtAuthProvider:
-        if auth_config.provider == "r2r":
-            r2r_auth = R2RAuthProvider(
+    ) -> FUSEAuthProvider | SupabaseAuthProvider | JwtAuthProvider:
+        if auth_config.provider == "fuse":
+            fuse_auth = FUSEAuthProvider(
                 auth_config, crypto_provider, database_provider, email_provider
             )
-            await r2r_auth.initialize()
-            return r2r_auth
+            await fuse_auth.initialize()
+            return fuse_auth
         elif auth_config.provider == "supabase":
             return SupabaseAuthProvider(
                 auth_config, crypto_provider, database_provider, email_provider
@@ -105,7 +105,7 @@ class R2RProviderFactory:
         llm_provider: LiteLLMCompletionProvider | OpenAICompletionProvider,
         *args,
         **kwargs,
-    ) -> R2RIngestionProvider | UnstructuredIngestionProvider:
+    ) -> FUSEIngestionProvider | UnstructuredIngestionProvider:
         config_dict = (
             ingestion_config.model_dump()
             if isinstance(ingestion_config, IngestionConfig)
@@ -114,12 +114,12 @@ class R2RProviderFactory:
 
         extra_fields = config_dict.pop("extra_fields", {})
 
-        if config_dict["provider"] == "r2r":
-            r2r_ingestion_config = R2RIngestionConfig(
+        if config_dict["provider"] == "fuse":
+            fuse_ingestion_config = FUSEIngestionConfig(
                 **config_dict, **extra_fields
             )
-            return R2RIngestionProvider(
-                r2r_ingestion_config, database_provider, llm_provider
+            return FUSEIngestionProvider(
+                fuse_ingestion_config, database_provider, llm_provider
             )
         elif config_dict["provider"] in [
             "unstructured_local",
@@ -143,7 +143,7 @@ class R2RProviderFactory:
     ) -> HatchetOrchestrationProvider | SimpleOrchestrationProvider:
         if config.provider == "hatchet":
             orchestration_provider = HatchetOrchestrationProvider(config)
-            orchestration_provider.get_worker("r2r-worker")
+            orchestration_provider.get_worker("fuse-worker")
             return orchestration_provider
         elif config.provider == "simple":
             from core.providers import SimpleOrchestrationProvider
@@ -248,7 +248,7 @@ class R2RProviderFactory:
         """Creates an email provider based on configuration."""
         if not email_config:
             raise ValueError(
-                "No email configuration provided for email provider, please add `[email]` to your `r2r.toml`."
+                "No email configuration provided for email provider, please add `[email]` to your `fuse.toml`."
             )
 
         if email_config.provider == "smtp":
@@ -265,7 +265,7 @@ class R2RProviderFactory:
     async def create_providers(
         self,
         auth_provider_override: Optional[
-            R2RAuthProvider | SupabaseAuthProvider
+            FUSEAuthProvider | SupabaseAuthProvider
         ] = None,
         crypto_provider_override: Optional[
             BCryptCryptoProvider | NaClCryptoProvider
@@ -282,7 +282,7 @@ class R2RProviderFactory:
             | OllamaEmbeddingProvider
         ] = None,
         ingestion_provider_override: Optional[
-            R2RIngestionProvider | UnstructuredIngestionProvider
+            FUSEIngestionProvider | UnstructuredIngestionProvider
         ] = None,
         llm_provider_override: Optional[
             OpenAICompletionProvider | LiteLLMCompletionProvider
@@ -290,7 +290,7 @@ class R2RProviderFactory:
         orchestration_provider_override: Optional[Any] = None,
         *args,
         **kwargs,
-    ) -> R2RProviders:
+    ) -> FUSEProviders:
         embedding_provider = (
             embedding_provider_override
             or self.create_embedding_provider(
@@ -349,7 +349,7 @@ class R2RProviderFactory:
             or self.create_orchestration_provider(self.config.orchestration)
         )
 
-        return R2RProviders(
+        return FUSEProviders(
             auth=auth_provider,
             database=database_provider,
             embedding=embedding_provider,

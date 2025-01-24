@@ -1,4 +1,4 @@
-import { r2rClient } from "../src/index";
+import { fuseClient } from "../src/index";
 import { describe, test, beforeAll, expect } from "@jest/globals";
 
 const baseUrl = "http://localhost:7272";
@@ -9,10 +9,10 @@ const baseUrl = "http://localhost:7272";
  * User 1's collection will have an id of `81c948ae-d41d-5d49-becf-d605444af636`
  * User 2's collection will have an id of `1f99a459-6d2e-5690-ad21-db026f019683`
  */
-describe("r2rClient V3 System Integration Tests User", () => {
-  let client: r2rClient;
-  let user1Client: r2rClient;
-  let user2Client: r2rClient;
+describe("fuseClient V3 System Integration Tests User", () => {
+  let client: fuseClient;
+  let user1Client: fuseClient;
+  let user2Client: fuseClient;
   let user1Id: string;
   let user2Id: string;
   let user1DocumentId: string;
@@ -23,9 +23,9 @@ describe("r2rClient V3 System Integration Tests User", () => {
   let user2CollectionId: string;
 
   beforeAll(async () => {
-    client = new r2rClient(baseUrl);
-    user1Client = new r2rClient(baseUrl);
-    user2Client = new r2rClient(baseUrl);
+    client = new fuseClient(baseUrl);
+    user1Client = new fuseClient(baseUrl);
+    user2Client = new fuseClient(baseUrl);
 
     await client.users.login({
       email: "admin@example.com",

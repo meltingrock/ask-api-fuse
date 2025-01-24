@@ -1,10 +1,10 @@
 from pydantic import Field
 
-from .base import R2RSerializable
+from .base import FUSESerializable
 from .llm import GenerationConfig
 
 
-class KGCreationSettings(R2RSerializable):
+class KGCreationSettings(FUSESerializable):
     """Settings for knowledge graph creation."""
 
     clustering_mode: str = Field(
@@ -60,7 +60,7 @@ class KGCreationSettings(R2RSerializable):
     )
 
 
-class KGEnrichmentSettings(R2RSerializable):
+class KGEnrichmentSettings(FUSESerializable):
     """Settings for knowledge graph enrichment."""
 
     force_kg_enrichment: bool = Field(
@@ -90,7 +90,7 @@ class KGEnrichmentSettings(R2RSerializable):
     )
 
 
-class GraphCommunitySettings(R2RSerializable):
+class GraphCommunitySettings(FUSESerializable):
     """Settings for knowledge graph community enrichment."""
 
     force_kg_enrichment: bool = Field(

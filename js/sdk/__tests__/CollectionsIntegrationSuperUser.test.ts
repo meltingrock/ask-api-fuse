@@ -1,4 +1,4 @@
-import { r2rClient } from "../src/index";
+import { fuseClient } from "../src/index";
 import { describe, test, beforeAll, expect, afterAll } from "@jest/globals";
 import fs from "fs";
 import path from "path";
@@ -9,13 +9,13 @@ const baseUrl = "http://localhost:7272";
 /**
  * zametov.txt will have an id of 69100f1e-2839-5b37-916d-5c87afe14094
  */
-describe("r2rClient V3 Collections Integration Tests", () => {
-  let client: r2rClient;
+describe("fuseClient V3 Collections Integration Tests", () => {
+  let client: fuseClient;
   let collectionId: string;
   let documentId: string;
 
   beforeAll(async () => {
-    client = new r2rClient(baseUrl);
+    client = new fuseClient(baseUrl);
     await client.users.login({
       email: "admin@example.com",
       password: "change_me_immediately",

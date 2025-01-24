@@ -1,4 +1,4 @@
-import { r2rClient } from "../src/index";
+import { fuseClient } from "../src/index";
 import { describe, test, beforeAll, expect } from "@jest/globals";
 
 const baseUrl = "http://localhost:7272";
@@ -11,12 +11,12 @@ const message = {
 /**
  * sonia.txt will have an id of 28ce9a4c-4d15-5287-b0c6-67834b9c4546
  */
-describe("r2rClient V3 Documents Integration Tests", () => {
-  let client: r2rClient;
+describe("fuseClient V3 Documents Integration Tests", () => {
+  let client: fuseClient;
   let documentId: string;
 
   beforeAll(async () => {
-    client = new r2rClient(baseUrl);
+    client = new fuseClient(baseUrl);
     await client.users.login({
       email: "admin@example.com",
       password: "change_me_immediately",

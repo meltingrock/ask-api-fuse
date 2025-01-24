@@ -273,7 +273,7 @@ export interface ServerStats {
 export interface SettingsResponse {
   config: Record<string, any>;
   prompts: Record<string, any>;
-  r2rProjectName: string;
+  fuseProjectName: string;
 }
 
 // User types
@@ -381,9 +381,9 @@ export type WrappedUserResponse = ResultsWrapper<User>;
 export type WrappedUsersResponse = PaginatedResultsWrapper<User[]>;
 
 /**
- * The "base" shape for an R2R results wrapper.
+ * The "base" shape for an FUSE results wrapper.
  */
-export interface R2RResults<T> {
+export interface FUSEResults<T> {
   results: T;
   // Potentially other fields, e.g. "info", "status", etc.
 }
@@ -392,7 +392,7 @@ export interface R2RResults<T> {
  * A paginated results wrapper typically includes a 'meta' object
  * or something similar for "total_entries".
  */
-export interface PaginatedR2RResult<T> extends R2RResults<T> {
+export interface PaginatedFUSEResult<T> extends FUSEResults<T> {
   meta: {
     total_entries: number;
   };
@@ -428,9 +428,9 @@ export interface ApiKeyNoPriv {
 /**
  * Wrapped response that contains one newly created API key.
  */
-export type WrappedAPIKeyResponse = R2RResults<ApiKey>;
+export type WrappedAPIKeyResponse = FUSEResults<ApiKey>;
 
 /**
  * Wrapped response that contains a list of existing API keys (no private keys).
  */
-export type WrappedAPIKeysResponse = PaginatedR2RResult<ApiKeyNoPriv[]>;
+export type WrappedAPIKeysResponse = PaginatedFUSEResult<ApiKeyNoPriv[]>;

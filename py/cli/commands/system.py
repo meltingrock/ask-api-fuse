@@ -12,13 +12,13 @@ from dotenv import load_dotenv
 from cli.command_group import cli
 from cli.utils.docker_utils import (
     bring_down_docker_compose,
-    remove_r2r_network,
+    remove_fuse_network,
     run_docker_serve,
     run_local_serve,
     wait_for_container_health,
 )
 from cli.utils.timer import timer
-from r2r import R2RAsyncClient, R2RException
+from fuse import FUSEAsyncClient, FUSEException
 
 
 @click.group()
@@ -31,12 +31,12 @@ def system():
 @pass_context
 async def health(ctx: click.Context):
     """Check the health of the server."""
-    client: R2RAsyncClient = ctx.obj
+    client: FUSEAsyncClient = ctx.obj
     try:
         with timer():
             response = await client.system.health()
         click.echo(json.dumps(response, indent=2))
-    except R2RException as e:
+    except FUSEException as e:
         click.echo(str(e), err=True)
         raise
     except Exception as e:
@@ -48,12 +48,12 @@ async def health(ctx: click.Context):
 @pass_context
 async def settings(ctx: click.Context):
     """Retrieve application settings."""
-    client: R2RAsyncClient = ctx.obj
+    client: FUSEAsyncClient = ctx.obj
     try:
         with timer():
             response = await client.system.settings()
         click.echo(json.dumps(response, indent=2))
-    except R2RException as e:
+    except FUSEException as e:
         click.echo(str(e), err=True)
         raise
     except Exception as e:
@@ -65,12 +65,12 @@ async def settings(ctx: click.Context):
 @pass_context
 async def status(ctx: click.Context):
     """Get statistics about the server, including the start time, uptime, CPU usage, and memory usage."""
-    client: R2RAsyncClient = ctx.obj
+    client: FUSEAsyncClient = ctx.obj
     try:
         with timer():
             response = await client.system.status()
         click.echo(json.dumps(response, indent=2))
-    except R2RException as e:
+    except FUSEException as e:
         click.echo(str(e), err=True)
         raise
     except Exception as e:
@@ -87,18 +87,18 @@ async def status(ctx: click.Context):
 @click.option(
     "--full",
     is_flag=True,
-    help="Run the full R2R compose? This includes Hatchet and Unstructured.",
+    help="Run the full FUSE compose? This includes Hatchet and Unstructured.",
 )
 @click.option(
     "--project-name", default=None, help="Project name for Docker deployment"
 )
 @click.option(
-    "--config-name", default=None, help="Name of the R2R configuration to use"
+    "--config-name", default=None, help="Name of the FUSE configuration to use"
 )
 @click.option(
     "--config-path",
     default=None,
-    help="Path to a custom R2R configuration file",
+    help="Path to a custom FUSE configuration file",
 )
 @click.option("--image", help="Docker image to use")
 @click.option(
@@ -124,21 +124,21 @@ async def serve(
     image_env,
     exclude_postgres,
 ):
-    """Start the R2R server."""
+    """Start the FUSE server."""
     load_dotenv()
-    click.echo("Spinning up an R2R deployment...")
+    click.echo("Spinning up an FUSE deployment...")
 
     if host is None:
-        host = os.getenv("R2R_HOST", "0.0.0.0")
+        host = os.getenv("FUSE_HOST", "0.0.0.0")
 
     if port is None:
-        port = int(os.getenv("R2R_PORT", (os.getenv("PORT", "7272"))))
+        port = int(os.getenv("FUSE_PORT", (os.getenv("PORT", "7272"))))
 
     click.echo(f"Running on {host}:{port}, with docker={docker}")
 
     if full:
         click.echo(
-            "Running the full R2R setup which includes `Hatchet` and `Unstructured.io`."
+            "Running the full FUSE setup which includes `Hatchet` and `Unstructured.io`."
         )
 
     if config_name in ["local_llm", "full_local_llm"]:
@@ -160,10 +160,10 @@ async def serve(
             "WARNING: Both `image` and `image_env` were provided. Using `image`."
         )
     if not image and docker:
-        r2r_version = get_version("r2r")
+        fuse_version = get_version("fuse")
 
-        version_specific_image = f"ragtoriches/{image_env}:{r2r_version}"
-        latest_image = f"ragtoriches/{image_env}:latest"
+        version_specific_image = f"meltingrock/{image_env}:{fuse_version}"
+        latest_image = f"meltingrock/{image_env}:latest"
 
         def image_exists(img):
             try:
@@ -187,12 +187,12 @@ async def serve(
             image = latest_image
         else:
             click.echo(
-                f"Neither {version_specific_image} nor {latest_image} found in remote registry. Confirm the sanity of your output for `docker manifest inspect ragtoriches/{version_specific_image}` and  `docker manifest inspect ragtoriches/{latest_image}`."
+                f"Neither {version_specific_image} nor {latest_image} found in remote registry. Confirm the sanity of your output for `docker manifest inspect meltingrock/{version_specific_image}` and  `docker manifest inspect meltingrock/{latest_image}`."
             )
             raise click.Abort()
 
     if docker:
-        os.environ["R2R_IMAGE"] = image
+        os.environ["FUSE_IMAGE"] = image
 
     if config_path:
         config_path = os.path.abspath(config_path)
@@ -227,17 +227,17 @@ async def serve(
 
             click.echo("Waiting for all services to become healthy...")
             if not wait_for_container_health(
-                project_name or ("r2r-full" if full else "r2r"), "r2r"
+                project_name or ("fuse-full" if full else "fuse"), "fuse"
             ):
                 click.secho(
-                    "r2r container failed to become healthy.", fg="red"
+                    "fuse container failed to become healthy.", fg="red"
                 )
                 return
 
-            traefik_port = os.environ.get("R2R_DASHBOARD_PORT", "80")
+            traefik_port = os.environ.get("FUSE_DASHBOARD_PORT", "80")
             url = f"http://localhost:{traefik_port}"
 
-            click.secho(f"Navigating to R2R application at {url}.", fg="blue")
+            click.secho(f"Navigating to FUSE application at {url}.", fg="blue")
             webbrowser.open(url)
     else:
         await run_local_serve(host, port, config_name, config_path, full)
@@ -263,21 +263,21 @@ def docker_down(volumes, remove_orphans, project_name):
     """Bring down the Docker Compose setup and attempt to remove the network if necessary."""
 
     if not project_name:
-        print("Bringing down the default R2R Docker setup(s)...")
+        print("Bringing down the default FUSE Docker setup(s)...")
         try:
             result = bring_down_docker_compose(
-                project_name or "r2r", volumes, remove_orphans
+                project_name or "fuse", volumes, remove_orphans
             )
         except:
             pass
         try:
             result = bring_down_docker_compose(
-                project_name or "r2r-full", volumes, remove_orphans
+                project_name or "fuse-full", volumes, remove_orphans
             )
         except:
             pass
     else:
-        print(f"Bringing down the `{project_name}` R2R Docker setup...")
+        print(f"Bringing down the `{project_name}` FUSE Docker setup...")
         result = bring_down_docker_compose(
             project_name, volumes, remove_orphans
         )
@@ -290,17 +290,17 @@ def docker_down(volumes, remove_orphans, project_name):
             click.echo(
                 f"{project_name} Docker Compose setup has been successfully brought down."
             )
-    remove_r2r_network()
+    remove_fuse_network()
 
 
 @cli.command()
 def generate_report():
-    """Generate a system report including R2R version, Docker info, and OS details."""
+    """Generate a system report including FUSE version, Docker info, and OS details."""
 
-    # Get R2R version
+    # Get FUSE version
     from importlib.metadata import version
 
-    report = {"r2r_version": version("r2r")}
+    report = {"fuse_version": version("fuse")}
 
     # Get Docker info
     try:
@@ -374,18 +374,18 @@ def generate_report():
 
 @cli.command()
 def update():
-    """Update the R2R package to the latest version."""
+    """Update the FUSE package to the latest version."""
     try:
-        cmd = [sys.executable, "-m", "pip", "install", "--upgrade", "r2r"]
+        cmd = [sys.executable, "-m", "pip", "install", "--upgrade", "fuse"]
 
-        click.echo("Updating R2R...")
+        click.echo("Updating FUSE...")
         result = subprocess.run(
             cmd, check=True, capture_output=True, text=True
         )
         click.echo(result.stdout)
-        click.echo("R2R has been successfully updated.")
+        click.echo("FUSE has been successfully updated.")
     except subprocess.CalledProcessError as e:
-        click.echo(f"An error occurred while updating R2R: {e}")
+        click.echo(f"An error occurred while updating FUSE: {e}")
         click.echo(e.stderr)
     except Exception as e:
         click.echo(f"An unexpected error occurred: {e}")
@@ -397,8 +397,8 @@ def version():
     from importlib.metadata import version
 
     try:
-        r2r_version = version("r2r")
-        click.echo(json.dumps(r2r_version, indent=2))
+        fuse_version = version("fuse")
+        click.echo(json.dumps(fuse_version, indent=2))
     except Exception as e:
         click.echo(str(f"An unexpected error occurred: {e}"), err=True)
         raise

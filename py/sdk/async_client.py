@@ -4,7 +4,7 @@ from typing import Any, AsyncGenerator
 
 import httpx
 
-from shared.abstractions import R2RException
+from shared.abstractions import FUSEException
 
 from .base.base_client import BaseClient
 from .v3 import (
@@ -21,9 +21,9 @@ from .v3 import (
 )
 
 
-class R2RAsyncClient(BaseClient):
+class FUSEAsyncClient(BaseClient):
     """
-    Asynchronous client for interacting with the R2R API.
+    Asynchronous client for interacting with the FUSE API.
     """
 
     def __init__(
@@ -56,9 +56,9 @@ class R2RAsyncClient(BaseClient):
             and ("health" not in endpoint)
         ):
             if not self.access_token and not self.api_key:
-                raise R2RException(
+                raise FUSEException(
                     status_code=401,
-                    message="Access token or api key is required to access `https://api.cloud.sciphi.ai`. To change the base url, use `set_base_url` method. For instance, if using the CLI then execute `r2r set-api-base http://localhost:7272`, or set the local environment variable `R2R_API_BASE` to `http://localhost:7272`.",
+                    message="Access token or api key is required to access `https://api.cloud.sciphi.ai`. To change the base url, use `set_base_url` method. For instance, if using the CLI then execute `fuse set-api-base http://localhost:7272`, or set the local environment variable `FUSE_API_BASE` to `http://localhost:7272`.",
                 )
         request_args = self._prepare_request_args(endpoint, **kwargs)
 
@@ -74,7 +74,7 @@ class R2RAsyncClient(BaseClient):
                 return BytesIO(response.content)
 
         except httpx.RequestError as e:
-            raise R2RException(
+            raise FUSEException(
                 status_code=500,
                 message=f"Request failed: {str(e)}",
             ) from e
@@ -112,7 +112,7 @@ class R2RAsyncClient(BaseClient):
             except json.JSONDecodeError:
                 message = response.text
 
-            raise R2RException(
+            raise FUSEException(
                 status_code=response.status_code, message=message
             )
 

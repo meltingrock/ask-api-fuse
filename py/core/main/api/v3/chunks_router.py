@@ -9,7 +9,7 @@ from fastapi import Body, Depends, Path, Query
 from core.base import (
     ChunkResponse,
     GraphSearchSettings,
-    R2RException,
+    FUSEException,
     SearchSettings,
     UpdateChunk,
     select_search_filters,
@@ -26,7 +26,7 @@ from core.providers import (
     SimpleOrchestrationProvider,
 )
 
-from ...abstractions import R2RProviders, R2RServices
+from ...abstractions import FUSEProviders, FUSEServices
 from .base_router import BaseRouterV3
 
 logger = logging.getLogger()
@@ -37,8 +37,8 @@ MAX_CHUNKS_PER_REQUEST = 1024 * 100
 class ChunksRouter(BaseRouterV3):
     def __init__(
         self,
-        providers: R2RProviders,
-        services: R2RServices,
+        providers: FUSEProviders,
+        services: FUSEServices,
     ):
         logging.info("Initializing ChunksRouter")
         super().__init__(providers, services)
@@ -48,26 +48,6 @@ class ChunksRouter(BaseRouterV3):
             "/chunks/search",
             summary="Search Chunks",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            response = client.chunks.search(
-                                query="search query",
-                                search_settings={
-                                    "limit": 10
-                                }
-                            )
-                            """
-                        ),
-                    }
-                ]
-            },
         )
         @self.base_endpoint
         async def search_chunks(
@@ -103,41 +83,6 @@ class ChunksRouter(BaseRouterV3):
             "/chunks/{id}",
             summary="Retrieve Chunk",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            response = client.chunks.retrieve(
-                                id="b4ac4dd6-5f27-596e-a55b-7cf242ca30aa"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.chunks.retrieve({
-                                    id: "b4ac4dd6-5f27-596e-a55b-7cf242ca30aa"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def retrieve_chunk(
@@ -152,7 +97,7 @@ class ChunksRouter(BaseRouterV3):
             """
             chunk = await self.services.ingestion.get_chunk(id)
             if not chunk:
-                raise R2RException("Chunk not found", 404)
+                raise FUSEException("Chunk not found", 404)
 
             # # Check access rights
             # document = await self.services.management.get_document(chunk.document_id)
@@ -160,7 +105,7 @@ class ChunksRouter(BaseRouterV3):
             if not auth_user.is_superuser and str(auth_user.id) != str(
                 chunk["owner_id"]
             ):
-                raise R2RException("Not authorized to access this chunk", 403)
+                raise FUSEException("Not authorized to access this chunk", 403)
 
             return ChunkResponse(  # type: ignore
                 id=chunk["id"],
@@ -176,47 +121,6 @@ class ChunksRouter(BaseRouterV3):
             "/chunks/{id}",
             summary="Update Chunk",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            response = client.chunks.update(
-                                {
-                                    "id": "b4ac4dd6-5f27-596e-a55b-7cf242ca30aa",
-                                    "text": "Updated content",
-                                    "metadata": {"key": "new value"}
-                                }
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.chunks.update({
-                                    id: "b4ac4dd6-5f27-596e-a55b-7cf242ca30aa",
-                                    text: "Updated content",
-                                    metadata: {key: "new value"}
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def update_chunk(
@@ -236,7 +140,7 @@ class ChunksRouter(BaseRouterV3):
                 chunk_update.id
             )
             if existing_chunk is None:
-                raise R2RException(f"Chunk {chunk_update.id} not found", 404)
+                raise FUSEException(f"Chunk {chunk_update.id} not found", 404)
 
             workflow_input = {
                 "document_id": str(existing_chunk["document_id"]),
@@ -269,41 +173,6 @@ class ChunksRouter(BaseRouterV3):
             "/chunks/{id}",
             summary="Delete Chunk",
             dependencies=[Depends(self.rate_limit_dependency)],
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            response = client.chunks.delete(
-                                id="b4ac4dd6-5f27-596e-a55b-7cf242ca30aa"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.chunks.delete({
-                                    id: "b4ac4dd6-5f27-596e-a55b-7cf242ca30aa"
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def delete_chunk(
@@ -321,7 +190,7 @@ class ChunksRouter(BaseRouterV3):
             existing_chunk = await self.services.ingestion.get_chunk(id)
 
             if existing_chunk is None:
-                raise R2RException(
+                raise FUSEException(
                     message=f"Chunk {id} not found", status_code=404
                 )
 
@@ -340,47 +209,6 @@ class ChunksRouter(BaseRouterV3):
             "/chunks",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List Chunks",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            response = client.chunks.list(
-                                metadata_filter={"key": "value"},
-                                include_vectors=False,
-                                offset=0,
-                                limit=10,
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.chunks.list({
-                                    metadataFilter: {key: "value"},
-                                    includeVectors: false,
-                                    offset: 0,
-                                    limit: 10,
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def list_chunks(

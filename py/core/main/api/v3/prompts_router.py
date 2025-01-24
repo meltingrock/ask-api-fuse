@@ -4,7 +4,7 @@ from typing import Optional
 
 from fastapi import Body, Depends, Path, Query
 
-from core.base import R2RException
+from core.base import FUSEException
 from core.base.api.models import (
     GenericBooleanResponse,
     GenericMessageResponse,
@@ -14,15 +14,15 @@ from core.base.api.models import (
     WrappedPromptsResponse,
 )
 
-from ...abstractions import R2RProviders, R2RServices
+from ...abstractions import FUSEProviders, FUSEServices
 from .base_router import BaseRouterV3
 
 
 class PromptsRouter(BaseRouterV3):
     def __init__(
         self,
-        providers: R2RProviders,
-        services: R2RServices,
+        providers: FUSEProviders,
+        services: FUSEServices,
     ):
         logging.info("Initializing PromptsRouter")
         super().__init__(providers, services)
@@ -32,58 +32,6 @@ class PromptsRouter(BaseRouterV3):
             "/prompts",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Create a new prompt",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.prompts.create(
-                                name="greeting_prompt",
-                                template="Hello, {name}!",
-                                input_types={"name": "string"}
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.prompts.create({
-                                    name: "greeting_prompt",
-                                    template: "Hello, {name}!",
-                                    inputTypes: { name: "string" },
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/prompts" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" \\
-                                -H "Content-Type: application/json" \\
-                                -d '{"name": "greeting_prompt", "template": "Hello, {name}!", "input_types": {"name": "string"}}'
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def create_prompt(
@@ -103,7 +51,7 @@ class PromptsRouter(BaseRouterV3):
             This endpoint allows superusers to create a new prompt with a specified name, template, and input types.
             """
             if not auth_user.is_superuser:
-                raise R2RException(
+                raise FUSEException(
                     "Only a superuser can create prompts.",
                     403,
                 )
@@ -116,56 +64,6 @@ class PromptsRouter(BaseRouterV3):
             "/prompts",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="List all prompts",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.prompts.list()
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.prompts.list();
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r prompts list
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                                curl -X GET "https://api.example.com/v3/prompts" \\
-                                    -H "Authorization: Bearer YOUR_API_KEY"
-                                """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_prompts(
@@ -177,7 +75,7 @@ class PromptsRouter(BaseRouterV3):
             This endpoint retrieves a list of all prompts in the system. Only superusers can access this endpoint.
             """
             if not auth_user.is_superuser:
-                raise R2RException(
+                raise FUSEException(
                     "Only a superuser can list prompts.",
                     403,
                 )
@@ -196,64 +94,6 @@ class PromptsRouter(BaseRouterV3):
             "/prompts/{name}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Get a specific prompt",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.prompts.get(
-                                "greeting_prompt",
-                                inputs={"name": "John"},
-                                prompt_override="Hi, {name}!"
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.prompts.retrieve({
-                                    name: "greeting_prompt",
-                                    inputs: { name: "John" },
-                                    promptOverride: "Hi, {name}!",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r prompts retrieve greeting_prompt --inputs '{"name": "John"}' --prompt-override "Hi, {name}!"
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X POST "https://api.example.com/v3/prompts/greeting_prompt?inputs=%7B%22name%22%3A%22John%22%7D&prompt_override=Hi%2C%20%7Bname%7D!" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def get_prompt(
@@ -273,7 +113,7 @@ class PromptsRouter(BaseRouterV3):
             Only superusers can access this endpoint.
             """
             if not auth_user.is_superuser:
-                raise R2RException(
+                raise FUSEException(
                     "Only a superuser can retrieve prompts.",
                     403,
                 )
@@ -286,58 +126,6 @@ class PromptsRouter(BaseRouterV3):
             "/prompts/{name}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Update an existing prompt",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.prompts.update(
-                                "greeting_prompt",
-                                template="Greetings, {name}!",
-                                input_types={"name": "string", "age": "integer"}
-                            )
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.prompts.update({
-                                    name: "greeting_prompt",
-                                    template: "Greetings, {name}!",
-                                    inputTypes: { name: "string", age: "integer" },
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X PUT "https://api.example.com/v3/prompts/greeting_prompt" \\
-                                -H "Authorization: Bearer YOUR_API_KEY" \\
-                                -H "Content-Type: application/json" \\
-                                -d '{"template": "Greetings, {name}!", "input_types": {"name": "string", "age": "integer"}}'
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def update_prompt(
@@ -357,7 +145,7 @@ class PromptsRouter(BaseRouterV3):
             This endpoint allows superusers to update the template and input types of an existing prompt.
             """
             if not auth_user.is_superuser:
-                raise R2RException(
+                raise FUSEException(
                     "Only a superuser can update prompts.",
                     403,
                 )
@@ -370,58 +158,6 @@ class PromptsRouter(BaseRouterV3):
             "/prompts/{name}",
             dependencies=[Depends(self.rate_limit_dependency)],
             summary="Delete a prompt",
-            openapi_extra={
-                "x-codeSamples": [
-                    {
-                        "lang": "Python",
-                        "source": textwrap.dedent(
-                            """
-                            from r2r import R2RClient
-
-                            client = R2RClient()
-                            # when using auth, do client.login(...)
-
-                            result = client.prompts.delete("greeting_prompt")
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": textwrap.dedent(
-                            """
-                            const { r2rClient } = require("r2r-js");
-
-                            const client = new r2rClient();
-
-                            function main() {
-                                const response = await client.prompts.delete({
-                                    name: "greeting_prompt",
-                                });
-                            }
-
-                            main();
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "CLI",
-                        "source": textwrap.dedent(
-                            """
-                            r2r prompts delete greeting_prompt
-                            """
-                        ),
-                    },
-                    {
-                        "lang": "cURL",
-                        "source": textwrap.dedent(
-                            """
-                            curl -X DELETE "https://api.example.com/v3/prompts/greeting_prompt" \\
-                                -H "Authorization: Bearer YOUR_API_KEY"
-                            """
-                        ),
-                    },
-                ]
-            },
         )
         @self.base_endpoint
         async def delete_prompt(
@@ -434,7 +170,7 @@ class PromptsRouter(BaseRouterV3):
             This endpoint allows superusers to delete an existing prompt.
             """
             if not auth_user.is_superuser:
-                raise R2RException(
+                raise FUSEException(
                     "Only a superuser can delete prompts.",
                     403,
                 )

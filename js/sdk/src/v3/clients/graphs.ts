@@ -1,5 +1,5 @@
 import { feature } from "../../feature";
-import { r2rClient } from "../../r2rClient";
+import { fuseClient } from "../../fuseClient";
 import {
   WrappedGraphResponse,
   WrappedBooleanResponse,
@@ -21,7 +21,7 @@ if (typeof window === "undefined") {
 }
 
 export class GraphsClient {
-  constructor(private client: r2rClient) {}
+  constructor(private client: fuseClient) {}
 
   /**
    * List graphs with pagination and filtering options.

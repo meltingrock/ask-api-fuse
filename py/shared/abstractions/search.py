@@ -7,12 +7,12 @@ from uuid import UUID
 
 from pydantic import Field
 
-from .base import R2RSerializable
+from .base import FUSESerializable
 from .llm import GenerationConfig
 from .vector import IndexMeasure
 
 
-class ChunkSearchResult(R2RSerializable):
+class ChunkSearchResult(FUSESerializable):
     """Result of a search operation."""
 
     id: UUID
@@ -62,7 +62,7 @@ class GraphSearchResultType(str, Enum):
     COMMUNITY = "community"
 
 
-class GraphEntityResult(R2RSerializable):
+class GraphEntityResult(FUSESerializable):
     name: str
     description: str
     metadata: Optional[dict[str, Any]] = None
@@ -75,7 +75,7 @@ class GraphEntityResult(R2RSerializable):
         }
 
 
-class GraphRelationshipResult(R2RSerializable):
+class GraphRelationshipResult(FUSESerializable):
     # name: str
     subject: str
     predicate: str
@@ -94,7 +94,7 @@ class GraphRelationshipResult(R2RSerializable):
         }
 
 
-class GraphCommunityResult(R2RSerializable):
+class GraphCommunityResult(FUSESerializable):
     name: str
     summary: str
     rating: float
@@ -113,7 +113,7 @@ class GraphCommunityResult(R2RSerializable):
         }
 
 
-class GraphSearchResult(R2RSerializable):
+class GraphSearchResult(FUSESerializable):
     content: GraphEntityResult | GraphRelationshipResult | GraphCommunityResult
     result_type: Optional[GraphSearchResultType] = None
     chunk_ids: Optional[list[UUID]] = None
@@ -129,7 +129,7 @@ class GraphSearchResult(R2RSerializable):
         }
 
 
-class WebSearchResult(R2RSerializable):
+class WebSearchResult(FUSESerializable):
     title: str
     link: str
     snippet: str
@@ -154,12 +154,12 @@ class WebSearchResult(R2RSerializable):
         }
 
 
-class RelatedSearchResult(R2RSerializable):
+class RelatedSearchResult(FUSESerializable):
     query: str
     type: str = "related"
 
 
-class PeopleAlsoAskResult(R2RSerializable):
+class PeopleAlsoAskResult(FUSESerializable):
     question: str
     snippet: str
     link: str
@@ -167,7 +167,7 @@ class PeopleAlsoAskResult(R2RSerializable):
     type: str = "peopleAlsoAsk"
 
 
-class WebSearchResponse(R2RSerializable):
+class WebSearchResponse(FUSESerializable):
     organic_results: list[WebSearchResult] = []
     related_searches: list[RelatedSearchResult] = []
     people_also_ask: list[PeopleAlsoAskResult] = []
@@ -193,7 +193,7 @@ class WebSearchResponse(R2RSerializable):
         )
 
 
-class ContextDocumentResult(R2RSerializable):
+class ContextDocumentResult(FUSESerializable):
     """
     Holds a single 'document' plus its 'chunks', exactly as your
     content_method returns them, or tidied up a bit.
@@ -203,7 +203,7 @@ class ContextDocumentResult(R2RSerializable):
     chunks: list[dict[str, Any]] = Field(default_factory=list)
 
 
-class AggregateSearchResult(R2RSerializable):
+class AggregateSearchResult(FUSESerializable):
     """Result of an aggregate search operation."""
 
     chunk_search_results: Optional[list[ChunkSearchResult]]
@@ -248,12 +248,12 @@ from uuid import UUID
 
 from pydantic import Field
 
-from .base import R2RSerializable
+from .base import FUSESerializable
 from .llm import GenerationConfig
 from .vector import IndexMeasure
 
 
-class HybridSearchSettings(R2RSerializable):
+class HybridSearchSettings(FUSESerializable):
     """Settings for hybrid search combining full-text and semantic search."""
 
     full_text_weight: float = Field(
@@ -271,7 +271,7 @@ class HybridSearchSettings(R2RSerializable):
     )
 
 
-class ChunkSearchSettings(R2RSerializable):
+class ChunkSearchSettings(FUSESerializable):
     """Settings specific to chunk/vector search."""
 
     index_measure: IndexMeasure = Field(
@@ -292,7 +292,7 @@ class ChunkSearchSettings(R2RSerializable):
     )
 
 
-class GraphSearchSettings(R2RSerializable):
+class GraphSearchSettings(FUSESerializable):
     """Settings specific to knowledge graph search."""
 
     generation_config: GenerationConfig = Field(
@@ -322,7 +322,7 @@ class GraphSearchSettings(R2RSerializable):
     )
 
 
-class SearchSettings(R2RSerializable):
+class SearchSettings(FUSESerializable):
     """Main search settings class that combines shared settings with specialized settings for chunks and KG."""
 
     # Search type flags

@@ -3,7 +3,7 @@
 # import pytest
 # import time
 # from datetime import datetime
-# from r2r import R2RClient, R2RException, LimitSettings
+# from fuse import FUSEClient, FUSEException, LimitSettings
 
 
 # async def test_health_endpoint(aclient):
@@ -47,7 +47,7 @@
 #         assert "results" in response
 
 #     # Next request should fail with rate limit error
-#     with pytest.raises(R2RException) as exc_info:
+#     with pytest.raises(FUSEException) as exc_info:
 #         await aclient.retrieval.search(
 #             "over limit query",
 #         )
@@ -69,11 +69,11 @@
 #         try:
 #             # use `me` route which is at `global_limit` in `test_limits` config
 #             result = await aclient.users.me()
-#         except R2RException as e:
+#         except FUSEException as e:
 #             if "rate limit" not in str(e).lower():
 #                 raise  # Re-raise if it's not a rate limit exception
 #     # Verify global limit is enforced
-#     with pytest.raises(R2RException) as exc_info:
+#     with pytest.raises(FUSEException) as exc_info:
 #         await aclient.users.me()
 #     assert "rate limit" in str(exc_info.value).lower()
 #     await aclient.users.logout()
@@ -94,11 +94,11 @@
 #             # use `me` route which is at `global_limit` in `test_limits` config
 #             await aclient.users.me()
 #             await aclient.retrieval.search("whoami?")
-#         except R2RException as e:
+#         except FUSEException as e:
 #             if "rate limit" not in str(e).lower():
 #                 raise  # Re-raise if it's not a rate limit exception
 #     # Verify global limit is enforced
-#     with pytest.raises(R2RException) as exc_info:
+#     with pytest.raises(FUSEException) as exc_info:
 #         await aclient.users.me()
 #     assert "rate limit" in str(exc_info.value).lower()
 #     await aclient.users.logout()
@@ -130,7 +130,7 @@
 # #     time.sleep(61)  # Avoid per-minute limits
 
 # #     # Next request should fail with monthly limit error
-# #     with pytest.raises(R2RException) as exc_info:
+# #     with pytest.raises(FUSEException) as exc_info:
 # #         client.retrieval.search(
 # #             "over monthly limit query",
 # #         )
@@ -156,7 +156,7 @@
 #         lambda:  aclient.system.settings(),
 #         lambda:  aclient.system.logs(),
 #     ]:
-#         with pytest.raises(R2RException) as exc_info:
+#         with pytest.raises(FUSEException) as exc_info:
 #             await endpoint()
 #         # assert exc_info.value.status_code == 403
 
@@ -232,7 +232,7 @@
 #             await aclient.retrieval.search(f"test query {i}")
 #             if i >= 2:
 #                 assert False, "Should have raised exception"
-#         except R2RException as e:
+#         except FUSEException as e:
 #             assert "rate limit" in str(e).lower()
 #             assert i >= 1  # Should fail after first request
 #             break
@@ -261,7 +261,7 @@
 #     await asyncio.sleep(61)  # Avoid per-minute limits
 
 #     # Next request should fail with monthly limit error
-#     with pytest.raises(R2RException) as exc_info:
+#     with pytest.raises(FUSEException) as exc_info:
 #         await aclient.users.me()
 #     assert "monthly" in str(exc_info.value).lower()
 
@@ -278,7 +278,7 @@
 #         await aclient.retrieval.search(f"test query {i}")
 
 #     # Try different route to test global limit still applies
-#     with pytest.raises(R2RException) as exc_info:
+#     with pytest.raises(FUSEException) as exc_info:
 #         for i in range(10):
 #             await aclient.users.me()
 #     assert "rate limit" in str(exc_info.value).lower()
@@ -296,6 +296,6 @@
 #         await aclient.users.me()
 
 #     # Next request should hit global limit
-#     with pytest.raises(R2RException) as exc_info:
+#     with pytest.raises(FUSEException) as exc_info:
 #         await aclient.users.me()
 #     assert "rate limit" in str(exc_info.value).lower()

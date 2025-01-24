@@ -1,4 +1,4 @@
-# Understanding Internals of R2R Library
+# Understanding Internals of FUSE Library
 
 ## Table of Contents
 
@@ -6,24 +6,24 @@
 2. [Installation](#installation)
    - [Prerequisites](#prerequisites)
    - [Docker Installation](#docker-installation)
-     - [Install the R2R CLI & Python SDK](#install-the-r2r-cli--python-sdk)
-     - [Start R2R with Docker](#start-r2r-with-docker)
+     - [Install the FUSE CLI & Python SDK](#install-the-fuse-cli--python-sdk)
+     - [Start FUSE with Docker](#start-fuse-with-docker)
    - [Google Cloud Platform Deployment](#google-cloud-platform-deployment)
      - [Overview](#overview)
      - [Creating a Google Compute Engine Instance](#creating-a-google-compute-engine-instance)
      - [Installing Dependencies](#installing-dependencies)
-     - [Setting up R2R](#setting-up-r2r)
+     - [Setting up FUSE](#setting-up-fuse)
      - [Configuring Port Forwarding for Local Access](#configuring-port-forwarding-for-local-access)
      - [Exposing Ports for Public Access (Optional)](#exposing-ports-for-public-access-optional)
      - [Conclusion](#conclusion-1)
-3. [R2R Application Lifecycle](#r2r-application-lifecycle)
+3. [FUSE Application Lifecycle](#fuse-application-lifecycle)
    - [Developer Workflow](#developer-workflow)
    - [User Interaction](#user-interaction)
-   - [Hello R2R (Code Example)](#hello-r2r-code-example)
+   - [Hello FUSE (Code Example)](#hello-fuse-code-example)
 4. [Configuration](#configuration)
    - [Configuration Overview](#configuration-overview)
-   - [Server-Side Configuration (`r2r.toml`)](#server-side-configuration-r2rtoml)
-     - [Example: `r2r.toml`](#example-r2rtoml)
+   - [Server-Side Configuration (`fuse.toml`)](#server-side-configuration-fusetoml)
+     - [Example: `fuse.toml`](#example-fusetoml)
    - [Runtime Overrides](#runtime-overrides)
    - [Postgres Configuration](#postgres-configuration)
      - [Example Configuration](#example-configuration-1)
@@ -74,7 +74,7 @@
 7. [AI Powered Search](#ai-powered-search)
    - [Introduction](#introduction-2)
    - [Understanding Search Modes](#understanding-search-modes)
-   - [How R2R Hybrid Search Works](#how-r2r-hybrid-search-works)
+   - [How FUSE Hybrid Search Works](#how-fuse-hybrid-search-works)
    - [Vector Search](#vector-search)
      - [Example](#example-2)
    - [Hybrid Search](#hybrid-search)
@@ -111,7 +111,7 @@
    - [Customization and Server-Side Defaults](#customization-and-server-side-defaults)
      - [Example](#example-10)
    - [Conclusion](#conclusion-5)
-9. [Knowledge Graphs in R2R](#knowledge-graphs-in-r2r)
+9. [Knowledge Graphs in FUSE](#knowledge-graphs-in-fuse)
    - [Overview](#overview-2)
    - [System Architecture](#system-architecture)
    - [Getting Started](#getting-started)
@@ -148,7 +148,7 @@
    - [Troubleshooting](#troubleshooting-1)
    - [Conclusion](#conclusion-6)
    - [Next Steps](#next-steps-1)
-10. [GraphRAG in R2R](#graphrag-in-r2r)
+10. [GraphRAG in FUSE](#graphrag-in-fuse)
     - [Overview](#overview-1)
     - [Architecture](#architecture)
     - [Understanding Communities](#understanding-communities)
@@ -179,7 +179,7 @@
     - [Conclusion](#conclusion-7)
     - [Security Considerations](#security-considerations-1)
 11. [Agent](#agent)
-    - [Understanding R2R’s RAG Agent](#understanding-r2rs-rag-agent)
+    - [Understanding FUSE’s RAG Agent](#understanding-fuses-rag-agent)
        - [Planned Extensions](#planned-extensions)
     - [Configuration](#configuration-2)
        - [Default Configuration](#default-configuration)
@@ -207,9 +207,9 @@
     - [Security Considerations](#security-considerations-2)
 12. [Orchestration](#orchestration)
     - [Key Concepts](#key-concepts)
-    - [Orchestration in R2R](#orchestration-in-r2r)
+    - [Orchestration in FUSE](#orchestration-in-fuse)
        - [Benefits of Orchestration](#benefits-of-orchestration)
-       - [Workflows in R2R](#workflows-in-r2r)
+       - [Workflows in FUSE](#workflows-in-fuse)
           - [List of Workflows](#list-of-workflows)
     - [Orchestration GUI](#orchestration-gui)
        - [Access GUI](#access-gui)
@@ -237,7 +237,7 @@
        - [Important Considerations](#important-considerations-1)
     - [System Updates and Maintenance](#system-updates-and-maintenance)
        - [Version Management](#version-management)
-          - [Check Current R2R Version](#check-current-r2r-version)
+          - [Check Current FUSE Version](#check-current-fuse-version)
        - [Update Process](#update-process)
           - [Steps with Commands](#steps-with-commands)
        - [Database Migration Management](#database-migration-management)
@@ -270,9 +270,9 @@
        - [Plan Scaling Ahead](#plan-scaling-ahead)
     - [Conclusion](#conclusion-10)
 14. [Web Development](#web-development)
-    - [Hello R2R—JavaScript](#hello-r2rjavascript)
-       - [Example: `r2r-js/examples/hello_r2r.js`](#example-r2r-jsexampleshello_r2rjs)
-    - [r2r-js Client](#r2r-js-client)
+    - [Hello FUSE—JavaScript](#hello-fusejavascript)
+       - [Example: `fuse-js/examples/hello_fuse.js`](#example-fuse-jsexampleshello_fusejs)
+    - [fuse-js Client](#fuse-js-client)
        - [Installing](#installing-1)
        - [Creating the Client](#creating-the-client)
        - [Log into the Server](#log-into-the-server)
@@ -377,8 +377,8 @@
 18. [Embedding](#embedding)
     - [Embedding System](#embedding-system)
     - [Embedding Configuration](#embedding-configuration-1)
-       - [Example: `r2r.toml`](#example-r2rtoml-1)
-    - [Advanced Embedding Features in R2R](#advanced-embedding-features-in-r2r)
+       - [Example: `fuse.toml`](#example-fusetoml-1)
+    - [Advanced Embedding Features in FUSE](#advanced-embedding-features-in-fuse)
        - [Batched Processing](#batched-processing)
           - [Python Example](#python-example-24)
        - [Concurrent Request Management](#concurrent-request-management-1)
@@ -390,7 +390,7 @@
     - [Performance Considerations](#performance-considerations-3)
     - [Conclusion](#conclusion-15)
 19. [Prompts](#prompts)
-    - [Prompt Management in R2R](#prompt-management-in-r2r)
+    - [Prompt Management in FUSE](#prompt-management-in-fuse)
     - [Default Prompts](#default-prompts)
        - [Example: `default_rag.yaml`](#example-default_ragyaml)
        - [Prompt Files](#prompt-files)
@@ -433,15 +433,15 @@
 
 ## Introduction
 
-**R2R** (Retrieval to Riches) is an engine for building user-facing **Retrieval-Augmented Generation (RAG)** applications. It provides core services through an architecture of providers, services, and an integrated RESTful API. This documentation offers a detailed walkthrough of interacting with R2R, including installation, configuration, and leveraging its advanced features such as data ingestion, search, RAG, and knowledge graphs.
+**FUSE** (Retrieval to Riches) is an engine for building user-facing **Retrieval-Augmented Generation (RAG)** applications. It provides core services through an architecture of providers, services, and an integrated RESTful API. This documentation offers a detailed walkthrough of interacting with FUSE, including installation, configuration, and leveraging its advanced features such as data ingestion, search, RAG, and knowledge graphs.
 
-For a deeper dive into the R2R system architecture, refer to the [R2R System Architecture](https://r2r-docs.sciphi.ai/introduction/system).
+For a deeper dive into the FUSE system architecture, refer to the [FUSE System Architecture](https://fuse-docs.sciphi.ai/introduction/system).
 
 ---
 
 ## Installation
 
-Before diving into R2R's features, ensure that you have completed the [installation instructions](https://r2r-docs.sciphi.ai/documentation/installation/overview).
+Before diving into FUSE's features, ensure that you have completed the [installation instructions](https://fuse-docs.sciphi.ai/documentation/installation/overview).
 
 ### Prerequisites
 
@@ -451,35 +451,35 @@ Before diving into R2R's features, ensure that you have completed the [installat
 
 ### Docker Installation
 
-This installation guide is for the **Full R2R**. For solo developers or teams prototyping, start with [R2R Light](https://r2r-docs.sciphi.ai/documentation/installation/light/local-system).
+This installation guide is for the **Full FUSE**. For solo developers or teams prototyping, start with [FUSE Light](https://fuse-docs.sciphi.ai/documentation/installation/light/local-system).
 
-#### Install the R2R CLI & Python SDK
-
-```bash
-pip install r2r
-```
-
-> **Note**: A distinct CLI binary for R2R is under active development. For specific needs or feature requests, reach out to the R2R team.
-
-#### Start R2R with Docker
-
-The Full R2R installation uses a custom configuration (`full.toml`). Launch R2R with Docker:
+#### Install the FUSE CLI & Python SDK
 
 ```bash
-r2r serve --docker --config-path=full.toml
+pip install fuse
 ```
 
-> This command pulls necessary Docker images and starts required containers, including R2R, Hatchet, and Postgres+pgvector. Access the live server at [http://localhost:7272](http://localhost:7272/).
+> **Note**: A distinct CLI binary for FUSE is under active development. For specific needs or feature requests, reach out to the FUSE team.
+
+#### Start FUSE with Docker
+
+The Full FUSE installation uses a custom configuration (`full.toml`). Launch FUSE with Docker:
+
+```bash
+fuse serve --docker --config-path=full.toml
+```
+
+> This command pulls necessary Docker images and starts required containers, including FUSE, Hatchet, and Postgres+pgvector. Access the live server at [http://localhost:7272](http://localhost:7272/).
 
 ### Google Cloud Platform Deployment
 
-Deploying R2R on Google Cloud Platform (GCP) involves setting up a Compute Engine instance, installing dependencies, and configuring port forwarding.
+Deploying FUSE on Google Cloud Platform (GCP) involves setting up a Compute Engine instance, installing dependencies, and configuring port forwarding.
 
 #### Overview
 
 1. **Creating a Google Compute Engine Instance**
 2. **Installing Dependencies**
-3. **Setting up R2R**
+3. **Setting up FUSE**
 4. **Configuring Port Forwarding for Local Access**
 5. **Exposing Ports for Public Access (Optional)**
 6. **Security Considerations**
@@ -510,10 +510,10 @@ SSH into your instance and run the following commands:
 sudo apt update
 sudo apt install python3-pip -y
 
-# Install R2R
-pip install r2r
+# Install FUSE
+pip install fuse
 
-# Add R2R to PATH
+# Add FUSE to PATH
 echo 'export PATH=$PATH:$HOME/.local/bin' >> ~/.bashrc
 source ~/.bashrc
 
@@ -538,19 +538,19 @@ newgrp docker
 docker run hello-world
 ```
 
-#### Setting up R2R
+#### Setting up FUSE
 
 ```bash
 # Set required remote providers
 export OPENAI_API_KEY=sk-...
 
 # Optional - pass in a custom configuration
-r2r serve --docker --full
+fuse serve --docker --full
 ```
 
 #### Configuring Port Forwarding for Local Access
 
-Use SSH port forwarding to access R2R locally:
+Use SSH port forwarding to access FUSE locally:
 
 ```bash
 gcloud compute ssh --zone "your-zone" "your-instance-name" -- -L 7273:localhost:7273 -L 7274:localhost:7274
@@ -558,24 +558,24 @@ gcloud compute ssh --zone "your-zone" "your-instance-name" -- -L 7273:localhost:
 
 #### Exposing Ports for Public Access (Optional)
 
-To make R2R publicly accessible:
+To make FUSE publicly accessible:
 
 1. **Create a Firewall Rule**:
    - Navigate to **VPC network** > **Firewall**.
    - Click **Create Firewall Rule**.
-   - **Name**: Allow-R2R
-   - **Target tags**: `r2r-server`
+   - **Name**: Allow-FUSE
+   - **Target tags**: `fuse-server`
    - **Source IP ranges**: `0.0.0.0/0`
    - **Protocols and ports**: `tcp:7272`
 2. **Add Network Tag to Instance**:
    - Go to **Compute Engine** > **VM instances**.
    - Click on your instance.
    - Click **Edit**.
-   - Under **Network tags**, add `r2r-server`.
+   - Under **Network tags**, add `fuse-server`.
    - Click **Save**.
-3. **Ensure R2R Listens on All Interfaces**.
+3. **Ensure FUSE Listens on All Interfaces**.
 
-After starting R2R, access it at:
+After starting FUSE, access it at:
 
 ```
 http://<your-instance-external-ip>:7272
@@ -588,37 +588,37 @@ http://<your-instance-external-ip>:7272
 
 #### Conclusion
 
-You have successfully deployed R2R on Google Cloud Platform. The application is accessible locally via SSH tunneling and optionally publicly. Ensure proper security measures are in place before exposing R2R to the internet.
+You have successfully deployed FUSE on Google Cloud Platform. The application is accessible locally via SSH tunneling and optionally publicly. Ensure proper security measures are in place before exposing FUSE to the internet.
 
-For more details, refer to the [R2R Configuration Documentation](https://r2r-docs.sciphi.ai/documentation/configuration/overview).
+For more details, refer to the [FUSE Configuration Documentation](https://fuse-docs.sciphi.ai/documentation/configuration/overview).
 
 ---
 
-## R2R Application Lifecycle
+## FUSE Application Lifecycle
 
-R2R's application lifecycle encompasses customization, configuration, deployment, implementation, and interaction. The lifecycle is designed to provide flexibility and scalability for various use cases.
+FUSE's application lifecycle encompasses customization, configuration, deployment, implementation, and interaction. The lifecycle is designed to provide flexibility and scalability for various use cases.
 
 ### Developer Workflow
 
-- **Customize**: Developers tailor R2R applications using R2RConfig and the R2R SDK.
-- **Configure**: Adjust settings via configuration files (`r2r.toml`) or runtime overrides.
-- **Deploy**: Launch R2R using Docker, cloud platforms, or local installations.
-- **Implement**: Integrate R2R into applications using provided APIs and SDKs.
-- **Interact**: Users engage with the R2R application through interfaces like dashboards or APIs to perform RAG queries or search documents.
+- **Customize**: Developers tailor FUSE applications using FUSEConfig and the FUSE SDK.
+- **Configure**: Adjust settings via configuration files (`fuse.toml`) or runtime overrides.
+- **Deploy**: Launch FUSE using Docker, cloud platforms, or local installations.
+- **Implement**: Integrate FUSE into applications using provided APIs and SDKs.
+- **Interact**: Users engage with the FUSE application through interfaces like dashboards or APIs to perform RAG queries or search documents.
 
 ### User Interaction
 
-- **Users** interact with the R2R application, typically over an HTTP interface, to run RAG queries or search documents.
-- Access the **R2R Dashboard** for managing documents, collections, and performing searches.
+- **Users** interact with the FUSE application, typically over an HTTP interface, to run RAG queries or search documents.
+- Access the **FUSE Dashboard** for managing documents, collections, and performing searches.
 
-### Hello R2R (Code Example)
+### Hello FUSE (Code Example)
 
-**Python Example** at `core/examples/hello_r2r.py`:
+**Python Example** at `core/examples/hello_fuse.py`:
 
 ```python
-from r2r import R2RClient
+from fuse import FUSEClient
 
-client = R2RClient("http://localhost:7272")
+client = FUSEClient("http://localhost:7272")
 
 # Create a test document
 with open("test.txt", "w") as file:
@@ -687,7 +687,7 @@ print(f"Completion:\n{results['completion']}")
 
 This snippet:
 1. Creates a file with simple text.
-2. Ingests it to R2R.
+2. Ingests it to FUSE.
 3. Runs a **Retrieval-Augmented Generation** query.
 4. Prints the context matched (“search_results”) and the generated answer (“completion”).
 
@@ -695,19 +695,19 @@ This snippet:
 
 ## Configuration
 
-R2R is highly configurable, allowing you to tailor its behavior to your specific needs. Configuration can be done at the server-side using configuration files (`r2r.toml`) or at runtime via API calls.
+FUSE is highly configurable, allowing you to tailor its behavior to your specific needs. Configuration can be done at the server-side using configuration files (`fuse.toml`) or at runtime via API calls.
 
 ### Configuration Overview
 
-R2R configurations are divided into two primary levels:
-1. **Server-Side Configuration**: Managed through the `r2r.toml` file and environment variables.
+FUSE configurations are divided into two primary levels:
+1. **Server-Side Configuration**: Managed through the `fuse.toml` file and environment variables.
 2. **Runtime Overrides**: Passed directly in API calls to adjust settings dynamically.
 
-### Server-Side Configuration (`r2r.toml`)
+### Server-Side Configuration (`fuse.toml`)
 
-The `r2r.toml` file allows you to define server-side settings that govern the behavior of R2R. Below are the main configuration sections:
+The `fuse.toml` file allows you to define server-side settings that govern the behavior of FUSE. Below are the main configuration sections:
 
-#### Example: `r2r.toml`
+#### Example: `fuse.toml`
 
 ```toml
 [completion]
@@ -719,7 +719,7 @@ model = "openai/gpt-4o"
 temperature = 0.5
 
 [ingestion]
-provider = "r2r"
+provider = "fuse"
 chunking_strategy = "recursive"
 chunk_size = 1024
 chunk_overlap = 512
@@ -743,7 +743,7 @@ rerank_model = "BAAI/bge-reranker-v2-m3"
 concurrent_request_limit = 256
 
 [auth]
-provider = "r2r"
+provider = "fuse"
 require_authentication = true
 require_email_verification = false
 default_admin_email = "admin@example.com"
@@ -784,7 +784,7 @@ generation_config = { model = "openai/gpt-4o-mini" }
 
 ### Runtime Overrides
 
-Runtime overrides allow you to adjust configurations dynamically without modifying the `r2r.toml` file. This is useful for temporary changes or testing different settings on the fly.
+Runtime overrides allow you to adjust configurations dynamically without modifying the `fuse.toml` file. This is useful for temporary changes or testing different settings on the fly.
 
 **Example: Customizing RAG Query at Runtime**
 
@@ -805,7 +805,7 @@ rag_response = client.retrieval.rag(
 
 ### Postgres Configuration
 
-R2R uses Postgres for relational and vector data storage, leveraging the `pgvector` extension for vector indexing.
+FUSE uses Postgres for relational and vector data storage, leveraging the `pgvector` extension for vector indexing.
 
 #### Example Configuration
 
@@ -827,7 +827,7 @@ project_name = "your_project_name"
 
 ### Embedding Configuration
 
-R2R uses **LiteLLM** to manage embedding providers, allowing flexibility in selecting different LLM providers.
+FUSE uses **LiteLLM** to manage embedding providers, allowing flexibility in selecting different LLM providers.
 
 #### Example Configuration
 
@@ -862,13 +862,13 @@ concurrent_request_limit = 256
 
 ### Auth & Users Configuration
 
-R2R’s authentication system supports secure user registration, login, session management, and access control.
+FUSE’s authentication system supports secure user registration, login, session management, and access control.
 
 #### Example Configuration
 
 ```toml
 [auth]
-provider = "r2r"
+provider = "fuse"
 require_authentication = true
 require_email_verification = false
 default_admin_email = "admin@example.com"
@@ -885,13 +885,13 @@ secret_key = "your-secret-key"
 
 ### Data Ingestion Configuration
 
-Configure how R2R ingests documents, including parsing, chunking, and embedding strategies.
+Configure how FUSE ingests documents, including parsing, chunking, and embedding strategies.
 
 #### Example Configuration
 
 ```toml
 [ingestion]
-provider = "r2r"
+provider = "fuse"
 chunking_strategy = "recursive"
 chunk_size = 1024
 chunk_overlap = 512
@@ -974,7 +974,7 @@ generation_config = { model = "openai/gpt-4o-mini" }
 
 ### Prompts Configuration
 
-Manages prompt templates used for various tasks within R2R.
+Manages prompt templates used for various tasks within FUSE.
 
 #### Example Configuration
 
@@ -996,7 +996,7 @@ response = client.prompts.add_prompt(
 
 ### Introduction
 
-R2R provides a powerful and flexible ingestion pipeline to process and manage various types of documents. It supports a wide range of file formats—text, documents, PDFs, images, audio, and video—and transforms them into searchable, analyzable content. The ingestion process includes parsing, chunking, embedding, and optionally extracting entities and relationships for knowledge graph construction.
+FUSE provides a powerful and flexible ingestion pipeline to process and manage various types of documents. It supports a wide range of file formats—text, documents, PDFs, images, audio, and video—and transforms them into searchable, analyzable content. The ingestion process includes parsing, chunking, embedding, and optionally extracting entities and relationships for knowledge graph construction.
 
 This section will guide you through:
 
@@ -1004,11 +1004,11 @@ This section will guide you through:
 - Choosing an ingestion mode (`fast`, `hi-res`, or `custom`)
 - Updating and deleting documents and chunks
 
-For more on configuring ingestion, see the [Ingestion Configuration Overview](https://r2r-docs.sciphi.ai/documentation/configuration/ingestion) and [Parsing & Chunking](https://r2r-docs.sciphi.ai/documentation/configuration/ingestion/parsing_and_chunking).
+For more on configuring ingestion, see the [Ingestion Configuration Overview](https://fuse-docs.sciphi.ai/documentation/configuration/ingestion) and [Parsing & Chunking](https://fuse-docs.sciphi.ai/documentation/configuration/ingestion/parsing_and_chunking).
 
 ### Ingestion Modes
 
-R2R offers three primary ingestion modes to tailor the process to your requirements:
+FUSE offers three primary ingestion modes to tailor the process to your requirements:
 
 | Mode    | Description                                                                                                          |
 |---------|----------------------------------------------------------------------------------------------------------------------|
@@ -1053,7 +1053,7 @@ ingest_response = client.documents.create(
 
 ### Ingesting Documents
 
-A `Document` represents ingested content in R2R. When you ingest a file, text, or chunks:
+A `Document` represents ingested content in FUSE. When you ingest a file, text, or chunks:
 
 1. **Parsing**: Converts source files into text.
 2. **Chunking**: Breaks text into manageable units.
@@ -1061,10 +1061,10 @@ A `Document` represents ingested content in R2R. When you ingest a file, text, o
 4. **Storing**: Persists chunks and embeddings for retrieval.
 5. **Knowledge Graph Integration**: Optionally extracts entities and relationships.
 
-In a **full** R2R installation, ingestion is asynchronous. Monitor ingestion status and confirm when documents are ready:
+In a **full** FUSE installation, ingestion is asynchronous. Monitor ingestion status and confirm when documents are ready:
 
 ```bash
-r2r documents list
+fuse documents list
 ```
 
 **Example Response:**
@@ -1086,9 +1086,9 @@ r2r documents list
 }
 ```
 
-An `ingestion_status` of `"success"` confirms the document is fully ingested. Also, check the R2R dashboard at [http://localhost:7273](http://localhost:7273/) for ingestion progress and status.
+An `ingestion_status` of `"success"` confirms the document is fully ingested. Also, check the FUSE dashboard at [http://localhost:7273](http://localhost:7273/) for ingestion progress and status.
 
-For more details on creating documents, refer to the [Create Document API](https://r2r-docs.sciphi.ai/api-and-sdks/documents/create-document).
+For more details on creating documents, refer to the [Create Document API](https://fuse-docs.sciphi.ai/api-and-sdks/documents/create-document).
 
 ### Ingesting Pre-Processed Chunks
 
@@ -1108,7 +1108,7 @@ print(ingest_response)
 # {'results': [{'message': 'Document created and ingested successfully.', 'document_id': '7a0dad00-b041-544e-8028-bc9631a0a527'}]}
 ```
 
-For more on ingesting chunks, see the [Create Chunks API](https://r2r-docs.sciphi.ai/api-and-sdks/chunks/create-chunks).
+For more on ingesting chunks, see the [Create Chunks API](https://fuse-docs.sciphi.ai/api-and-sdks/chunks/create-chunks).
 
 ### Deleting Documents and Chunks
 
@@ -1133,35 +1133,35 @@ curl -X DELETE http://localhost:7272/v3/documents/9fbe403b-c11c-5aae-8ade-ef2298
 2. **Cascading Deletion**: Deletes associated chunks and metadata.
 3. **Deletion by Filter**: Delete documents based on criteria like text match or user ID using `documents/by-filter`.
 
-This mechanism ensures precise control over document management within R2R.
+This mechanism ensures precise control over document management within FUSE.
 
-For advanced document management and user authentication details, refer to the [User Auth Cookbook](https://r2r-docs.sciphi.ai/cookbooks/user-auth).
+For advanced document management and user authentication details, refer to the [User Auth Cookbook](https://fuse-docs.sciphi.ai/cookbooks/user-auth).
 
 ### Additional Configuration & Concepts
 
 - **Light vs. Full Deployments**:
-  - **Light**: Uses R2R’s built-in parser and supports synchronous ingestion.
+  - **Light**: Uses FUSE’s built-in parser and supports synchronous ingestion.
   - **Full**: Orchestrates ingestion tasks asynchronously and integrates with complex providers like `unstructured_local`.
 
 - **Provider Configuration**:
-  - Settings in `r2r.toml` or at runtime (`ingestion_config`) adjust parsing and chunking strategies.
+  - Settings in `fuse.toml` or at runtime (`ingestion_config`) adjust parsing and chunking strategies.
     - `fast` and `hi-res` modes influenced by strategies like `"auto"` or `"hi_res"`.
     - `custom` mode allows overriding chunk size, overlap, excluded parsers, and more at runtime.
 
 For detailed configuration options, see:
 
-- [Data Ingestion Configuration](https://r2r-docs.sciphi.ai/documentation/configuration/ingestion)
-- [Parsing & Chunking Configuration](https://r2r-docs.sciphi.ai/documentation/configuration/ingestion/parsing_and_chunking)
+- [Data Ingestion Configuration](https://fuse-docs.sciphi.ai/documentation/configuration/ingestion)
+- [Parsing & Chunking Configuration](https://fuse-docs.sciphi.ai/documentation/configuration/ingestion/parsing_and_chunking)
 
 ### Conclusion
 
-R2R’s ingestion pipeline is flexible and efficient, allowing you to tailor ingestion to your needs:
+FUSE’s ingestion pipeline is flexible and efficient, allowing you to tailor ingestion to your needs:
 
 - Use `fast` for quick processing.
 - Use `hi-res` for high-quality, multimodal analysis.
 - Use `custom` for advanced, granular control.
 
-Easily ingest documents or pre-processed chunks, update their content, and delete them when no longer needed. Combined with powerful retrieval and knowledge graph capabilities, R2R enables seamless integration of advanced document management into your applications.
+Easily ingest documents or pre-processed chunks, update their content, and delete them when no longer needed. Combined with powerful retrieval and knowledge graph capabilities, FUSE enables seamless integration of advanced document management into your applications.
 
 ---
 
@@ -1193,7 +1193,7 @@ Contextual enrichment enhances chunks with relevant information from surrounding
 
 ### Enabling Enrichment
 
-Configure your `r2r.toml` file with the following settings:
+Configure your `fuse.toml` file with the following settings:
 
 ```toml
 [ingestion.chunk_enrichment_settings]
@@ -1208,7 +1208,7 @@ generation_config = { model = "openai/gpt-4o-mini" }
 
 ### Enrichment Strategies Explained
 
-R2R implements two strategies for chunk enrichment:
+FUSE implements two strategies for chunk enrichment:
 
 #### 1. Neighborhood Strategy
 
@@ -1225,7 +1225,7 @@ R2R implements two strategies for chunk enrichment:
 
 ### The Enrichment Process
 
-R2R uses a prompt to guide the Language Model (LLM) during enrichment:
+FUSE uses a prompt to guide the Language Model (LLM) during enrichment:
 
 **Task:**
 
@@ -1265,7 +1265,7 @@ Enrich and refine the given chunk of text using information from the provided co
 To process documents with enrichment:
 
 ```bash
-r2r documents create --file_path path/to/lyft_2021.pdf
+fuse documents create --file_path path/to/lyft_2021.pdf
 ```
 
 #### Viewing Enriched Results
@@ -1297,7 +1297,7 @@ The impacts of the COVID-19 pandemic on the demand for and operations of the var
 
 ### Metadata and Storage
 
-R2R maintains both enriched and original versions:
+FUSE maintains both enriched and original versions:
 
 ```json
 {
@@ -1327,15 +1327,15 @@ This dual storage ensures transparency and allows for version comparison when ne
 
 ## AI Powered Search
 
-R2R supports advanced search capabilities, including vector search, hybrid search (keyword + vector), and knowledge graph-enhanced search. This section covers the understanding of search modes, configuration, and best practices.
+FUSE supports advanced search capabilities, including vector search, hybrid search (keyword + vector), and knowledge graph-enhanced search. This section covers the understanding of search modes, configuration, and best practices.
 
 ### Introduction
 
-R2R’s hybrid search blends keyword-based full-text search with semantic vector search, delivering results that are both contextually relevant and precise. This unified approach excels at handling complex queries where both exact terms and overall meaning matter.
+FUSE’s hybrid search blends keyword-based full-text search with semantic vector search, delivering results that are both contextually relevant and precise. This unified approach excels at handling complex queries where both exact terms and overall meaning matter.
 
 ### Understanding Search Modes
 
-R2R supports multiple search modes to simplify or customize your search configuration:
+FUSE supports multiple search modes to simplify or customize your search configuration:
 
 | Mode      | Description                                                                                                          |
 |-----------|----------------------------------------------------------------------------------------------------------------------|
@@ -1346,7 +1346,7 @@ R2R supports multiple search modes to simplify or customize your search configur
 - **`advanced` Mode**: Automatically configures hybrid search with balanced parameters.
 - **`custom` Mode**: Manually set `use_hybrid_search=True` or enable both `use_semantic_search` and `use_fulltext_search` for a hybrid setup.
 
-### How R2R Hybrid Search Works
+### How FUSE Hybrid Search Works
 
 1. **Full-Text Search**:
    - Utilizes Postgres’s `ts_rank_cd` and `websearch_to_tsquery` for exact term matches.
@@ -1457,7 +1457,7 @@ Results are ranked based on the combined RRF score, providing a balanced mix of 
 | `advanced`| Hybrid search with well-tuned defaults                    | `search_mode = "advanced"`                                             |
 | `custom`  | Manually configure hybrid search settings                 | ```python<br>search_mode = "custom"<br>search_settings = {<br> "use_semantic_search": True,<br> "use_fulltext_search": True,<br> "hybrid_settings": {<br> "full_text_weight": 1.0,<br> "semantic_weight": 5.0,<br> "full_text_limit": 200,<br> "rrf_k": 50<br> }<br> }``` |
 
-For detailed runtime configuration and combining `search_mode` with custom `search_settings`, refer to the [Search API Documentation](https://r2r-docs.sciphi.ai/api-and-sdks/retrieval/search-app).
+For detailed runtime configuration and combining `search_mode` with custom `search_settings`, refer to the [Search API Documentation](https://fuse-docs.sciphi.ai/api-and-sdks/retrieval/search-app).
 
 ### Best Practices
 
@@ -1475,13 +1475,13 @@ For detailed runtime configuration and combining `search_mode` with custom `sear
 
 ### Conclusion
 
-R2R’s hybrid search delivers robust, context-aware retrieval by merging semantic and keyword-driven approaches. Whether you choose `basic` mode for simplicity, `advanced` mode for out-of-the-box hybrid search, or `custom` mode for granular control, R2R ensures you can tailor the search experience to your unique needs.
+FUSE’s hybrid search delivers robust, context-aware retrieval by merging semantic and keyword-driven approaches. Whether you choose `basic` mode for simplicity, `advanced` mode for out-of-the-box hybrid search, or `custom` mode for granular control, FUSE ensures you can tailor the search experience to your unique needs.
 
 ---
 
 ## Retrieval-Augmented Generation (RAG)
 
-R2R couples its powerful retrieval capabilities with large language models (LLMs) to provide comprehensive Q&A and content generation based on ingested documents.
+FUSE couples its powerful retrieval capabilities with large language models (LLMs) to provide comprehensive Q&A and content generation based on ingested documents.
 
 ### Basic RAG
 
@@ -1530,7 +1530,7 @@ Stream RAG responses in real-time, providing partial results as they are generat
 **Example:**
 
 ```bash
-r2r retrieval rag --query="who was aristotle" --use-hybrid-search=True --stream
+fuse retrieval rag --query="who was aristotle" --use-hybrid-search=True --stream
 ```
 
 It streams real-time tokens.
@@ -1555,7 +1555,7 @@ curl -X POST http://localhost:7272/v3/retrieval/rag \
 
 ### Advanced RAG Techniques
 
-R2R supports advanced RAG techniques, currently in beta, including HyDE and RAG-Fusion.
+FUSE supports advanced RAG techniques, currently in beta, including HyDE and RAG-Fusion.
 
 #### HyDE (Hypothetical Document Embeddings)
 
@@ -1571,9 +1571,9 @@ HyDE enhances retrieval by generating and embedding hypothetical documents based
 **Python Example:**
 
 ```python
-from r2r import R2RClient
+from fuse import FUSEClient
 
-client = R2RClient()
+client = FUSEClient()
 
 hyde_response = client.retrieval.rag(
     "What are the main themes in Shakespeare's plays?",
@@ -1621,9 +1621,9 @@ RAG-Fusion improves retrieval quality by combining results from multiple search 
 **Python Example:**
 
 ```python
-from r2r import R2RClient
+from fuse import FUSEClient
 
-client = R2RClient()
+client = FUSEClient()
 
 rag_fusion_response = client.retrieval.rag(
     "Explain the theory of relativity",
@@ -1680,10 +1680,10 @@ custom_rag_response = client.retrieval.rag(
 
 ### Customization and Server-Side Defaults
 
-While R2R allows runtime configuration of advanced techniques, server-side defaults can also be modified for consistent behavior. This includes updating prompts used for techniques like HyDE and RAG-Fusion.
+While FUSE allows runtime configuration of advanced techniques, server-side defaults can also be modified for consistent behavior. This includes updating prompts used for techniques like HyDE and RAG-Fusion.
 
-- **General Configuration**: Refer to the [R2R Configuration Documentation](https://r2r-docs.sciphi.ai/documentation/configuration/overview).
-- **Customizing Prompts**: Learn about customizing prompts [here](https://r2r-docs.sciphi.ai/documentation/configuration/retrieval/prompts).
+- **General Configuration**: Refer to the [FUSE Configuration Documentation](https://fuse-docs.sciphi.ai/documentation/configuration/overview).
+- **Customizing Prompts**: Learn about customizing prompts [here](https://fuse-docs.sciphi.ai/documentation/configuration/retrieval/prompts).
 
 **Example:**
 
@@ -1695,22 +1695,22 @@ temperature = 0.7
 
 ### Conclusion
 
-By leveraging advanced RAG techniques and customizing their underlying prompts, you can significantly enhance the quality and relevance of your retrieval and generation processes. Experiment with different strategies, settings, and prompt variations to find the optimal configuration for your specific use case. R2R's flexibility allows iterative improvement and adaptation to changing requirements.
+By leveraging advanced RAG techniques and customizing their underlying prompts, you can significantly enhance the quality and relevance of your retrieval and generation processes. Experiment with different strategies, settings, and prompt variations to find the optimal configuration for your specific use case. FUSE's flexibility allows iterative improvement and adaptation to changing requirements.
 
 ---
 
-## Knowledge Graphs in R2R
+## Knowledge Graphs in FUSE
 
-Knowledge graphs enhance search accuracy and context understanding by extracting and connecting information from your documents. R2R uses a two-level architecture:
+Knowledge graphs enhance search accuracy and context understanding by extracting and connecting information from your documents. FUSE uses a two-level architecture:
 
 1. **Document Level**: Entities and relationships are first extracted and stored with their source documents.
 2. **Collection Level**: Collections act as soft containers that include documents and maintain corresponding graphs.
 
 ### Overview
 
-R2R supports robust knowledge graph functionality to enhance document understanding and retrieval. By extracting entities and relationships from documents and organizing them into collections, R2R enables advanced graph-based analysis and search capabilities.
+FUSE supports robust knowledge graph functionality to enhance document understanding and retrieval. By extracting entities and relationships from documents and organizing them into collections, FUSE enables advanced graph-based analysis and search capabilities.
 
-**Note**: Refer to the [Knowledge Graph Cookbook](https://r2r-docs.sciphi.ai/cookbooks/knowledge-graphs) and [GraphRAG Cookbook](https://r2r-docs.sciphi.ai/cookbooks/graphrag) for detailed guides.
+**Note**: Refer to the [Knowledge Graph Cookbook](https://fuse-docs.sciphi.ai/cookbooks/knowledge-graphs) and [GraphRAG Cookbook](https://fuse-docs.sciphi.ai/cookbooks/graphrag) for detailed guides.
 
 ### System Architecture
 
@@ -1741,9 +1741,9 @@ Extract entities and relationships from documents.
 **Python Example:**
 
 ```python
-from r2r import R2RClient
+from fuse import FUSEClient
 
-client = R2RClient("http://localhost:7272")
+client = FUSEClient("http://localhost:7272")
 
 # Extract entities and relationships
 document_id = "your-document-id"
@@ -1961,7 +1961,7 @@ response = client.retrieval.rag(
 - Start with small document sets to test extraction.
 - Use collection-level operations for bulk processing.
 - Monitor graph size and complexity.
-- Consider using [orchestration](https://r2r-docs.sciphi.ai/cookbooks/orchestration) for large collections.
+- Consider using [orchestration](https://fuse-docs.sciphi.ai/cookbooks/orchestration) for large collections.
 
 #### Access Control
 
@@ -1992,18 +1992,18 @@ response = client.retrieval.rag(
 
 ### Conclusion
 
-R2R’s knowledge graph capabilities enhance document understanding and improve search and RAG operations by providing structured and interconnected information from your documents.
+FUSE’s knowledge graph capabilities enhance document understanding and improve search and RAG operations by providing structured and interconnected information from your documents.
 
 ### Next Steps
 
-- Explore [GraphRAG](https://r2r-docs.sciphi.ai/cookbooks/graphrag) for advanced features.
-- Learn about [hybrid search](https://r2r-docs.sciphi.ai/cookbooks/hybrid-search) integration.
-- Discover more about [collections](https://r2r-docs.sciphi.ai/cookbooks/collections).
-- Set up [orchestration](https://r2r-docs.sciphi.ai/cookbooks/orchestration) for large-scale processing.
+- Explore [GraphRAG](https://fuse-docs.sciphi.ai/cookbooks/graphrag) for advanced features.
+- Learn about [hybrid search](https://fuse-docs.sciphi.ai/cookbooks/hybrid-search) integration.
+- Discover more about [collections](https://fuse-docs.sciphi.ai/cookbooks/collections).
+- Set up [orchestration](https://fuse-docs.sciphi.ai/cookbooks/orchestration) for large-scale processing.
 
 ---
 
-## GraphRAG in R2R
+## GraphRAG in FUSE
 
 GraphRAG extends traditional RAG by leveraging community detection and summarization within knowledge graphs. This approach provides richer context and more comprehensive answers by understanding how information is clustered and connected across your documents.
 
@@ -2061,9 +2061,9 @@ Ensure you have:
 **Python Example:**
 
 ```python
-from r2r import R2RClient
+from fuse import FUSEClient
 
-client = R2RClient("http://localhost:7272")
+client = FUSEClient("http://localhost:7272")
 
 # Setup collection and extract knowledge
 collection_id = "your-collection-id"
@@ -2173,7 +2173,7 @@ GraphRAG returns three types of results:
 
 #### Using Orchestration
 
-For large collections, utilize R2R’s orchestration capabilities via Hatchet UI.
+For large collections, utilize FUSE’s orchestration capabilities via Hatchet UI.
 
 **Access Hatchet UI:**
 
@@ -2230,25 +2230,25 @@ For large collections, utilize R2R’s orchestration capabilities via Hatchet UI
 
 ### Next Steps
 
-- Explore [hybrid search](https://r2r-docs.sciphi.ai/cookbooks/hybrid-search) integration.
-- Learn about [collection management](https://r2r-docs.sciphi.ai/cookbooks/collections).
-- Discover more about [observability](https://r2r-docs.sciphi.ai/cookbooks/observability).
+- Explore [hybrid search](https://fuse-docs.sciphi.ai/cookbooks/hybrid-search) integration.
+- Learn about [collection management](https://fuse-docs.sciphi.ai/cookbooks/collections).
+- Discover more about [observability](https://fuse-docs.sciphi.ai/cookbooks/observability).
 
 ### Conclusion
 
-GraphRAG enhances R2R’s RAG capabilities by integrating community detection and summarization within knowledge graphs. This results in richer, more contextualized responses, improving the overall quality of information retrieval and generation.
+GraphRAG enhances FUSE’s RAG capabilities by integrating community detection and summarization within knowledge graphs. This results in richer, more contextualized responses, improving the overall quality of information retrieval and generation.
 
 ---
 
 ## Agent
 
-R2R’s agentic capabilities allow for intelligent systems that formulate their own questions, search for information, and provide informed responses based on retrieved context. Agents can be customized on the fly to suit various tasks.
+FUSE’s agentic capabilities allow for intelligent systems that formulate their own questions, search for information, and provide informed responses based on retrieved context. Agents can be customized on the fly to suit various tasks.
 
-**Note**: Agents in R2R are in beta. Feedback is encouraged at [founders@sciphi.ai](mailto:founders@sciphi.ai).
+**Note**: Agents in FUSE are in beta. Feedback is encouraged at [founders@sciphi.ai](mailto:founders@sciphi.ai).
 
-### Understanding R2R’s RAG Agent
+### Understanding FUSE’s RAG Agent
 
-R2R’s RAG agent combines large language models with search capabilities over ingested documents to provide powerful, context-aware responses. When initializing an R2R application, it automatically creates a RAG assistant ready for use.
+FUSE’s RAG agent combines large language models with search capabilities over ingested documents to provide powerful, context-aware responses. When initializing an FUSE application, it automatically creates a RAG assistant ready for use.
 
 **Planned Extensions:**
 
@@ -2259,7 +2259,7 @@ R2R’s RAG agent combines large language models with search capabilities over i
 
 ### Configuration
 
-The RAG agent is configured through the `r2r.toml` file. By default, it uses local search.
+The RAG agent is configured through the `fuse.toml` file. By default, it uses local search.
 
 **Default Configuration:**
 
@@ -2279,15 +2279,15 @@ tools = ["local_search", "web_search"]
 
 ### Using the RAG Agent
 
-Access the agent through the R2R API via the `agent` endpoint.
+Access the agent through the FUSE API via the `agent` endpoint.
 
 **Python Example:**
 
 ```python
-from r2r import R2RClient
+from fuse import FUSEClient
 
 # Initialize the client
-client = R2RClient("http://localhost:7272")
+client = FUSEClient("http://localhost:7272")
 
 # Make a simple query
 first_reply = client.retrieval.agent(
@@ -2424,11 +2424,11 @@ The agent may return error messages in the response. Always check for errors.
 **Python Example:**
 
 ```python
-from r2r import R2RException
+from fuse import FUSEException
 
 try:
     await client.retrieval.agent(...)
-except R2RException as e:
+except FUSEException as e:
     if e.status_code == 401:
         print("Invalid credentials")
     elif e.status_code == 400:
@@ -2444,24 +2444,24 @@ except R2RException as e:
 
 ### Future Developments
 
-R2R plans to enhance the agent system with:
+FUSE plans to enhance the agent system with:
 
 - Enhanced tool integration.
 - Improved conversation management.
 - Better search capabilities.
 - More customization options.
 
-Stay updated with the latest developments by checking the R2R documentation regularly.
+Stay updated with the latest developments by checking the FUSE documentation regularly.
 
 ### Conclusion
 
-R2R’s agent system provides powerful, context-aware interactions by combining LLMs with advanced search capabilities. By leveraging these features, you can create intelligent assistants that offer comprehensive and accurate responses based on your document corpus.
+FUSE’s agent system provides powerful, context-aware interactions by combining LLMs with advanced search capabilities. By leveraging these features, you can create intelligent assistants that offer comprehensive and accurate responses based on your document corpus.
 
 ---
 
 ## Orchestration
 
-Orchestration in R2R is managed using [Hatchet](https://docs.hatchet.run/home), a distributed, fault-tolerant task queue that handles complex workflows such as ingestion and knowledge graph construction.
+Orchestration in FUSE is managed using [Hatchet](https://docs.hatchet.run/home), a distributed, fault-tolerant task queue that handles complex workflows such as ingestion and knowledge graph construction.
 
 ### Key Concepts
 
@@ -2471,15 +2471,15 @@ Orchestration in R2R is managed using [Hatchet](https://docs.hatchet.run/home), 
 | **Workers**      | Long-running processes that execute workflow functions.                    |
 | **Managed Queue**| Low-latency queue for handling real-time tasks.                            |
 
-### Orchestration in R2R
+### Orchestration in FUSE
 
 #### Benefits of Orchestration
 
 1. **Scalability**: Efficiently handles large-scale tasks.
 2. **Fault Tolerance**: Built-in retry mechanisms and error handling.
-3. **Flexibility**: Easy to add or modify workflows as R2R’s capabilities expand.
+3. **Flexibility**: Easy to add or modify workflows as FUSE’s capabilities expand.
 
-#### Workflows in R2R
+#### Workflows in FUSE
 
 1. **IngestFilesWorkflow**: Handles file ingestion, parsing, chunking, and embedding.
 2. **UpdateFilesWorkflow**: Manages updating existing files.
@@ -2502,7 +2502,7 @@ Use the following credentials to log in:
 
 #### Running Tasks
 
-After initiating tasks like `r2r documents create-samples`, view running workflows:
+After initiating tasks like `fuse documents create-samples`, view running workflows:
 
 ![Running Workflows](https://files.buildwithfern.com/https://sciphi.docs.buildwithfern.com/2024-12-13T18:29:49.890Z/images/hatchet_running.png)
 
@@ -2556,13 +2556,13 @@ Details about upcoming orchestration features will be available soon.
 
 ### Conclusion
 
-Orchestration via Hatchet enables R2R to handle complex and large-scale workflows efficiently. By leveraging workflows and monitoring tools, you can ensure smooth and scalable operations within your R2R deployment.
+Orchestration via Hatchet enables FUSE to handle complex and large-scale workflows efficiently. By leveraging workflows and monitoring tools, you can ensure smooth and scalable operations within your FUSE deployment.
 
 ---
 
 ## Maintenance & Scaling
 
-Effective maintenance and scaling are crucial for ensuring R2R operates optimally, especially as data volumes grow.
+Effective maintenance and scaling are crucial for ensuring FUSE operates optimally, especially as data volumes grow.
 
 ### Vector Indices
 
@@ -2580,14 +2580,14 @@ For development or smaller deployments, the overhead of maintaining vector indic
 
 #### Vector Index Management
 
-R2R supports multiple indexing methods, with HNSW (Hierarchical Navigable Small World) being recommended for most use cases.
+FUSE supports multiple indexing methods, with HNSW (Hierarchical Navigable Small World) being recommended for most use cases.
 
 **Python Example: Creating and Deleting a Vector Index**
 
 ```python
-from r2r import R2RClient
+from fuse import FUSEClient
 
-client = R2RClient()
+client = FUSEClient()
 
 # Create vector index
 create_response = client.indices.create(
@@ -2640,10 +2640,10 @@ print('delete_response = ', delete_response)
 
 #### Version Management
 
-**Check Current R2R Version:**
+**Check Current FUSE Version:**
 
 ```bash
-r2r version
+fuse version
 ```
 
 #### Update Process
@@ -2652,51 +2652,51 @@ r2r version
 
 ```bash
 # Check current versions
-r2r version
-r2r db current
+fuse version
+fuse db current
 
 # Generate system report (optional)
-r2r generate-report
+fuse generate-report
 ```
 
 2. **Stop Running Services**
 
 ```bash
-r2r docker-down
+fuse docker-down
 ```
 
-3. **Update R2R**
+3. **Update FUSE**
 
 ```bash
-r2r update
+fuse update
 ```
 
 4. **Update Database**
 
 ```bash
-r2r db upgrade
+fuse db upgrade
 ```
 
 5. **Restart Services**
 
 ```bash
-r2r serve --docker [additional options]
+fuse serve --docker [additional options]
 ```
 
 #### Database Migration Management
 
-R2R uses database migrations to manage schema changes.
+FUSE uses database migrations to manage schema changes.
 
 **Check Current Migration:**
 
 ```bash
-r2r db current
+fuse db current
 ```
 
 **Apply Migrations:**
 
 ```bash
-r2r db upgrade
+fuse db upgrade
 ```
 
 ### Managing Multiple Environments
@@ -2707,16 +2707,16 @@ Use different project names and schemas for different environments.
 
 ```bash
 # Development
-export R2R_PROJECT_NAME=r2r_dev
-r2r serve --docker --project-name r2r-dev
+export FUSE_PROJECT_NAME=fuse_dev
+fuse serve --docker --project-name fuse-dev
 
 # Staging
-export R2R_PROJECT_NAME=r2r_staging
-r2r serve --docker --project-name r2r-staging
+export FUSE_PROJECT_NAME=fuse_staging
+fuse serve --docker --project-name fuse-staging
 
 # Production
-export R2R_PROJECT_NAME=r2r_prod
-r2r serve --docker --project-name r2r-prod
+export FUSE_PROJECT_NAME=fuse_prod
+fuse serve --docker --project-name fuse-prod
 ```
 
 ### Troubleshooting
@@ -2726,27 +2726,27 @@ If issues occur:
 1. **Generate a System Report**
 
 ```bash
-r2r generate-report
+fuse generate-report
 ```
 
 2. **Check Container Health**
 
 ```bash
-r2r docker-down
-r2r serve --docker
+fuse docker-down
+fuse serve --docker
 ```
 
 3. **Review Database State**
 
 ```bash
-r2r db current
-r2r db history
+fuse db current
+fuse db history
 ```
 
 4. **Roll Back if Needed**
 
 ```bash
-r2r db downgrade --revision <previous-working-version>
+fuse db downgrade --revision <previous-working-version>
 ```
 
 ### Scaling Strategies
@@ -2756,7 +2756,7 @@ r2r db downgrade --revision <previous-working-version>
 For applications serving many users:
 
 1. **Load Balancing**
-   - Deploy multiple R2R instances behind a load balancer.
+   - Deploy multiple FUSE instances behind a load balancer.
    - Each instance handles a subset of users.
 
 2. **Sharding**
@@ -2834,7 +2834,7 @@ Monitor the following metrics to inform scaling decisions:
 
 ### Performance Considerations
 
-When configuring embeddings in R2R, consider these optimization strategies:
+When configuring embeddings in FUSE, consider these optimization strategies:
 
 1. **Batch Size Optimization**:
    - Larger batch sizes improve throughput but increase latency.
@@ -2858,9 +2858,9 @@ When configuring embeddings in R2R, consider these optimization strategies:
 
 ### Additional Resources
 
-- [Python SDK Ingestion Documentation](https://r2r-docs.sciphi.ai/documentation/python-sdk/ingestion)
-- [CLI Maintenance Documentation](https://r2r-docs.sciphi.ai/documentation/cli/maintenance)
-- [Ingestion Configuration Documentation](https://r2r-docs.sciphi.ai/documentation/configuration/ingestion)
+- [Python SDK Ingestion Documentation](https://fuse-docs.sciphi.ai/documentation/python-sdk/ingestion)
+- [CLI Maintenance Documentation](https://fuse-docs.sciphi.ai/documentation/cli/maintenance)
+- [Ingestion Configuration Documentation](https://fuse-docs.sciphi.ai/documentation/configuration/ingestion)
 
 ### Best Practices
 
@@ -2871,24 +2871,24 @@ When configuring embeddings in R2R, consider these optimization strategies:
 
 ### Conclusion
 
-Effective maintenance and scaling strategies ensure that R2R remains performant and reliable as your data and user base grow. By optimizing vector indices, managing system updates, and employing robust scaling strategies, you can maintain an efficient and scalable R2R deployment.
+Effective maintenance and scaling strategies ensure that FUSE remains performant and reliable as your data and user base grow. By optimizing vector indices, managing system updates, and employing robust scaling strategies, you can maintain an efficient and scalable FUSE deployment.
 
 ---
 
 ## Web Development
 
-Web developers can easily integrate R2R into their projects using the [R2R JavaScript client](https://github.com/SciPhi-AI/r2r-js). For extensive references and examples, explore the [R2R Application](https://r2r-docs.sciphi.ai/cookbooks/application) and its source code.
+Web developers can easily integrate FUSE into their projects using the [FUSE JavaScript client](https://github.com/SciPhi-AI/fuse-js). For extensive references and examples, explore the [FUSE Application](https://fuse-docs.sciphi.ai/cookbooks/application) and its source code.
 
-### Hello R2R—JavaScript
+### Hello FUSE—JavaScript
 
-R2R offers configurable vector search and RAG capabilities with direct method calls.
+FUSE offers configurable vector search and RAG capabilities with direct method calls.
 
-#### Example: `r2r-js/examples/hello_r2r.js`
+#### Example: `fuse-js/examples/hello_fuse.js`
 
 ```javascript
-const { r2rClient } = require("r2r-js");
+const { fuseClient } = require("fuse-js");
 
-const client = new r2rClient("http://localhost:7272");
+const client = new fuseClient("http://localhost:7272");
 
 async function main() {
     const files = [
@@ -2935,25 +2935,25 @@ async function main() {
 main();
 ```
 
-### r2r-js Client
+### fuse-js Client
 
 #### Installing
 
-Install the R2R JavaScript client using [npm](https://www.npmjs.com/package/r2r-js):
+Install the FUSE JavaScript client using [npm](https://www.npmjs.com/package/fuse-js):
 
 ```bash
-npm install r2r-js
+npm install fuse-js
 ```
 
 #### Creating the Client
 
-First, create the R2R client and specify the base URL where the R2R server is running.
+First, create the FUSE client and specify the base URL where the FUSE server is running.
 
 ```javascript
-const { r2rClient } = require("r2r-js");
+const { fuseClient } = require("fuse-js");
 
-// http://localhost:7272 or your R2R server address
-const client = new r2rClient("http://localhost:7272");
+// http://localhost:7272 or your FUSE server address
+const client = new fuseClient("http://localhost:7272");
 ```
 
 #### Log into the Server
@@ -3056,11 +3056,11 @@ provides him with meals and services [2].
 
 ### Connecting to a Web App
 
-Integrate R2R into web applications by creating API routes and React components.
+Integrate FUSE into web applications by creating API routes and React components.
 
 #### Setting up an API Route
 
-Create `r2r-query.ts` in the `pages/api` directory to handle R2R queries.
+Create `fuse-query.ts` in the `pages/api` directory to handle FUSE queries.
 
 #### Frontend: React Component
 
@@ -3068,15 +3068,15 @@ Create a React component, e.g., `index.tsx`, to interact with the API route, pro
 
 #### Template Repository
 
-For a complete working example, check out the [R2R Web Dev Template Repository](https://github.com/SciPhi-AI/r2r-webdev-template).
+For a complete working example, check out the [FUSE Web Dev Template Repository](https://github.com/SciPhi-AI/fuse-webdev-template).
 
 **Usage:**
 
 1. **Clone the Repository:**
 
 ```bash
-git clone https://github.com/SciPhi-AI/r2r-webdev-template.git
-cd r2r-webdev-template
+git clone https://github.com/SciPhi-AI/fuse-webdev-template.git
+cd fuse-webdev-template
 ```
 
 2. **Install Dependencies:**
@@ -3087,7 +3087,7 @@ pnpm install
 
 3. **Run the Development Server:**
 
-Ensure your R2R server is running, then start the frontend:
+Ensure your FUSE server is running, then start the frontend:
 
 ```bash
 pnpm dev
@@ -3105,21 +3105,21 @@ Access the dashboard at [http://localhost:3000](http://localhost:3000).
 
 ### Conclusion
 
-The R2R JavaScript client simplifies integration into web applications, enabling developers to build powerful RAG features with minimal setup. Utilize the template repository for a quick start and explore more advanced examples in the [R2R Dashboard](https://github.com/SciPhi-AI/R2R-Application).
+The FUSE JavaScript client simplifies integration into web applications, enabling developers to build powerful RAG features with minimal setup. Utilize the template repository for a quick start and explore more advanced examples in the [FUSE Dashboard](https://github.com/SciPhi-AI/FUSE-Application).
 
 ---
 
 ## User Management
 
-R2R provides robust user authentication and management capabilities, ensuring secure and efficient access control over documents and features.
+FUSE provides robust user authentication and management capabilities, ensuring secure and efficient access control over documents and features.
 
 ### Introduction
 
-R2R's authentication system supports secure user registration, login, session management, and access control. This guide covers basic usage, advanced features, security considerations, and troubleshooting.
+FUSE's authentication system supports secure user registration, login, session management, and access control. This guide covers basic usage, advanced features, security considerations, and troubleshooting.
 
-For detailed configuration, refer to the [Authentication Configuration Documentation](https://r2r-docs.sciphi.ai/documentation/configuration/auth) and the [User API Reference](https://r2r-docs.sciphi.ai/api-and-sdks/users/users).
+For detailed configuration, refer to the [Authentication Configuration Documentation](https://fuse-docs.sciphi.ai/documentation/configuration/auth) and the [User API Reference](https://fuse-docs.sciphi.ai/api-and-sdks/users/users).
 
-**Default Behavior**: When `require_authentication` is set to `false` (default in `r2r.toml`), unauthenticated requests use default admin credentials. Use caution in production environments.
+**Default Behavior**: When `require_authentication` is set to `false` (default in `fuse.toml`), unauthenticated requests use default admin credentials. Use caution in production environments.
 
 ### Basic Usage
 
@@ -3128,9 +3128,9 @@ For detailed configuration, refer to the [Authentication Configuration Documenta
 **Python Example:**
 
 ```python
-from r2r import R2RClient
+from fuse import FUSEClient
 
-client = R2RClient("http://localhost:7272")  # Replace with your R2R deployment URL
+client = FUSEClient("http://localhost:7272")  # Replace with your FUSE deployment URL
 
 # Register a new user
 user_result = client.users.create("user1@test.com", "password123")
@@ -3244,7 +3244,7 @@ Users can view and update their profiles.
 
 ```python
 # Update user profile (requires login)
-update_result = client.users.update_user(name="John Doe", bio="R2R enthusiast")
+update_result = client.users.update_user(name="John Doe", bio="FUSE enthusiast")
 print(update_result)
 # {'results': {'email': 'user1@test.com', 'id': '76eea168-9f98-4672-af3b-2c26ec92d7f8', ...}}
 ```
@@ -3287,13 +3287,13 @@ Superusers have elevated privileges, enabling them to:
 
 #### Default Admin Creation
 
-R2R automatically creates a default admin user during initialization via the `R2RAuthProvider` class.
+FUSE automatically creates a default admin user during initialization via the `FUSEAuthProvider` class.
 
 **Configuration:**
 
 ```toml
 [auth]
-provider = "r2r"
+provider = "fuse"
 access_token_lifetime_in_minutes = 60
 refresh_token_lifetime_in_days = 7
 require_authentication = true
@@ -3312,9 +3312,9 @@ Authenticate as the default admin or another superuser to access superuser featu
 **Python Example:**
 
 ```python
-from r2r import R2RClient
+from fuse import FUSEClient
 
-client = R2RClient("http://localhost:7272")
+client = FUSEClient("http://localhost:7272")
 
 # Login as admin
 login_result = client.users.login("admin@example.com", "change_me_immediately")
@@ -3351,13 +3351,13 @@ When implementing user authentication, consider the following security best prac
 
 1. **Use HTTPS**: Always use HTTPS in production to encrypt data in transit.
 2. **Implement Rate Limiting**: Protect against brute-force attacks by limiting login attempts.
-3. **Use Secure Password Hashing**: R2R uses bcrypt for password hashing by default.
+3. **Use Secure Password Hashing**: FUSE uses bcrypt for password hashing by default.
 4. **Implement Multi-Factor Authentication (MFA)**: Add MFA for an extra layer of security.
 5. **Regular Security Audits**: Conduct regular security audits of your authentication system.
 
 ### Customizing Authentication
 
-R2R’s authentication system is flexible and can be customized to fit your specific needs:
+FUSE’s authentication system is flexible and can be customized to fit your specific needs:
 
 1. **Custom User Fields**: Extend the User model to include additional fields.
 2. **OAuth Integration**: Integrate with third-party OAuth providers for social login.
@@ -3379,9 +3379,9 @@ R2R’s authentication system is flexible and can be customized to fit your spec
 
 ### Conclusion
 
-R2R provides a comprehensive set of user authentication and management features, allowing developers to implement secure and user-friendly applications. By leveraging these capabilities, you can implement robust user authentication, document management, and access control in your R2R-based projects.
+FUSE provides a comprehensive set of user authentication and management features, allowing developers to implement secure and user-friendly applications. By leveraging these capabilities, you can implement robust user authentication, document management, and access control in your FUSE-based projects.
 
-For more advanced use cases or custom implementations, refer to the R2R documentation or reach out to the community for support.
+For more advanced use cases or custom implementations, refer to the FUSE documentation or reach out to the community for support.
 
 ---
 
@@ -3389,11 +3389,11 @@ For more advanced use cases or custom implementations, refer to the R2R document
 
 ### Introduction
 
-A **collection** in R2R is a logical grouping of users and documents that allows for efficient access control and organization. Collections enable you to manage permissions and access to documents at a group level, rather than individually.
+A **collection** in FUSE is a logical grouping of users and documents that allows for efficient access control and organization. Collections enable you to manage permissions and access to documents at a group level, rather than individually.
 
-R2R provides robust document collection management, allowing developers to implement efficient access control and organization of users and documents.
+FUSE provides robust document collection management, allowing developers to implement efficient access control and organization of users and documents.
 
-**Note**: Collection permissioning in R2R is under development and may continue evolving in future releases.
+**Note**: Collection permissioning in FUSE is under development and may continue evolving in future releases.
 
 ### Basic Usage
 
@@ -3402,9 +3402,9 @@ R2R provides robust document collection management, allowing developers to imple
 **Creating a Collection:**
 
 ```python
-from r2r import R2RClient
+from fuse import FUSEClient
 
-client = R2RClient("http://localhost:7272")  # Replace with your R2R deployment URL
+client = FUSEClient("http://localhost:7272")  # Replace with your FUSE deployment URL
 
 # Create a new collection
 collection_result = client.collections.create("Marketing Team", "Collection for marketing department")
@@ -3569,7 +3569,7 @@ When implementing collection permissions, consider the following security best p
 
 ### Customizing Collection Permissions
 
-While R2R’s current collection system follows a flat hierarchy, you can build more complex permission structures:
+While FUSE’s current collection system follows a flat hierarchy, you can build more complex permission structures:
 
 1. **Custom Roles**: Implement application-level roles within collections (e.g., collection admin, editor, viewer).
 2. **Hierarchical Collections**: Create a hierarchy by establishing parent-child relationships between collections in your application logic.
@@ -3592,24 +3592,24 @@ While R2R’s current collection system follows a flat hierarchy, you can build 
 
 ### Conclusion
 
-R2R’s collection permissioning system provides a foundation for implementing sophisticated access control in your applications. As the feature set evolves, more advanced capabilities will become available. Regularly update your practices based on the latest R2R documentation.
+FUSE’s collection permissioning system provides a foundation for implementing sophisticated access control in your applications. As the feature set evolves, more advanced capabilities will become available. Regularly update your practices based on the latest FUSE documentation.
 
 ### Next Steps
 
-- Explore [GraphRAG](https://r2r-docs.sciphi.ai/cookbooks/graphrag) for advanced features.
-- Learn about [hybrid search](https://r2r-docs.sciphi.ai/cookbooks/hybrid-search) integration.
-- Discover more about [observability](https://r2r-docs.sciphi.ai/cookbooks/observability).
-- Set up [orchestration](https://r2r-docs.sciphi.ai/cookbooks/orchestration) for large-scale processing.
+- Explore [GraphRAG](https://fuse-docs.sciphi.ai/cookbooks/graphrag) for advanced features.
+- Learn about [hybrid search](https://fuse-docs.sciphi.ai/cookbooks/hybrid-search) integration.
+- Discover more about [observability](https://fuse-docs.sciphi.ai/cookbooks/observability).
+- Set up [orchestration](https://fuse-docs.sciphi.ai/cookbooks/orchestration) for large-scale processing.
 
 ---
 
 ## Telemetry
 
-R2R uses telemetry to collect **anonymous** usage information. This data helps understand how R2R is used, prioritize new features and bug fixes, and improve overall performance and stability.
+FUSE uses telemetry to collect **anonymous** usage information. This data helps understand how FUSE is used, prioritize new features and bug fixes, and improve overall performance and stability.
 
 ### Introduction
 
-R2R uses telemetry to collect **anonymous** usage information. This data helps understand how R2R is used, prioritize new features and bug fixes, and improve overall performance and stability.
+FUSE uses telemetry to collect **anonymous** usage information. This data helps understand how FUSE is used, prioritize new features and bug fixes, and improve overall performance and stability.
 
 ### Disabling Telemetry
 
@@ -3642,13 +3642,13 @@ Telemetry data helps us:
 1. Understand which features are most valuable to users.
 2. Identify areas for improvement.
 3. Prioritize development efforts.
-4. Enhance R2R’s overall performance and stability.
+4. Enhance FUSE’s overall performance and stability.
 
-We appreciate your participation in our telemetry program, as it directly contributes to making R2R better for everyone.
+We appreciate your participation in our telemetry program, as it directly contributes to making FUSE better for everyone.
 
 ### Conclusion
 
-Telemetry in R2R provides valuable insights into system usage and performance, enabling continuous improvement. Users concerned about privacy can easily disable telemetry by setting the appropriate environment variable.
+Telemetry in FUSE provides valuable insights into system usage and performance, enabling continuous improvement. Users concerned about privacy can easily disable telemetry by setting the appropriate environment variable.
 
 ---
 
@@ -3656,15 +3656,15 @@ Telemetry in R2R provides valuable insights into system usage and performance, e
 
 ### Embedding System
 
-R2R uses embeddings as the foundation for semantic search and similarity matching capabilities. The embedding system converts text into high-dimensional vectors that capture semantic meaning, enabling powerful search and retrieval operations.
+FUSE uses embeddings as the foundation for semantic search and similarity matching capabilities. The embedding system converts text into high-dimensional vectors that capture semantic meaning, enabling powerful search and retrieval operations.
 
-R2R leverages **LiteLLM** to route embedding requests due to their provider flexibility. Read more about [LiteLLM here](https://docs.litellm.ai/).
+FUSE leverages **LiteLLM** to route embedding requests due to their provider flexibility. Read more about [LiteLLM here](https://docs.litellm.ai/).
 
 ### Embedding Configuration
 
-Customize the embedding system through the `embedding` section in your `r2r.toml` file, along with corresponding environment variables for sensitive information.
+Customize the embedding system through the `embedding` section in your `fuse.toml` file, along with corresponding environment variables for sensitive information.
 
-**Example: `r2r.toml`**
+**Example: `fuse.toml`**
 
 ```toml
 [embedding]
@@ -3689,11 +3689,11 @@ concurrent_request_limit = 256  # defaults to 256
 - `VERTEX_AI_API_KEY`
 - `VOYAGE_AI_API_KEY`
 
-### Advanced Embedding Features in R2R
+### Advanced Embedding Features in FUSE
 
 #### Batched Processing
 
-R2R implements intelligent batching for embedding operations to optimize throughput and, in some cases, cost.
+FUSE implements intelligent batching for embedding operations to optimize throughput and, in some cases, cost.
 
 **Python Example:**
 
@@ -3718,7 +3718,7 @@ The system manages requests with rate limiting and concurrency control.
 
 ### Performance Considerations
 
-When configuring embeddings in R2R, consider these optimization strategies:
+When configuring embeddings in FUSE, consider these optimization strategies:
 
 1. **Batch Size Optimization**:
    - Larger batch sizes improve throughput but increase latency.
@@ -3742,7 +3742,7 @@ When configuring embeddings in R2R, consider these optimization strategies:
 
 ### Supported LiteLLM Providers
 
-R2R supports multiple LiteLLM providers:
+FUSE supports multiple LiteLLM providers:
 
 - **OpenAI**
 - **Azure**
@@ -3789,19 +3789,19 @@ export OPENAI_API_KEY=your_openai_key
 
 ### Conclusion
 
-R2R’s embedding system, powered by LiteLLM, offers flexible and powerful semantic search capabilities. By optimizing batch sizes, managing concurrent requests, and selecting appropriate models, you can ensure efficient and accurate embeddings tailored to your application's needs.
+FUSE’s embedding system, powered by LiteLLM, offers flexible and powerful semantic search capabilities. By optimizing batch sizes, managing concurrent requests, and selecting appropriate models, you can ensure efficient and accurate embeddings tailored to your application's needs.
 
 ---
 
 ## Prompts
 
-### Prompt Management in R2R
+### Prompt Management in FUSE
 
-R2R provides a flexible system for managing prompts, allowing you to create, update, retrieve, and delete prompts dynamically. This system is crucial for customizing the behavior of language models and ensuring consistent interactions across your application.
+FUSE provides a flexible system for managing prompts, allowing you to create, update, retrieve, and delete prompts dynamically. This system is crucial for customizing the behavior of language models and ensuring consistent interactions across your application.
 
 ### Default Prompts
 
-R2R comes with a set of default prompts loaded from YAML files located in the [`py/core/providers/database/prompts`](https://github.com/SciPhi-AI/R2R/tree/main/py/core/providers/database/prompts) directory. These prompts serve as starting points for various tasks.
+FUSE comes with a set of default prompts loaded from YAML files located in the [`py/core/providers/database/prompts`](https://github.com/SciPhi-AI/FUSE/tree/main/py/core/providers/database/prompts) directory. These prompts serve as starting points for various tasks.
 
 **Example: `default_rag.yaml`**
 
@@ -3837,11 +3837,11 @@ default_rag:
 | `rag_agent.yaml`                             | Defines behavior and instructions for the RAG agent, coordinating retrieval and generation.  |
 | `rag_context.yaml`                           | Used to process or format the context retrieved for RAG tasks.                               |
 | `rag_fusion.yaml`                            | Used in RAG fusion techniques for combining information from multiple retrieved passages.    |
-| `system.yaml`                                | Contains general system-level prompts or instructions for the R2R system.                    |
+| `system.yaml`                                | Contains general system-level prompts or instructions for the FUSE system.                    |
 
 ### Prompt Provider
 
-R2R uses a Postgres class to manage prompts, enabling storage, retrieval, and manipulation of prompts. This leverages both a Postgres database and YAML files for flexibility and persistence.
+FUSE uses a Postgres class to manage prompts, enabling storage, retrieval, and manipulation of prompts. This leverages both a Postgres database and YAML files for flexibility and persistence.
 
 **Key Features:**
 
@@ -3851,7 +3851,7 @@ R2R uses a Postgres class to manage prompts, enabling storage, retrieval, and ma
 
 ### Prompt Structure
 
-Each prompt in R2R consists of:
+Each prompt in FUSE consists of:
 
 - **Name**: A unique identifier for the prompt.
 - **Template**: The actual text of the prompt, which may include placeholders for dynamic content.
@@ -3859,14 +3859,14 @@ Each prompt in R2R consists of:
 
 ### Managing Prompts
 
-R2R provides several endpoints and SDK methods for managing prompts:
+FUSE provides several endpoints and SDK methods for managing prompts:
 
 #### Adding a Prompt
 
 ```python
-from r2r import R2RClient
+from fuse import FUSEClient
 
-client = R2RClient()
+client = FUSEClient()
 
 response = client.prompts.add_prompt(
     name="my_new_prompt",
@@ -3895,15 +3895,15 @@ response = client.prompts.get_prompt(
 )
 ```
 
-Refer to the [Prompt API Reference](https://r2r-docs.sciphi.ai/api-and-sdks/prompts) for more details.
+Refer to the [Prompt API Reference](https://fuse-docs.sciphi.ai/api-and-sdks/prompts) for more details.
 
 ### Security Considerations
 
-Access to prompt management functions is restricted to superusers to prevent unauthorized modifications to system prompts. Ensure only trusted administrators have superuser access to your R2R deployment.
+Access to prompt management functions is restricted to superusers to prevent unauthorized modifications to system prompts. Ensure only trusted administrators have superuser access to your FUSE deployment.
 
 ### Conclusion
 
-R2R’s prompt management system offers powerful and flexible control over language model behavior. By effectively managing prompts, you can create dynamic, context-aware, and maintainable AI-powered features tailored to your application's needs.
+FUSE’s prompt management system offers powerful and flexible control over language model behavior. By effectively managing prompts, you can create dynamic, context-aware, and maintainable AI-powered features tailored to your application's needs.
 
 ---
 
@@ -3911,7 +3911,7 @@ R2R’s prompt management system offers powerful and flexible control over langu
 
 ### RAG Customization
 
-RAG (Retrieval-Augmented Generation) in R2R can be extensively customized to suit various use cases. The main components for customization are:
+RAG (Retrieval-Augmented Generation) in FUSE can be extensively customized to suit various use cases. The main components for customization are:
 
 1. **Generation Configuration**: Control the language model’s behavior.
 2. **Search Settings**: Fine-tune the retrieval process.
@@ -3919,22 +3919,22 @@ RAG (Retrieval-Augmented Generation) in R2R can be extensively customized to sui
 
 #### LLM Provider Configuration
 
-Refer to the [LLM Configuration](https://r2r-docs.sciphi.ai/documentation/configuration/llm) page for detailed information.
+Refer to the [LLM Configuration](https://fuse-docs.sciphi.ai/documentation/configuration/llm) page for detailed information.
 
 #### Retrieval Configuration
 
-Refer to the [Retrieval Configuration](https://r2r-docs.sciphi.ai/documentation/configuration/retrieval/overview) page for detailed information.
+Refer to the [Retrieval Configuration](https://fuse-docs.sciphi.ai/documentation/configuration/retrieval/overview) page for detailed information.
 
 ### Combining LLM and Retrieval Configuration for RAG
 
-The `rag_generation_config` parameter allows you to customize the language model’s behavior. Default settings are set on the server-side using `r2r.toml`. These settings can be overridden at runtime.
+The `rag_generation_config` parameter allows you to customize the language model’s behavior. Default settings are set on the server-side using `fuse.toml`. These settings can be overridden at runtime.
 
 **Python Example:**
 
 ```python
-from r2r import R2RClient
+from fuse import FUSEClient
 
-client = R2RClient()
+client = FUSEClient()
 
 response = client.retrieval.rag(
     "Who was Aristotle?",
@@ -3971,14 +3971,14 @@ response = client.retrieval.rag(
 
 ### Agent-based Interaction
 
-R2R supports multi-turn conversations and complex query processing through its agent endpoint.
+FUSE supports multi-turn conversations and complex query processing through its agent endpoint.
 
 **Python Example:**
 
 ```python
-from r2r import R2RClient
+from fuse import FUSEClient
 
-client = R2RClient("http://localhost:7272")
+client = FUSEClient("http://localhost:7272")
 
 messages = [
     {"role": "system", "content": "You are a helpful AI assistant."},
@@ -3995,7 +3995,7 @@ response = client.retrieval.agent(
 
 ### Conclusion
 
-By leveraging R2R’s RAG customization options, you can fine-tune retrieval and generation processes to best suit your specific use case and requirements, enhancing the overall performance and relevance of your AI-powered features.
+By leveraging FUSE’s RAG customization options, you can fine-tune retrieval and generation processes to best suit your specific use case and requirements, enhancing the overall performance and relevance of your AI-powered features.
 
 ---
 
@@ -4003,9 +4003,9 @@ By leveraging R2R’s RAG customization options, you can fine-tune retrieval and
 
 ### Graphs
 
-R2R supports robust knowledge graph functionality to enhance document understanding and retrieval. By extracting entities and relationships from documents and organizing them into collections, R2R enables advanced graph-based analysis and search capabilities.
+FUSE supports robust knowledge graph functionality to enhance document understanding and retrieval. By extracting entities and relationships from documents and organizing them into collections, FUSE enables advanced graph-based analysis and search capabilities.
 
-**Note**: Refer to the [Knowledge Graph Cookbook](https://r2r-docs.sciphi.ai/cookbooks/knowledge-graphs) and [GraphRAG Cookbook](https://r2r-docs.sciphi.ai/cookbooks/graphrag) for detailed guides.
+**Note**: Refer to the [Knowledge Graph Cookbook](https://fuse-docs.sciphi.ai/cookbooks/knowledge-graphs) and [GraphRAG Cookbook](https://fuse-docs.sciphi.ai/cookbooks/graphrag) for detailed guides.
 
 ### Knowledge Graph Operations
 
@@ -4038,11 +4038,11 @@ Customize knowledge graph extraction and search processes by modifying `kg_tripl
 
 ### Conclusion
 
-R2R’s knowledge graph capabilities enhance document understanding and improve search and RAG operations by providing structured and interconnected information from your documents.
+FUSE’s knowledge graph capabilities enhance document understanding and improve search and RAG operations by providing structured and interconnected information from your documents.
 
-# HTTP API of R2R Library
+# HTTP API of FUSE Library
 
-Welcome to the **R2R (Retrieve to Retrieve) API** documentation. This guide provides an exhaustive overview of all available API endpoints, organized into logical sections with detailed descriptions, request and response schemas, error codes, and usage examples. Whether you're integrating R2R into your application or developing workflows around it, this documentation will serve as your essential reference.
+Welcome to the **FUSE (Retrieve to Retrieve) API** documentation. This guide provides an exhaustive overview of all available API endpoints, organized into logical sections with detailed descriptions, request and response schemas, error codes, and usage examples. Whether you're integrating FUSE into your application or developing workflows around it, this documentation will serve as your essential reference.
 
 ---
 
@@ -4109,13 +4109,13 @@ Welcome to the **R2R (Retrieve to Retrieve) API** documentation. This guide prov
 
 ## Introduction
 
-**R2R (Retrieve to Retrieve)** is a robust content management and retrieval system designed to ingest, manage, and retrieve various types of documents efficiently. It leverages advanced features such as semantic search, knowledge graph creation, and conversational agents powered by large language models (LLMs). This API allows seamless integration with R2R’s functionalities, enabling developers to build sophisticated applications and workflows.
+**FUSE (Retrieve to Retrieve)** is a robust content management and retrieval system designed to ingest, manage, and retrieve various types of documents efficiently. It leverages advanced features such as semantic search, knowledge graph creation, and conversational agents powered by large language models (LLMs). This API allows seamless integration with FUSE’s functionalities, enabling developers to build sophisticated applications and workflows.
 
 ---
 
 ## Authentication
 
-Before accessing any R2R API endpoints, ensure you have authenticated and obtained the necessary access tokens. Authentication is handled via Bearer tokens included in the `Authorization` header of each request.
+Before accessing any FUSE API endpoints, ensure you have authenticated and obtained the necessary access tokens. Authentication is handled via Bearer tokens included in the `Authorization` header of each request.
 
 ### Example Header
 
@@ -4129,7 +4129,7 @@ Authorization: Bearer YOUR_API_KEY
 
 ### Overview
 
-A **Document** in R2R represents an ingested piece of content such as text files, PDFs, images, or audio files. Documents undergo processing to generate **Chunks**, extract **Entities** & **Relationships**, and facilitate the construction of knowledge graphs. They are central to R2R’s content management system and are associated with metadata and collections for organized access control.
+A **Document** in FUSE represents an ingested piece of content such as text files, PDFs, images, or audio files. Documents undergo processing to generate **Chunks**, extract **Entities** & **Relationships**, and facilitate the construction of knowledge graphs. They are central to FUSE’s content management system and are associated with metadata and collections for organized access control.
 
 ### Core Features of Documents
 
@@ -4773,7 +4773,7 @@ curl -X GET "https://api.example.com/v3/documents/document_id/relationships" \
 
 ### Overview
 
-A **Chunk** in R2R represents a processed segment of text derived from a parent Document. Chunks are optimized for semantic retrieval, knowledge graph construction, and vector-based operations. Each chunk contains text content, metadata, and optional vector embeddings, facilitating efficient search and analysis.
+A **Chunk** in FUSE represents a processed segment of text derived from a parent Document. Chunks are optimized for semantic retrieval, knowledge graph construction, and vector-based operations. Each chunk contains text content, metadata, and optional vector embeddings, facilitating efficient search and analysis.
 
 ### Core Features of Chunks
 
@@ -5081,7 +5081,7 @@ curl -X DELETE "https://api.example.com/v3/chunks/chunk_id" \
 
 ### Overview
 
-A **Graph** in R2R is a knowledge graph associated with a specific **Collection**. It comprises **Entities**, **Relationships**, and **Communities** (groupings of related entities). Graphs facilitate the organization and retrieval of interconnected information, enabling advanced data analysis and exploration.
+A **Graph** in FUSE is a knowledge graph associated with a specific **Collection**. It comprises **Entities**, **Relationships**, and **Communities** (groupings of related entities). Graphs facilitate the organization and retrieval of interconnected information, enabling advanced data analysis and exploration.
 
 ### Core Features of Graphs
 
@@ -5371,7 +5371,7 @@ curl -X POST "https://api.example.com/v3/graphs/collection_id/pull" \
 
 ### Overview
 
-**Entities** are the fundamental building blocks of a knowledge graph in R2R. They represent distinct concepts, objects, or individuals extracted from documents. Entities are linked through **Relationships**, forming a comprehensive network of interconnected information.
+**Entities** are the fundamental building blocks of a knowledge graph in FUSE. They represent distinct concepts, objects, or individuals extracted from documents. Entities are linked through **Relationships**, forming a comprehensive network of interconnected information.
 
 ### Core Features of Entities
 
@@ -6429,7 +6429,7 @@ curl -X DELETE "https://api.example.com/v3/graphs/collection_id/communities/comm
 
 ### Overview
 
-R2R’s **Retrieval** system offers advanced search and generation capabilities powered by vector search, knowledge graphs, and large language models (LLMs). The system provides multiple ways to interact with your data, including:
+FUSE’s **Retrieval** system offers advanced search and generation capabilities powered by vector search, knowledge graphs, and large language models (LLMs). The system provides multiple ways to interact with your data, including:
 
 - **Semantic Search**: Direct semantic similarity searches across documents and chunks.
 - **Retrieval-Augmented Generation (RAG)**: Combines retrieval with language model generation to produce informative responses grounded in your content.
@@ -6482,7 +6482,7 @@ R2R’s **Retrieval** system offers advanced search and generation capabilities 
 
 ### Endpoint Details
 
-#### 1. Search R2R
+#### 1. Search FUSE
 
 ```http
 POST /v3/retrieval/search
@@ -6925,7 +6925,7 @@ curl -X POST "https://api.example.com/v3/retrieval/embedding" \
 
 ### Overview
 
-An **Index** in R2R represents a vector index structure optimized for similarity search operations across chunks or entities. Indices are crucial for efficient retrieval in Retrieval-Augmented Generation (RAG) applications, supporting various similarity measures and index types tailored to different use cases.
+An **Index** in FUSE represents a vector index structure optimized for similarity search operations across chunks or entities. Indices are crucial for efficient retrieval in Retrieval-Augmented Generation (RAG) applications, supporting various similarity measures and index types tailored to different use cases.
 
 ### Core Features of Indices
 
@@ -7235,7 +7235,7 @@ curl -X DELETE "https://api.example.com/v3/indices/vectors/ai_research_vectors" 
 
 ### Overview
 
-A **User** in R2R represents an authenticated entity that can interact with the system. Users are the foundation of R2R’s access control system, enabling granular permissions management, activity tracking, and content organization through collections.
+A **User** in FUSE represents an authenticated entity that can interact with the system. Users are the foundation of FUSE’s access control system, enabling granular permissions management, activity tracking, and content organization through collections.
 
 ### Core Features of Users
 
@@ -8122,7 +8122,7 @@ curl -X DELETE "https://api.example.com/v3/users/user_id/collections/collection_
 
 ### Overview
 
-A **Collection** in R2R is a logical grouping mechanism that organizes documents, enabling efficient access control and collaboration among users. Collections serve as the primary unit for managing permissions, sharing content, and organizing related documents across users and teams.
+A **Collection** in FUSE is a logical grouping mechanism that organizes documents, enabling efficient access control and collaboration among users. Collections serve as the primary unit for managing permissions, sharing content, and organizing related documents across users and teams.
 
 ### Core Features of Collections
 
@@ -8791,7 +8791,7 @@ curl -X POST "https://api.example.com/v3/collections/collection_id/extract" \
 
 ### Overview
 
-A **Conversation** in R2R represents a threaded exchange of messages that can branch into multiple paths. Conversations provide a structured way to maintain dialogue history, support branching discussions, and manage message flows, enabling interactive and dynamic interactions with the system.
+A **Conversation** in FUSE represents a threaded exchange of messages that can branch into multiple paths. Conversations provide a structured way to maintain dialogue history, support branching discussions, and manage message flows, enabling interactive and dynamic interactions with the system.
 
 ### Core Features of Conversations
 
@@ -9196,7 +9196,7 @@ curl -X GET "https://api.example.com/v3/conversations/conversation_id/branches?l
 
 ### Overview
 
-A **Prompt** in R2R represents a templated instruction or query pattern managed by superusers. Prompts provide a consistent and reusable way to structure interactions with language models and other AI components, ensuring standardized outputs and interactions across the system.
+A **Prompt** in FUSE represents a templated instruction or query pattern managed by superusers. Prompts provide a consistent and reusable way to structure interactions with language models and other AI components, ensuring standardized outputs and interactions across the system.
 
 ### Core Features of Prompts
 
@@ -9498,7 +9498,7 @@ curl -X DELETE "https://api.example.com/v3/prompts/greeting_prompt" \
 
 ### Overview
 
-A **Conversation** in R2R maintains a threaded and potentially branching series of messages between users and the system. Conversations support context persistence, enabling multi-turn dialogues that can adapt and diverge based on user interactions.
+A **Conversation** in FUSE maintains a threaded and potentially branching series of messages between users and the system. Conversations support context persistence, enabling multi-turn dialogues that can adapt and diverge based on user interactions.
 
 ### Core Features of Conversations
 
@@ -9903,7 +9903,7 @@ curl -X GET "https://api.example.com/v3/conversations/conversation_id/branches?l
 
 ### Overview
 
-A **Prompt** in R2R represents a templated instruction or query pattern that can be reused across the system. Managed by superusers, prompts provide a standardized way to interact with language models and other AI components, ensuring consistent outputs and interactions.
+A **Prompt** in FUSE represents a templated instruction or query pattern that can be reused across the system. Managed by superusers, prompts provide a standardized way to interact with language models and other AI components, ensuring consistent outputs and interactions.
 
 ### Core Features of Prompts
 
@@ -10205,18 +10205,18 @@ curl -X DELETE "https://api.example.com/v3/prompts/greeting_prompt" \
 
 ### Overview
 
-The **System** section of the R2R API provides endpoints for monitoring and managing the overall health, logs, settings, and status of the R2R system. These tools are essential for administrators and superusers to ensure the system operates smoothly and efficiently.
+The **System** section of the FUSE API provides endpoints for monitoring and managing the overall health, logs, settings, and status of the FUSE system. These tools are essential for administrators and superusers to ensure the system operates smoothly and efficiently.
 
 ### Core Features of System Endpoints
 
 1. **Health Monitoring**
-    - Check the overall health status of the R2R system.
+    - Check the overall health status of the FUSE system.
 
 2. **Log Retrieval**
     - Access system logs for monitoring and debugging purposes.
 
 3. **Settings Management**
-    - Retrieve and manage current configuration settings of the R2R system.
+    - Retrieve and manage current configuration settings of the FUSE system.
 
 4. **Server Status**
     - Get real-time information about server uptime and resource usage.
@@ -10226,13 +10226,13 @@ The **System** section of the R2R API provides endpoints for monitoring and mana
 | Method | Endpoint               | Description                                                   |
 | :---- | :--------------------- | :------------------------------------------------------------ |
 | GET    | `/system/logs`         | Retrieve system logs for monitoring and debugging purposes.  |
-| GET    | `/system/health`       | Check the overall health status of the R2R system.           |
-| GET    | `/system/settings`     | Retrieve the current configuration settings of the R2R system. |
+| GET    | `/system/health`       | Check the overall health status of the FUSE system.           |
+| GET    | `/system/settings`     | Retrieve the current configuration settings of the FUSE system. |
 | GET    | `/system/status`       | Retrieve the current server status, including uptime and resource usage. |
 
 ### Endpoint Details
 
-#### 1. R2R Logs
+#### 1. FUSE Logs
 
 ```http
 GET /v3/system/logs
@@ -10293,7 +10293,7 @@ GET /v3/system/health
 ```
 
 **Description:**
-Checks the overall health status of the R2R system, ensuring that all components are functioning correctly.
+Checks the overall health status of the FUSE system, ensuring that all components are functioning correctly.
 
 **Successful Response:**
 
@@ -10318,14 +10318,14 @@ curl -X GET "https://api.example.com/v3/system/health" \
 
 ---
 
-#### 3. R2R Settings
+#### 3. FUSE Settings
 
 ```http
 GET /v3/system/settings
 ```
 
 **Description:**
-Retrieves the current configuration settings of the R2R system, including prompt configurations and project name.
+Retrieves the current configuration settings of the FUSE system, including prompt configurations and project name.
 
 **Successful Response:**
 
@@ -10338,7 +10338,7 @@ Retrieves the current configuration settings of the R2R system, including prompt
     "prompts": {
       "prompt_name": "prompt_template"
     },
-    "r2r_project_name": "R2R Project"
+    "fuse_project_name": "FUSE Project"
   }
 }
 ```
@@ -10393,7 +10393,7 @@ curl -X GET "https://api.example.com/v3/system/status" \
 
 ## Common Use Cases
 
-R2R API is designed to support a wide range of use cases, enabling users to harness the full potential of their data. Here are some common scenarios:
+FUSE API is designed to support a wide range of use cases, enabling users to harness the full potential of their data. Here are some common scenarios:
 
 1. **Research and Analysis**
     - **Literature Review:** Ingest and analyze academic papers to extract key entities and relationships.
@@ -10423,7 +10423,7 @@ R2R API is designed to support a wide range of use cases, enabling users to harn
 
 ## Conclusion
 
-This comprehensive documentation provides an in-depth overview of the **R2R API**, encompassing all available endpoints, their functionalities, request and response structures, and practical usage examples. By leveraging the R2R API, you can effectively manage, retrieve, and interact with your document collections, build sophisticated knowledge graphs, and develop intelligent conversational agents.
+This comprehensive documentation provides an in-depth overview of the **FUSE API**, encompassing all available endpoints, their functionalities, request and response structures, and practical usage examples. By leveraging the FUSE API, you can effectively manage, retrieve, and interact with your document collections, build sophisticated knowledge graphs, and develop intelligent conversational agents.
 
 ### Key Highlights:
 
@@ -10432,15 +10432,15 @@ This comprehensive documentation provides an in-depth overview of the **R2R API*
 - **Knowledge Graphs:** Build and manage detailed knowledge graphs through entity and relationship extraction, facilitating advanced data exploration.
 - **Retrieval Capabilities:** Harness powerful retrieval features including semantic search, RAG, and conversational agents to interact with your data intelligently.
 - **User & Collection Management:** Control access and collaboration through granular user and collection management features.
-- **System Tools:** Monitor and maintain the health and performance of your R2R system with dedicated system endpoints.
+- **System Tools:** Monitor and maintain the health and performance of your FUSE system with dedicated system endpoints.
 
-For further assistance, refer to the [R2R Docs](https://r2r-docs.sciphi.ai) or contact our support team.
+For further assistance, refer to the [FUSE Docs](https://fuse-docs.sciphi.ai) or contact our support team.
 
 ---
 
-# **R2R Deployment Guidelines**
+# **FUSE Deployment Guidelines**
 
-Welcome to the **R2R Deployment Guidelines**. This comprehensive guide will walk you through deploying the R2R (Retrieval to Riches) application using Docker and Docker Compose. The deployment includes setting up essential services such as PostgreSQL, RabbitMQ, Hatchet, Unstructured, Graph Clustering, R2R itself, R2R Dashboard, and Nginx. By following these guidelines, you will ensure a smooth and efficient deployment of R2R with all necessary configurations.
+Welcome to the **FUSE Deployment Guidelines**. This comprehensive guide will walk you through deploying the FUSE (Retrieval to Riches) application using Docker and Docker Compose. The deployment includes setting up essential services such as PostgreSQL, RabbitMQ, Hatchet, Unstructured, Graph Clustering, FUSE itself, FUSE Dashboard, and Nginx. By following these guidelines, you will ensure a smooth and efficient deployment of FUSE with all necessary configurations.
 
 ---
 
@@ -10459,9 +10459,9 @@ Welcome to the **R2R Deployment Guidelines**. This comprehensive guide will walk
    - [Step 4: Deploy Services with Docker Compose](#step-4-deploy-services-with-docker-compose)
 7. [Initial Setup Steps](#initial-setup-steps)
    - [Creating the Hatchet API Token](#creating-the-hatchet-api-token)
-8. [Accessing R2R and Hatchet Dashboard](#accessing-r2r-and-hatchet-dashboard)
+8. [Accessing FUSE and Hatchet Dashboard](#accessing-fuse-and-hatchet-dashboard)
 9. [Configuring Nginx as a Reverse Proxy](#configuring-nginx-as-a-reverse-proxy)
-10. [Configuring R2R](#configuring-r2r)
+10. [Configuring FUSE](#configuring-fuse)
 11. [Maintenance and Scaling](#maintenance-and-scaling)
 12. [Security Considerations](#security-considerations)
 13. [Troubleshooting](#troubleshooting)
@@ -10489,9 +10489,9 @@ The deployment consists of the following key components:
 2. **Hatchet Services**: Includes Hatchet Postgres, RabbitMQ, Migration, Setup Config, Engine, and Dashboard.
 3. **Unstructured Service**: Handles document processing and parsing.
 4. **Graph Clustering Service**: Manages community detection within knowledge graphs.
-5. **R2R Application**: The core application providing Retrieval-Augmented Generation (RAG) functionalities.
-6. **R2R Dashboard**: User interface for managing R2R.
-7. **Nginx**: Acts as a reverse proxy to route traffic to R2R and other services.
+5. **FUSE Application**: The core application providing Retrieval-Augmented Generation (RAG) functionalities.
+6. **FUSE Dashboard**: User interface for managing FUSE.
+7. **Nginx**: Acts as a reverse proxy to route traffic to FUSE and other services.
 
 The deployment is managed using Docker Compose, orchestrating the interaction between these services.
 
@@ -10506,21 +10506,21 @@ Environment variables are crucial for configuring services. You can set them dir
 Create a `.env` file in the root directory of your project with the following content:
 
 ```dotenv
-# General R2R Settings
-R2R_PORT=7272
-R2R_HOST=0.0.0.0
-R2R_CONFIG_NAME=
-R2R_CONFIG_PATH=/app/config
-R2R_PROJECT_NAME=r2r_default
+# General FUSE Settings
+FUSE_PORT=7272
+FUSE_HOST=0.0.0.0
+FUSE_CONFIG_NAME=
+FUSE_CONFIG_PATH=/app/config
+FUSE_PROJECT_NAME=fuse_default
 
 # PostgreSQL Settings
-R2R_POSTGRES_USER=postgres
-R2R_POSTGRES_PASSWORD=postgres
-R2R_POSTGRES_HOST=postgres
-R2R_POSTGRES_PORT=5432
-R2R_POSTGRES_DBNAME=postgres
-R2R_POSTGRES_MAX_CONNECTIONS=1024
-R2R_POSTGRES_STATEMENT_CACHE_SIZE=100
+FUSE_POSTGRES_USER=postgres
+FUSE_POSTGRES_PASSWORD=postgres
+FUSE_POSTGRES_HOST=postgres
+FUSE_POSTGRES_PORT=5432
+FUSE_POSTGRES_DBNAME=postgres
+FUSE_POSTGRES_MAX_CONNECTIONS=1024
+FUSE_POSTGRES_STATEMENT_CACHE_SIZE=100
 
 # Hatchet Settings
 HATCHET_POSTGRES_USER=hatchet_user
@@ -10530,17 +10530,17 @@ HATCHET_CLIENT_GRPC_MAX_RECV_MESSAGE_LENGTH=134217728
 HATCHET_CLIENT_GRPC_MAX_SEND_MESSAGE_LENGTH=134217728
 
 # RabbitMQ Settings
-R2R_RABBITMQ_PORT=5673
-R2R_RABBITMQ_MGMT_PORT=15673
+FUSE_RABBITMQ_PORT=5673
+FUSE_RABBITMQ_MGMT_PORT=15673
 
 # Graph Clustering Settings
-R2R_GRAPH_CLUSTERING_PORT=7276
+FUSE_GRAPH_CLUSTERING_PORT=7276
 
-# R2R Dashboard Settings
-R2R_DASHBOARD_PORT=7273
+# FUSE Dashboard Settings
+FUSE_DASHBOARD_PORT=7273
 
 # Nginx Settings
-R2R_NGINX_PORT=7280
+FUSE_NGINX_PORT=7280
 
 # API Keys and External Services
 OPENAI_API_KEY=your_openai_api_key
@@ -10576,7 +10576,7 @@ CLUSTERING_SERVICE_URL=http://graph_clustering:7276
 
 ### **Dockerfile**
 
-The `Dockerfile` is used to build the R2R application image.
+The `Dockerfile` is used to build the FUSE application image.
 
 - **Base Image**: `python:3.12-slim`
 - **System Dependencies**: GCC, G++, Musl-dev, Curl, Libffi-dev, Gfortran, Libopenblas-dev, Poppler-utils, Rust (via Rustup)
@@ -10598,7 +10598,7 @@ The `Dockerfile.unstructured` builds the Unstructured service image.
 
 Docker Compose orchestrates the deployment of all services. There are three main Docker Compose files provided:
 
-1. **compose.yaml**: Basic setup with PostgreSQL and R2R.
+1. **compose.yaml**: Basic setup with PostgreSQL and FUSE.
 2. **compose.full.yaml**: Extends `compose.yaml` by adding Hatchet, RabbitMQ, and related services.
 3. **compose.full_with_replicas.yaml**: Further extends `compose.full.yaml` with additional replicas and services.
 
@@ -10608,7 +10608,7 @@ For a comprehensive deployment, we'll focus on using `compose.full_with_replicas
 
 #### **Networks**
 
-- **r2r-network**: A bridge network facilitating communication between all services.
+- **fuse-network**: A bridge network facilitating communication between all services.
 
 #### **Volumes**
 
@@ -10629,7 +10629,7 @@ Below is a detailed overview of each service included in `compose.full_with_repl
 1. **PostgreSQL (`postgres`)**
 
    - **Image**: `pgvector/pgvector:pg16`
-   - **Purpose**: Primary database with vector support for R2R.
+   - **Purpose**: Primary database with vector support for FUSE.
    - **Environment Variables**:
      - `POSTGRES_USER`: Database username.
      - `POSTGRES_PASSWORD`: Database password.
@@ -10637,7 +10637,7 @@ Below is a detailed overview of each service included in `compose.full_with_repl
      - `POSTGRES_PORT`: Port number.
      - `POSTGRES_MAX_CONNECTIONS`: Maximum allowed connections.
    - **Volumes**: `postgres_data` for persistent storage.
-   - **Ports**: Maps `${R2R_POSTGRES_PORT:-5432}` on the host to `5432` in the container.
+   - **Ports**: Maps `${FUSE_POSTGRES_PORT:-5432}` on the host to `5432` in the container.
    - **Healthcheck**: Ensures PostgreSQL is ready before other services depend on it.
    - **Restart Policy**: `on-failure`
 
@@ -10660,8 +10660,8 @@ Below is a detailed overview of each service included in `compose.full_with_repl
      - `RABBITMQ_DEFAULT_USER`: Default RabbitMQ user (`user`).
      - `RABBITMQ_DEFAULT_PASS`: Default RabbitMQ password (`password`).
    - **Ports**:
-     - `${R2R_RABBITMQ_PORT:-5673}` on the host to `5672` in the container.
-     - `${R2R_RABBITMQ_MGMT_PORT:-15673}` on the host to `15672` in the container.
+     - `${FUSE_RABBITMQ_PORT:-5673}` on the host to `5672` in the container.
+     - `${FUSE_RABBITMQ_MGMT_PORT:-15673}` on the host to `15672` in the container.
    - **Volumes**:
      - `hatchet_rabbitmq_data`: Persistent storage for RabbitMQ data.
      - `hatchet_rabbitmq_conf`: Configuration files for RabbitMQ.
@@ -10675,7 +10675,7 @@ Below is a detailed overview of each service included in `compose.full_with_repl
    - **Environment Variables**:
      - `DATABASE_URL`: Connection string for Hatchet PostgreSQL.
    - **Depends On**: `hatchet-postgres`
-   - **Networks**: `r2r-network`
+   - **Networks**: `fuse-network`
 
 5. **Hatchet Migration (`hatchet-migration`)**
 
@@ -10684,7 +10684,7 @@ Below is a detailed overview of each service included in `compose.full_with_repl
    - **Environment Variables**:
      - `DATABASE_URL`: Connection string for Hatchet PostgreSQL.
    - **Depends On**: `hatchet-create-db`
-   - **Networks**: `r2r-network`
+   - **Networks**: `fuse-network`
 
 6. **Hatchet Setup Config (`hatchet-setup-config`)**
 
@@ -10701,7 +10701,7 @@ Below is a detailed overview of each service included in `compose.full_with_repl
    - **Depends On**:
      - `hatchet-migration`
      - `hatchet-rabbitmq`
-   - **Networks**: `r2r-network`
+   - **Networks**: `fuse-network`
 
 7. **Hatchet Engine (`hatchet-engine`)**
 
@@ -10711,7 +10711,7 @@ Below is a detailed overview of each service included in `compose.full_with_repl
    - **Environment Variables**:
      - `DATABASE_URL`: Connection string for Hatchet PostgreSQL.
      - GRPC settings.
-   - **Ports**: Maps `${R2R_HATCHET_ENGINE_PORT:-7077}` on the host to `7077` in the container.
+   - **Ports**: Maps `${FUSE_HATCHET_ENGINE_PORT:-7077}` on the host to `7077` in the container.
    - **Volumes**:
      - `hatchet_certs`: SSL certificates.
      - `hatchet_config`: Configuration files.
@@ -10726,12 +10726,12 @@ Below is a detailed overview of each service included in `compose.full_with_repl
    - **Command**: Runs Hatchet dashboard with specified configuration.
    - **Environment Variables**:
      - `DATABASE_URL`: Connection string for Hatchet PostgreSQL.
-   - **Ports**: Maps `${R2R_HATCHET_DASHBOARD_PORT:-7274}` on the host to `80` in the container.
+   - **Ports**: Maps `${FUSE_HATCHET_DASHBOARD_PORT:-7274}` on the host to `80` in the container.
    - **Volumes**:
      - `hatchet_certs`: SSL certificates.
      - `hatchet_config`: Configuration files.
    - **Depends On**: `hatchet-setup-config`
-   - **Networks**: `r2r-network`
+   - **Networks**: `fuse-network`
 
 9. **Setup Token (`setup-token`)**
 
@@ -10743,65 +10743,65 @@ Below is a detailed overview of each service included in `compose.full_with_repl
      - `hatchet_config`: Configuration files.
      - `hatchet_api_key`: Stores the generated API key.
    - **Depends On**: `hatchet-setup-config`
-   - **Networks**: `r2r-network`
+   - **Networks**: `fuse-network`
 
 10. **Unstructured (`unstructured`)**
 
-    - **Image**: `${UNSTRUCTURED_IMAGE:-ragtoriches/unst-prod}`
+    - **Image**: `${UNSTRUCTURED_IMAGE:-meltingrock/unst-prod}`
     - **Purpose**: Handles document parsing and processing.
     - **Healthcheck**: Ensures the Unstructured service is operational.
-    - **Networks**: `r2r-network`
+    - **Networks**: `fuse-network`
 
 11. **Graph Clustering (`graph_clustering`)**
 
-    - **Image**: `${GRAPH_CLUSTERING_IMAGE:-ragtoriches/cluster-prod}`
+    - **Image**: `${GRAPH_CLUSTERING_IMAGE:-meltingrock/cluster-prod}`
     - **Purpose**: Manages community detection within knowledge graphs.
-    - **Ports**: Maps `${R2R_GRAPH_CLUSTERING_PORT:-7276}` on the host to `7276` in the container.
+    - **Ports**: Maps `${FUSE_GRAPH_CLUSTERING_PORT:-7276}` on the host to `7276` in the container.
     - **Healthcheck**: Ensures the Graph Clustering service is operational.
-    - **Networks**: `r2r-network`
+    - **Networks**: `fuse-network`
 
-12. **R2R (`r2r`)**
+12. **FUSE (`fuse`)**
 
-    - **Image**: `${R2R_IMAGE:-ragtoriches/prod:latest}`
+    - **Image**: `${FUSE_IMAGE:-meltingrock/prod:latest}`
     - **Build Context**: Current directory (`.`)
     - **Environment Variables**:
-      - General R2R settings (`R2R_PORT`, `R2R_HOST`, etc.).
+      - General FUSE settings (`FUSE_PORT`, `FUSE_HOST`, etc.).
       - PostgreSQL connection details.
       - API keys for external services (OpenAI, Anthropic, Azure, etc.).
       - Hatchet and Graph Clustering settings.
-    - **Command**: Sets the Hatchet API token and starts the R2R application using Uvicorn.
-    - **Healthcheck**: Ensures the R2R application is operational.
+    - **Command**: Sets the Hatchet API token and starts the FUSE application using Uvicorn.
+    - **Healthcheck**: Ensures the FUSE application is operational.
     - **Restart Policy**: `on-failure`
     - **Volumes**:
-      - `${R2R_CONFIG_PATH:-/}`: Configuration directory.
+      - `${FUSE_CONFIG_PATH:-/}`: Configuration directory.
       - `hatchet_api_key`: Read-only access to the Hatchet API key.
     - **Extra Hosts**: Adds `host.docker.internal` to facilitate communication with host services.
     - **Depends On**:
       - `setup-token`
       - `unstructured`
-    - **Networks**: `r2r-network`
+    - **Networks**: `fuse-network`
 
-13. **R2R Dashboard (`r2r-dashboard`)**
+13. **FUSE Dashboard (`fuse-dashboard`)**
 
-    - **Image**: `emrgntcmplxty/r2r-dashboard:latest`
+    - **Image**: `emrgntcmplxty/fuse-dashboard:latest`
     - **Environment Variables**:
-      - `NEXT_PUBLIC_R2R_DEPLOYMENT_URL`: URL to the R2R API.
+      - `NEXT_PUBLIC_FUSE_DEPLOYMENT_URL`: URL to the FUSE API.
       - `NEXT_PUBLIC_HATCHET_DASHBOARD_URL`: URL to the Hatchet Dashboard.
-    - **Ports**: Maps `${R2R_DASHBOARD_PORT:-7273}` on the host to `3000` in the container.
-    - **Networks**: `r2r-network`
+    - **Ports**: Maps `${FUSE_DASHBOARD_PORT:-7273}` on the host to `3000` in the container.
+    - **Networks**: `fuse-network`
 
 14. **Nginx (`nginx`)**
 
     - **Image**: `nginx:latest`
-    - **Purpose**: Acts as a reverse proxy to route traffic to R2R and other services.
-    - **Ports**: Maps `${R2R_NGINX_PORT:-7280}` on the host to `80` in the container.
+    - **Purpose**: Acts as a reverse proxy to route traffic to FUSE and other services.
+    - **Ports**: Maps `${FUSE_NGINX_PORT:-7280}` on the host to `80` in the container.
     - **Volumes**: Mounts `nginx.conf` from the host to the container.
-    - **Depends On**: `r2r`
+    - **Depends On**: `fuse`
     - **Deploy Resources**:
       - Limits CPU to `0.5`
       - Limits memory to `512M`
     - **Healthcheck**: Ensures Nginx is operational.
-    - **Networks**: `r2r-network`
+    - **Networks**: `fuse-network`
 
 > **Note**: Ensure that `nginx.conf` is properly configured to proxy requests to the appropriate services.
 
@@ -10811,11 +10811,11 @@ Below is a detailed overview of each service included in `compose.full_with_repl
 
 ### **Step 1: Clone the Repository**
 
-First, clone the R2R repository containing all necessary deployment files.
+First, clone the FUSE repository containing all necessary deployment files.
 
 ```bash
-git clone https://github.com/SciPhi-AI/r2r.git
-cd r2r
+git clone https://github.com/SciPhi-AI/fuse.git
+cd fuse
 ```
 
 > **Note**: Replace the repository URL with the actual URL if different.
@@ -10837,8 +10837,8 @@ nano .env
 Build the Docker images using the provided `Dockerfile` and `Dockerfile.unstructured`.
 
 ```bash
-# Build the R2R application image
-docker build -t r2r-app -f Dockerfile .
+# Build the FUSE application image
+docker build -t fuse-app -f Dockerfile .
 
 # Build the Unstructured service image
 docker build -t unstructured-service -f Dockerfile.unstructured .
@@ -10869,11 +10869,11 @@ docker-compose -f compose.full_with_replicas.yaml up -d
 
 ## **Initial Setup Steps**
 
-After deploying the services, perform the following initial setup steps to configure Hatchet and R2R.
+After deploying the services, perform the following initial setup steps to configure Hatchet and FUSE.
 
 ### **Creating the Hatchet API Token**
 
-The `setup-token` service is responsible for generating the Hatchet API token, which R2R uses to communicate with Hatchet.
+The `setup-token` service is responsible for generating the Hatchet API token, which FUSE uses to communicate with Hatchet.
 
 1. **Ensure `setup-token` Service is Running**
 
@@ -10888,10 +10888,10 @@ The `setup-token` service is responsible for generating the Hatchet API token, w
    The token is stored in the `hatchet_api_key` volume. To retrieve the token:
 
    ```bash
-   docker exec -it <r2r_container_name> cat /hatchet_api_key/api_key.txt
+   docker exec -it <fuse_container_name> cat /hatchet_api_key/api_key.txt
    ```
 
-   Replace `<r2r_container_name>` with the actual container name, which can be found using:
+   Replace `<fuse_container_name>` with the actual container name, which can be found using:
 
    ```bash
    docker-compose -f compose.full_with_replicas.yaml ps
@@ -10899,13 +10899,13 @@ The `setup-token` service is responsible for generating the Hatchet API token, w
 
 3. **Set Hatchet API Token Environment Variable**
 
-   Ensure that the `HATCHET_CLIENT_TOKEN` environment variable is correctly set in the `r2r` service. This is handled automatically by the `r2r` service command, which reads the token from the `hatchet_api_key` volume.
+   Ensure that the `HATCHET_CLIENT_TOKEN` environment variable is correctly set in the `fuse` service. This is handled automatically by the `fuse` service command, which reads the token from the `hatchet_api_key` volume.
 
 ---
 
-## **Accessing R2R and Hatchet Dashboard**
+## **Accessing FUSE and Hatchet Dashboard**
 
-### **R2R API**
+### **FUSE API**
 
 - **URL**: `http://<your-server-ip>:7272`
 - **Health Check Endpoint**: `http://<your-server-ip>:7272/v3/health`
@@ -10914,7 +10914,7 @@ The `setup-token` service is responsible for generating the Hatchet API token, w
 
 - **URL**: `http://<your-server-ip>:7274`
 
-### **R2R Dashboard**
+### **FUSE Dashboard**
 
 - **URL**: `http://<your-server-ip>:7273`
 
@@ -10944,7 +10944,7 @@ http {
         listen 80;
 
         location /api/ {
-            proxy_pass http://r2r:7272/;
+            proxy_pass http://fuse:7272/;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -10952,7 +10952,7 @@ http {
         }
 
         location /dashboard/ {
-            proxy_pass http://r2r-dashboard:3000/;
+            proxy_pass http://fuse-dashboard:3000/;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -10990,13 +10990,13 @@ docker-compose -f compose.full_with_replicas.yaml exec nginx nginx -s reload
 
 ---
 
-## **Configuring R2R**
+## **Configuring FUSE**
 
-R2R's behavior is controlled via the `r2r.toml` file. Ensure this file is correctly configured before starting the services.
+FUSE's behavior is controlled via the `fuse.toml` file. Ensure this file is correctly configured before starting the services.
 
-### **Sample `r2r.toml`**
+### **Sample `fuse.toml`**
 
-Below is a sample `r2r.toml` with essential configurations:
+Below is a sample `fuse.toml` with essential configurations:
 
 ```toml
 [app]
@@ -11012,7 +11012,7 @@ tools = ["local_search"]
   model = "openai/gpt-4o"
 
 [auth]
-provider = "r2r"
+provider = "fuse"
 access_token_lifetime_in_minutes = 60
 refresh_token_lifetime_in_days = 7
 require_authentication = false
@@ -11081,7 +11081,7 @@ quantization_settings = { quantization_type = "FP32" }
 provider = "postgres"
 
 [ingestion]
-provider = "r2r"
+provider = "fuse"
 chunking_strategy = "recursive"
 chunk_size = 1024
 chunk_overlap = 512
@@ -11103,7 +11103,7 @@ vision_pdf_model = "openai/gpt-4o"
     pdf = "zerox"
 
 [logging]
-provider = "r2r"
+provider = "fuse"
 log_table = "logs"
 log_info_table = "log_info"
 
@@ -11111,7 +11111,7 @@ log_info_table = "log_info"
 provider = "simple"
 
 [prompt]
-provider = "r2r"
+provider = "fuse"
 
 [email]
 provider = "console_mock"
@@ -11133,7 +11133,7 @@ provider = "console_mock"
 - **[prompt]**: Prompt management provider.
 - **[email]**: Email provider settings.
 
-> **Customization**: Adjust the `r2r.toml` file according to your specific requirements. Ensure that all paths, models, and service URLs match your deployment environment.
+> **Customization**: Adjust the `fuse.toml` file according to your specific requirements. Ensure that all paths, models, and service URLs match your deployment environment.
 
 ---
 
@@ -11153,14 +11153,14 @@ Vector indices enhance search capabilities but are not necessary for all deploym
 
 **Vector Index Management:**
 
-R2R supports various indexing methods, with HNSW (Hierarchical Navigable Small World) recommended for most use cases.
+FUSE supports various indexing methods, with HNSW (Hierarchical Navigable Small World) recommended for most use cases.
 
 **Example: Creating and Deleting a Vector Index**
 
 ```python
-from r2r import R2RClient
+from fuse import FUSEClient
 
-client = R2RClient()
+client = FUSEClient()
 
 # Create vector index
 create_response = client.indices.create(
@@ -11204,10 +11204,10 @@ print('delete_response = ', delete_response)
 
 **Version Management**
 
-Check the current R2R version:
+Check the current FUSE version:
 
 ```bash
-docker-compose -f compose.full_with_replicas.yaml exec r2r r2r version
+docker-compose -f compose.full_with_replicas.yaml exec fuse fuse version
 ```
 
 **Update Process**
@@ -11215,9 +11215,9 @@ docker-compose -f compose.full_with_replicas.yaml exec r2r r2r version
 1. **Prepare for Update**
 
    ```bash
-   docker-compose -f compose.full_with_replicas.yaml exec r2r r2r version
-   docker-compose -f compose.full_with_replicas.yaml exec r2r r2r db current
-   docker-compose -f compose.full_with_replicas.yaml exec r2r r2r generate-report
+   docker-compose -f compose.full_with_replicas.yaml exec fuse fuse version
+   docker-compose -f compose.full_with_replicas.yaml exec fuse fuse db current
+   docker-compose -f compose.full_with_replicas.yaml exec fuse fuse generate-report
    ```
 
 2. **Stop Running Services**
@@ -11226,7 +11226,7 @@ docker-compose -f compose.full_with_replicas.yaml exec r2r r2r version
    docker-compose -f compose.full_with_replicas.yaml down
    ```
 
-3. **Update R2R**
+3. **Update FUSE**
 
    ```bash
    docker-compose -f compose.full_with_replicas.yaml pull
@@ -11236,7 +11236,7 @@ docker-compose -f compose.full_with_replicas.yaml exec r2r r2r version
 4. **Update Database**
 
    ```bash
-   docker-compose -f compose.full_with_replicas.yaml exec r2r r2r db upgrade
+   docker-compose -f compose.full_with_replicas.yaml exec fuse fuse db upgrade
    ```
 
 5. **Restart Services**
@@ -11250,19 +11250,19 @@ docker-compose -f compose.full_with_replicas.yaml exec r2r r2r version
 Check current migration:
 
 ```bash
-docker-compose -f compose.full_with_replicas.yaml exec r2r r2r db current
+docker-compose -f compose.full_with_replicas.yaml exec fuse fuse db current
 ```
 
 Apply migrations:
 
 ```bash
-docker-compose -f compose.full_with_replicas.yaml exec r2r r2r db upgrade
+docker-compose -f compose.full_with_replicas.yaml exec fuse fuse db upgrade
 ```
 
 Rollback if necessary:
 
 ```bash
-docker-compose -f compose.full_with_replicas.yaml exec r2r r2r db downgrade --revision <previous-working-version>
+docker-compose -f compose.full_with_replicas.yaml exec fuse fuse db downgrade --revision <previous-working-version>
 ```
 
 ### **Managing Multiple Environments**
@@ -11273,15 +11273,15 @@ Use different project names and schemas for development, staging, and production
 
 ```bash
 # Development
-export R2R_PROJECT_NAME=r2r_dev
+export FUSE_PROJECT_NAME=fuse_dev
 docker-compose -f compose.full_with_replicas.yaml up -d
 
 # Staging
-export R2R_PROJECT_NAME=r2r_staging
+export FUSE_PROJECT_NAME=fuse_staging
 docker-compose -f compose.full_with_replicas.yaml up -d
 
 # Production
-export R2R_PROJECT_NAME=r2r_prod
+export FUSE_PROJECT_NAME=fuse_prod
 docker-compose -f compose.full_with_replicas.yaml up -d
 ```
 
@@ -11289,7 +11289,7 @@ docker-compose -f compose.full_with_replicas.yaml up -d
 
 ## **Security Considerations**
 
-Ensuring the security of your deployment is paramount. Follow these best practices to secure your R2R deployment.
+Ensuring the security of your deployment is paramount. Follow these best practices to secure your FUSE deployment.
 
 1. **Secure Environment Variables**
 
@@ -11313,12 +11313,12 @@ Ensuring the security of your deployment is paramount. Follow these best practic
 
 5. **Enable Authentication and Verification**
 
-   - In `r2r.toml`, set `require_authentication = true` and `require_email_verification = true` for production environments.
+   - In `fuse.toml`, set `require_authentication = true` and `require_email_verification = true` for production environments.
    - Update default admin credentials immediately after deployment.
 
 6. **Rate Limiting**
 
-   - Configure rate limits in `r2r.toml` to prevent abuse:
+   - Configure rate limits in `fuse.toml` to prevent abuse:
      ```toml
      [database.route_limits]
        "/v3/retrieval/search" = { route_per_min = 120 }
@@ -11355,12 +11355,12 @@ Deployments can encounter issues. Below are common problems and their solutions.
      ```
    - **Example**:
      ```bash
-     docker-compose -f compose.full_with_replicas.yaml logs r2r
+     docker-compose -f compose.full_with_replicas.yaml logs fuse
      ```
 
 2. **Database Connection Issues**
 
-   - **Verify Environment Variables**: Ensure `R2R_POSTGRES_HOST`, `R2R_POSTGRES_PORT`, `R2R_POSTGRES_USER`, and `R2R_POSTGRES_PASSWORD` are correct.
+   - **Verify Environment Variables**: Ensure `FUSE_POSTGRES_HOST`, `FUSE_POSTGRES_PORT`, `FUSE_POSTGRES_USER`, and `FUSE_POSTGRES_PASSWORD` are correct.
    - **Check Service Status**:
      ```bash
      docker-compose -f compose.full_with_replicas.yaml ps
@@ -11379,13 +11379,13 @@ Deployments can encounter issues. Below are common problems and their solutions.
 
 4. **API Not Responding**
 
-   - **Ensure R2R is Running**:
+   - **Ensure FUSE is Running**:
      ```bash
      docker-compose -f compose.full_with_replicas.yaml ps
      ```
    - **Check Network Connectivity**:
      ```bash
-     docker-compose -f compose.full_with_replicas.yaml exec r2r ping postgres
+     docker-compose -f compose.full_with_replicas.yaml exec fuse ping postgres
      ```
 
 5. **Token Generation Issues**
@@ -11416,6 +11416,6 @@ Deployments can encounter issues. Below are common problems and their solutions.
 
 ## **Conclusion**
 
-Deploying R2R involves orchestrating multiple services to work seamlessly together. By following this guide, you should be able to set up a robust and secure R2R deployment tailored to your needs. Remember to regularly update your services, monitor performance, and enforce security best practices to maintain the integrity and efficiency of your R2R application.
+Deploying FUSE involves orchestrating multiple services to work seamlessly together. By following this guide, you should be able to set up a robust and secure FUSE deployment tailored to your needs. Remember to regularly update your services, monitor performance, and enforce security best practices to maintain the integrity and efficiency of your FUSE application.
 
-For further assistance, refer to the [R2R Comprehensive Documentation](#) or reach out to the [SciPhi AI Support Team](mailto:support@sciphi.ai).
+For further assistance, refer to the [FUSE Comprehensive Documentation](#) or reach out to the [SciPhi AI Support Team](mailto:support@sciphi.ai).

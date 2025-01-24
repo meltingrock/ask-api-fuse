@@ -12,22 +12,22 @@ from core.base import (
     DocumentChunk,
     KGExtraction,
     KGExtractionStatus,
-    R2RDocumentProcessingError,
+    FUSEDocumentProcessingError,
 )
 from core.base.abstractions import (
     Community,
     Entity,
     GenerationConfig,
     KGEnrichmentStatus,
-    R2RException,
+    FUSEException,
     Relationship,
     StoreType,
 )
 from core.base.api.models import GraphResponse
 from core.telemetry.telemetry_decorator import telemetry_event
 
-from ..abstractions import R2RProviders
-from ..config import R2RConfig
+from ..abstractions import FUSEProviders
+from ..config import FUSEConfig
 from .base import Service
 
 logger = logging.getLogger()
@@ -48,8 +48,8 @@ async def _collect_async_results(result_gen: AsyncGenerator) -> list[Any]:
 class GraphService(Service):
     def __init__(
         self,
-        config: R2RConfig,
-        providers: R2RProviders,
+        config: FUSEConfig,
+        providers: FUSEProviders,
     ):
         super().__init__(
             config,
@@ -1049,7 +1049,7 @@ class GraphService(Service):
         total_tasks: Optional[int] = None,
         *args: Any,
         **kwargs: Any,
-    ) -> AsyncGenerator[KGExtraction | R2RDocumentProcessingError, None]:
+    ) -> AsyncGenerator[KGExtraction | FUSEDocumentProcessingError, None]:
         """
         The original “extract KG from doc” logic, but inlined instead of referencing a pipe.
         """
@@ -1087,7 +1087,7 @@ class GraphService(Service):
 
         if not chunks:
             logger.info(f"No chunks found for document {document_id}")
-            raise R2RException(
+            raise FUSEException(
                 message="No chunks found for document",
                 status_code=404,
             )
@@ -1146,7 +1146,7 @@ class GraphService(Service):
                     )
             except Exception as e:
                 logger.error(f"Error extracting from chunk group: {e}")
-                yield R2RDocumentProcessingError(
+                yield FUSEDocumentProcessingError(
                     document_id=document_id,
                     error_message=str(e),
                 )
@@ -1209,7 +1209,7 @@ class GraphService(Service):
                 kg_str = resp.choices[0].message.content
 
                 if not kg_str:
-                    raise R2RException(
+                    raise FUSEException(
                         "No extraction found in LLM response.",
                         400,
                     )
@@ -1256,7 +1256,7 @@ class GraphService(Service):
         try:
             root = ET.fromstring(wrapped)
         except ET.ParseError as e:
-            raise R2RException(
+            raise FUSEException(
                 f"Failed to parse XML: {e}\nData: {wrapped[:1000]}...", 400
             )
 
@@ -1265,7 +1265,7 @@ class GraphService(Service):
             len(response_str) > MIN_VALID_KG_EXTRACTION_RESPONSE_LENGTH
             and len(entities_elems) == 0
         ):
-            raise R2RException(
+            raise FUSEException(
                 f"No <entity> found in LLM XML, possibly malformed. Response excerpt: {response_str[:300]}",
                 400,
             )

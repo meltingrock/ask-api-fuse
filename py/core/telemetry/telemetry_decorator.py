@@ -16,7 +16,7 @@ logger = logging.getLogger()
 
 
 class ProductTelemetryClient:
-    USER_ID_PATH = str(Path.home() / ".cache" / "r2r" / "telemetry_user_id")
+    USER_ID_PATH = str(Path.home() / ".cache" / "fuse" / "telemetry_user_id")
     UNKNOWN_USER_ID = "UNKNOWN"
     _curr_user_id = None
     _version = None

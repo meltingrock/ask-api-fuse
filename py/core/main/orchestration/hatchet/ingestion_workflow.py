@@ -17,7 +17,7 @@ from core.base import (
     generate_extraction_id,
     increment_version,
 )
-from core.base.abstractions import DocumentResponse, R2RException
+from core.base.abstractions import DocumentResponse, FUSEException
 from core.utils import (
     generate_default_user_collection_id,
     update_settings_from_dict,
@@ -291,7 +291,7 @@ def hatchet_ingestion_factory(
                 }
 
             except AuthenticationError as e:
-                raise R2RException(
+                raise FUSEException(
                     status_code=401,
                     message="Authentication error: Invalid API key or credentials.",
                 )
