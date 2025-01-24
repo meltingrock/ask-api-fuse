@@ -1,0 +1,132 @@
+# Summary of Git Commands by Process
+
+## 1. Create a New Branch
+```bash
+git checkout -b <new_branch_name>
+```
+- Creates a new branch and switches to it.
+
+### Example:
+```bash
+git checkout -b feature/develop_temp
+```
+- Creates a new branch called `feature/develop_temp` and switches to it.
+
+---
+
+## 2. Make Changes and Commit
+```bash
+# Stage changes
+git add <file1> <file2> ...
+
+# Commit changes
+git commit -m "Description of changes"
+```
+- Stages and commits your changes to the branch.
+
+---
+
+## 3. Push the New Branch to Remote
+```bash
+git push origin <new_branch_name>
+```
+- Pushes your new branch to the remote repository.
+
+### Example:
+```bash
+git push origin feature/develop_temp
+```
+- Pushes the `feature/develop_temp` branch to the remote.
+
+---
+
+## 4. Update Another Branch with Your Changes
+### a. Push Changes to Overwrite a Remote Branch
+```bash
+git push origin <current_branch>:<target_branch> --force
+```
+- Overwrites the remote `<target_branch>` with the contents of `<current_branch>`.
+
+### Example:
+```bash
+git push origin feature/develop_temp:develop --force
+```
+- Overwrites the `develop` branch with the contents of the `feature/develop_temp` branch.
+
+### b. Update Local Branch to Match Remote
+```bash
+# Fetch the latest changes
+git fetch origin <target_branch>
+
+# Switch to the local branch
+git checkout <target_branch>
+
+# Reset local branch to match remote
+git reset --hard origin/<target_branch>
+```
+- Updates your local branch to match the remote branch.
+
+### Example:
+```bash
+# Fetch the latest changes from develop
+git fetch origin develop
+
+# Switch to develop
+git checkout develop
+
+# Reset develop to match the remote
+git reset --hard origin/develop
+```
+- Ensures the local `develop` branch matches the updated remote branch.
+
+---
+
+## 5. Create a New Branch as an Identical Copy of Another Branch
+```bash
+# Fetch the latest changes from remote
+git fetch origin <source_branch>
+
+# Create a new branch from the source branch
+git checkout -b <new_branch_name> origin/<source_branch>
+```
+- Creates a new branch identical to `<source_branch>`.
+
+### Example:
+```bash
+# Create a new branch identical to develop
+git fetch origin develop
+git checkout -b feature/new_branch origin/develop
+```
+- Creates a new branch `feature/new_branch` that is identical to `develop`.
+
+---
+
+## 6. Clean Up Untracked Files (Optional)
+```bash
+git clean -fd
+```
+- Removes untracked files and directories from the working directory.
+
+---
+
+## Example Workflow: Create a Branch and Update Another Branch
+```bash
+# Step 1: Create a new branch
+git checkout -b feature/develop_temp
+
+# Step 2: Make changes and commit
+git add .
+git commit -m "Implement new feature"
+
+# Step 3: Push the new branch to remote
+git push origin feature/develop_temp
+
+# Step 4: Overwrite another branch with your changes
+git push origin feature/develop_temp:develop --force
+
+# Step 5: Update your local branch to match the overwritten branch
+git checkout develop
+git reset --hard origin/develop
+```
+
+This ensures all branches are synchronized and updated as intended.
