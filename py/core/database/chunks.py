@@ -255,6 +255,7 @@ class PostgresChunksHandler(Handler):
                 )
                 for entry in entries
             ]
+
             await self.connection_manager.execute_many(query, bin_params)
 
         else:
@@ -283,6 +284,10 @@ class PostgresChunksHandler(Handler):
                 )
                 for entry in entries
             ]
+
+            logger.info(f"Sending to execute_many - Query: {query}")
+            logger.info(f"Sending to execute_many - First param set: {params[0] if params else 'No params'}")
+            logger.info(f"Sending to execute_many - Number of param sets: {len(params)}")
 
             await self.connection_manager.execute_many(query, params)
 

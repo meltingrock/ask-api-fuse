@@ -1,0 +1,23 @@
+# This HTTP call extracts entities from the docs
+
+
+    curl -X 'POST' \
+      'http://127.0.0.1:7272/api/fuse/v3/documents/33379a00-b12a-587d-8f1e-6421e8036e3e/extract' \
+      -H 'accept: application/json' \
+      -H 'Content-Type: application/json' \
+      -d '{
+        "run_type": "run",
+        "settings": {
+            "automatic_deduplication": true
+        },
+        "run_with_orchestration": true
+    }'
+
+    This is the body passed to the API:
+        {
+        "run_type": "run",
+        "settings": {
+            "automatic_deduplication": true
+        },
+        "run_with_orchestration": true
+    }
