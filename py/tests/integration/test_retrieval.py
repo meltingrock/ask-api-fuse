@@ -2,13 +2,14 @@ import uuid
 
 import pytest
 
-from fuse import Message, FUSEClient, FUSEException, SearchMode
+from fuse import FUSEClient, FUSEException
+# from core.base import Message, SearchMode
 
 
 @pytest.fixture(scope="session")
 def config():
     class TestConfig:
-        base_url = "http://localhost:7272"
+        base_url = "http://192.168.100.12:7272/api/fuse"
         superuser_email = "admin@example.com"
         superuser_password = "change_me_immediately"
 
@@ -33,7 +34,11 @@ def test_search_advanced_mode_with_filters(client):
     resp = client.retrieval.search(
         query="Philosophy",
         search_mode="advanced",
-        search_settings={"filters": filters, "limit": 5},
+        # Minimal search settings
+        search_settings={
+            "filters": filters,
+            "limit": 5
+        },
     )
     assert "results" in resp, "No results in advanced mode search"
 

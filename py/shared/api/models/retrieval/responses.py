@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 from shared.abstractions import ChunkSearchResult, GraphSearchResult, Message
 from shared.abstractions.llm import LLMChatCompletion
@@ -17,18 +17,32 @@ class CombinedSearchResponse(BaseModel):
         description="Knowledge graph search results, if applicable",
     )
 
-    class Config:
-        json_schema_extra = {
-            "example": {
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [{
                 "chunk_search_results": [
-                    ChunkSearchResult.Config.json_schema_extra,
+                    {
+                        "content": "Example chunk content",
+                        "document_id": "doc-123",
+                        "score": 0.95,
+                        "metadata": {"key": "value"}
+                    }
                 ],
                 "graph_search_results": [
-                    GraphSearchResult.Config.json_schema_extra,
-                ],
-            }
+                    {
+                        "content": {
+                            "id": "entity-123",
+                            "name": "Example Entity",
+                            "type": "entity"
+                        },
+                        "result_type": "entity",
+                        "score": 0.85,
+                        "metadata": {"key": "value"}
+                    }
+                ]
+            }]
         }
-
+    )
 
 class RAGResponse(BaseModel):
     completion: Any = Field(
@@ -40,9 +54,9 @@ class RAGResponse(BaseModel):
         description="The search results used for the RAG process",
     )
 
-    class Config:
-        json_schema_extra = {
-            "example": {
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [{
                 "completion": {
                     "id": "chatcmpl-example123",
                     "choices": [
@@ -59,15 +73,29 @@ class RAGResponse(BaseModel):
                 },
                 "search_results": {
                     "chunk_search_results": [
-                        ChunkSearchResult.Config.json_schema_extra,
+                        {
+                            "content": "Example chunk content",
+                            "document_id": "doc-123",
+                            "score": 0.95,
+                            "metadata": {"key": "value"}
+                        }
                     ],
                     "graph_search_results": [
-                        GraphSearchResult.Config.json_schema_extra,
-                    ],
-                },
-            }
+                        {
+                            "content": {
+                                "id": "entity-123",
+                                "name": "Example Entity",
+                                "type": "entity"
+                            },
+                            "result_type": "entity",
+                            "score": 0.85,
+                            "metadata": {"key": "value"}
+                        }
+                    ]
+                }
+            }]
         }
-
+    )
 
 class AgentResponse(BaseModel):
     messages: list[Message] = Field(..., description="Agent response messages")

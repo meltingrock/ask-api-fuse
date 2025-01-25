@@ -11,7 +11,7 @@ from fuse import FUSEAsyncClient, FUSEException
 class AsyncFUSETestClient:
     """Wrapper to ensure async operations use the correct event loop"""
 
-    def __init__(self, base_url: str = "http://localhost:7272"):
+    def __init__(self, base_url: str = "http://192.168.100.12:7272/api/fuse"):
         self.client = FUSEAsyncClient(base_url)
 
     async def create_document(

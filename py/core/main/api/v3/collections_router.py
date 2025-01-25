@@ -298,7 +298,7 @@ class CollectionsRouter(BaseRouterV3):
             )
 
         @self.router.get(
-            "/by-id/{id}",
+            "/{id}",
             summary="Get collection details",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -337,7 +337,7 @@ class CollectionsRouter(BaseRouterV3):
             return overview[0]
 
         @self.router.post(
-            "/by-id/{id}",
+            "/{id}",
             summary="Update collection",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -383,7 +383,7 @@ class CollectionsRouter(BaseRouterV3):
             )
 
         @self.router.delete(
-            "/by-id/{id}",
+            "/{id}",
             summary="Delete collection",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -410,7 +410,7 @@ class CollectionsRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.post(
-            "/by-id/{id}/documents/{document_id}",
+            "/{id}/documents/{document_id}",
             summary="Add document to collection",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -434,7 +434,7 @@ class CollectionsRouter(BaseRouterV3):
             )
 
         @self.router.get(
-            "/by-id/{id}/documents",
+            "/{id}/documents",
             summary="List documents in collection",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -479,7 +479,7 @@ class CollectionsRouter(BaseRouterV3):
             }
 
         @self.router.delete(
-            "/by-id/{id}/documents/{document_id}",
+            "/{id}/documents/{document_id}",
             summary="Remove document from collection",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -509,7 +509,7 @@ class CollectionsRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.get(
-            "/by-id/{id}/users",
+            "/{id}/users",
             summary="List users in collection",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -554,7 +554,7 @@ class CollectionsRouter(BaseRouterV3):
             }
 
         @self.router.post(
-            "/by-id/{id}/users/{user_id}",
+            "/{id}/users/{user_id}",
             summary="Add user to collection",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -584,7 +584,7 @@ class CollectionsRouter(BaseRouterV3):
             return GenericBooleanResponse(success=result)  # type: ignore
 
         @self.router.delete(
-            "/by-id/{id}/users/{user_id}",
+            "/{id}/users/{user_id}",
             summary="Remove user from collection",
             dependencies=[Depends(self.rate_limit_dependency)],
         )
@@ -616,7 +616,7 @@ class CollectionsRouter(BaseRouterV3):
             return GenericBooleanResponse(success=True)  # type: ignore
 
         @self.router.post(
-            "/by-id/{id}/extract",
+            "/{id}/extract",
             summary="Extract entities and relationships",
             dependencies=[Depends(self.rate_limit_dependency)],
             openapi_extra={

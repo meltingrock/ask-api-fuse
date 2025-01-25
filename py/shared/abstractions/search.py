@@ -5,11 +5,9 @@ from enum import Enum
 from typing import Any, Optional
 from uuid import UUID
 
-from pydantic import Field
+from pydantic import ConfigDict
 
 from .base import FUSESerializable
-from .llm import GenerationConfig
-from .vector import IndexMeasure
 
 
 class ChunkSearchResult(FUSESerializable):
@@ -117,16 +115,17 @@ class GraphSearchResult(FUSESerializable):
     content: KGEntityResult | KGRelationshipResult | KGCommunityResult
     result_type: Optional[KGSearchResultType] = None
     chunk_ids: Optional[list[UUID]] = None
-    metadata: dict[str, Any] = {}
+    metadata: dict[str, Any] = None
     score: Optional[float] = None
 
-    class Config:
-        json_schema_extra = {
-            "content": KGEntityResult.Config.json_schema_extra,
+    model_config = {
+        "json_schema_extra": {
+            "content": KGEntityResult.model_config["json_schema_extra"],
             "result_type": "entity",
             "chunk_ids": ["c68dc72e-fc23-5452-8f49-d7bd46088a96"],
             "metadata": {"associated_query": "What is the capital of France?"},
         }
+    }
 
 
 class WebSearchResult(FUSESerializable):
@@ -153,16 +152,24 @@ class PeopleAlsoAskResult(FUSESerializable):
 
 
 class WebSearchResponse(FUSESerializable):
-    organic_results: list[WebSearchResult] = []
-    related_searches: list[RelatedSearchResult] = []
-    people_also_ask: list[PeopleAlsoAskResult] = []
+    organic_results: list[WebSearchResult] = None
+    related_searches: list[RelatedSearchResult] = None
+    people_also_ask: list[PeopleAlsoAskResult] = None
+
+    def __init__(self, **data):
+        if data.get('organic_results') is None:
+            data['organic_results'] = []
+        if data.get('related_searches') is None:
+            data['related_searches'] = []
+        if data.get('people_also_ask') is None:
+            data['people_also_ask'] = []
+        super().__init__(**data)
 
     @classmethod
     def from_serper_results(cls, results: list[dict]) -> "WebSearchResponse":
         organic = []
         related = []
         paa = []
-
         for result in results:
             if result["type"] == "organic":
                 organic.append(WebSearchResult(**result))
@@ -170,13 +177,11 @@ class WebSearchResponse(FUSESerializable):
                 related.append(RelatedSearchResult(**result))
             elif result["type"] == "peopleAlsoAsk":
                 paa.append(PeopleAlsoAskResult(**result))
-
         return cls(
             organic_results=organic,
             related_searches=related,
             people_also_ask=paa,
         )
-
 
 class AggregateSearchResult(FUSESerializable):
     """Result of an aggregate search operation."""
@@ -212,7 +217,7 @@ class AggregateSearchResult(FUSESerializable):
 
 
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 from uuid import UUID
 
 from pydantic import Field
@@ -282,57 +287,59 @@ class GraphSearchSettings(FUSESerializable):
     max_llm_queries_for_global_search: int = Field(
         default=250,
     )
-    limits: dict[str, int] = Field(
-        default={},
-    )
+    limits: dict[str, int] = None
     enabled: bool = Field(
         default=True,
         description="Whether to enable graph search",
     )
 
+    def __init__(self, **data):
+        if data.get('limits') is None:
+            data['limits'] = {}
+        super().__init__(**data)
+
 
 class SearchSettings(FUSESerializable):
-    """Main search settings class that combines shared settings with specialized settings for chunks and KG."""
-
-    model_config = {
-        "populate_by_name": True,
-        "json_encoders": {UUID: str},
-        "json_schema_extra": {
-            "use_semantic_search": True,
-            "use_fulltext_search": False,
-            "use_hybrid_search": False,
-            "filters": {"category": "technology"},
-            "limit": 20,
-            "offset": 0,
-            "search_strategy": "vanilla",
-            "hybrid_settings": {
-                "full_text_weight": 1.0,
-                "semantic_weight": 5.0,
-                "full_text_limit": 200,
-                "rrf_k": 50,
-            },
-            "chunk_settings": {
-                "enabled": True,
-                "index_measure": "cosine_distance",
-                "include_metadata": True,
-                "probes": 10,
-                "ef_search": 40,
-            },
-            "graph_settings": {
-                "enabled": True,
-                "generation_config": GenerationConfig.model_config["json_schema_extra"],
-                "max_community_description_length": 65536,
-                "max_llm_queries_for_global_search": 250,
-                "limits": {
-                    "entity": 20,
-                    "relationship": 20,
-                    "community": 20,
+    model_config = ConfigDict(
+        populate_by_name=True,
+        json_encoders={UUID: str},
+        json_schema_extra={
+            "examples": [{
+                "use_semantic_search": True,
+                "use_fulltext_search": False,
+                "use_hybrid_search": False,
+                "filters": {"category": "technology"},
+                "limit": 20,
+                "offset": 0,
+                "search_strategy": "vanilla",
+                "hybrid_settings": {
+                    "full_text_weight": 1.0,
+                    "semantic_weight": 5.0,
+                    "full_text_limit": 200,
+                    "rrf_k": 50,
                 },
-            },
+                "chunk_settings": {
+                    "enabled": True,
+                    "index_measure": "cosine_distance",
+                    "include_metadata": True,
+                    "probes": 10,
+                    "ef_search": 40,
+                },
+                "graph_settings": {
+                    "enabled": True,
+                    "generation_config": None,
+                    "max_community_description_length": 65536,
+                    "max_llm_queries_for_global_search": 250,
+                    "limits": {
+                        "entity": 20,
+                        "relationship": 20,
+                        "community": 20,
+                    },
+                }
+            }]
         }
-    }
+    )
 
-    # Search type flags
     use_hybrid_search: bool = Field(
         default=False,
         description="Whether to perform a hybrid search. This is equivalent to setting `use_semantic_search=True` and `use_fulltext_search=True`, e.g. combining vector and keyword search.",
@@ -346,21 +353,7 @@ class SearchSettings(FUSESerializable):
         description="Whether to use full-text search",
     )
 
-    # Common search parameters
-    filters: dict[str, Any] = Field(
-        default_factory=dict,
-        description="""Filters to apply to the search. Allowed operators include `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `like`, `ilike`, `in`, and `nin`.
-
-      Commonly seen filters include operations include the following:
-
-        `{"document_id": {"$eq": "9fbe403b-..."}}`
-
-        `{"document_id": {"$in": ["9fbe403b-...", "3e157b3a-..."]}}`
-
-        `{"collection_ids": {"$overlap": ["122fdf6a-...", "..."]}}`
-
-        `{"$and": {"$document_id": ..., "collection_ids": ...}}`""",
-    )
+    filters: dict[str, Any] = None
     limit: int = Field(
         default=10,
         description="Maximum number of results to return",
@@ -381,7 +374,6 @@ class SearchSettings(FUSESerializable):
         description="Whether to include search score values in the search results",
     )
 
-    # Search strategy and settings
     search_strategy: str = Field(
         default="vanilla",
         description="Search strategy to use (e.g., 'vanilla', 'query_fusion', 'hyde')",
@@ -391,7 +383,6 @@ class SearchSettings(FUSESerializable):
         description="Settings for hybrid search (only used if `use_semantic_search` and `use_fulltext_search` are both true)",
     )
 
-    # Specialized settings
     chunk_settings: ChunkSearchSettings = Field(
         default_factory=ChunkSearchSettings,
         description="Settings specific to chunk/vector search",
@@ -401,44 +392,10 @@ class SearchSettings(FUSESerializable):
         description="Settings specific to knowledge graph search",
     )
 
-    # class Config:
-    #     populate_by_name = True
-    #     json_encoders = {UUID: str}
-    #     json_schema_extra = {
-    #         "use_semantic_search": True,
-    #         "use_fulltext_search": False,
-    #         "use_hybrid_search": False,
-    #         "filters": {"category": "technology"},
-    #         "limit": 20,
-    #         "offset": 0,
-    #         "search_strategy": "vanilla",
-    #         "hybrid_settings": {
-    #             "full_text_weight": 1.0,
-    #             "semantic_weight": 5.0,
-    #             "full_text_limit": 200,
-    #             "rrf_k": 50,
-    #         },
-    #         "chunk_settings": {
-    #             "enabled": True,
-    #             "index_measure": "cosine_distance",
-    #             "include_metadata": True,
-    #             "probes": 10,
-    #             "ef_search": 40,
-    #         },
-    #         "graph_settings": {
-    #             "enabled": True,
-    #             "generation_config": GenerationConfig.Config.json_schema_extra,
-    #             "max_community_description_length": 65536,
-    #             "max_llm_queries_for_global_search": 250,
-    #             "limits": {
-    #                 "entity": 20,
-    #                 "relationship": 20,
-    #                 "community": 20,
-    #             },
-    #         },
-    #     }
-
     def __init__(self, **data):
+        if "filters" not in data:
+            data["filters"] = {}
+
         # Handle legacy search_filters field
         data["filters"] = {
             **data.get("filters", {}),
@@ -459,7 +416,6 @@ class SearchSettings(FUSESerializable):
                 use_fulltext_search=False,
                 use_hybrid_search=False,
                 search_strategy="vanilla",
-                # Other relevant defaults can be provided here as needed
             )
         elif mode == "advanced":
             # A more powerful, combined search that leverages both semantic and fulltext.
@@ -468,7 +424,6 @@ class SearchSettings(FUSESerializable):
                 use_fulltext_search=True,
                 use_hybrid_search=True,
                 search_strategy="hyde",
-                # Other advanced defaults as needed
             )
         else:
             # For 'custom' or unrecognized modes, return a basic empty config.
