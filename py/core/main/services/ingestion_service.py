@@ -470,14 +470,14 @@ class IngestionService(Service):
         for enrichment_strategy in chunk_enrichment_settings.strategies:
             if enrichment_strategy == ChunkEnrichmentStrategy.NEIGHBORHOOD:
                 context_chunk_ids.extend(
-                    list_document_chunks[chunk_idx - prev]["chunk_id"]
+                    list_document_chunks[chunk_idx - prev]["id"]
                     for prev in range(
                         1, chunk_enrichment_settings.backward_chunks + 1
                     )
                     if chunk_idx - prev >= 0
                 )
                 context_chunk_ids.extend(
-                    list_document_chunks[chunk_idx + next]["chunk_id"]
+                    list_document_chunks[chunk_idx + next]["id"]
                     for next in range(
                         1, chunk_enrichment_settings.forward_chunks + 1
                     )
@@ -488,11 +488,11 @@ class IngestionService(Service):
                     offset=0,
                     limit=chunk_enrichment_settings.semantic_neighbors,
                     document_id=document_id,
-                    chunk_id=chunk["chunk_id"],
+                    id=chunk["id"],
                     similarity_threshold=chunk_enrichment_settings.semantic_similarity_threshold,
                 )
                 context_chunk_ids.extend(
-                    neighbor["chunk_id"] for neighbor in semantic_neighbors
+                    neighbor["id"] for neighbor in semantic_neighbors
                 )
 
         # weird behavior, sometimes we get UUIDs
@@ -562,7 +562,7 @@ class IngestionService(Service):
         chunk["metadata"]["original_text"] = chunk["text"]
 
         return VectorEntry(
-            id=uuid.uuid5(uuid.NAMESPACE_DNS, str(chunk["chunk_id"])),
+            id=uuid.uuid5(uuid.NAMESPACE_DNS, str(chunk["id"])),
             vector=Vector(data=data, type=VectorType.FIXED, length=len(data)),
             document_id=document_id,
             owner_id=chunk["owner_id"],
@@ -591,9 +591,13 @@ class IngestionService(Service):
             )
         )["results"]
 
+        # Add debugging
+        logger.info(
+            f"First chunk structure: {json.dumps(list_document_chunks[0] if list_document_chunks else 'No chunks', default=str)}")
+
         new_vector_entries = []
         document_chunks_dict = {
-            chunk["chunk_id"]: chunk for chunk in list_document_chunks
+            chunk["id"]: chunk for chunk in list_document_chunks
         }
 
         tasks = []

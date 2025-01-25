@@ -18,7 +18,7 @@ __all__ = [
 
 try:
     import core
-    from core import *
+    from ..core import *
 
     __all__ += core.__all__
 except ImportError as e:
