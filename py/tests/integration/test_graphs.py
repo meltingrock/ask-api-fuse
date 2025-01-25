@@ -8,7 +8,7 @@ from fuse import FUSEClient, FUSEException
 @pytest.fixture(scope="session")
 def config():
     class TestConfig:
-        base_url = "http://localhost:7272"
+        base_url = "http://192.168.100.12:7272/api/fuse"
         superuser_email = "admin@example.com"
         superuser_password = "change_me_immediately"
 
