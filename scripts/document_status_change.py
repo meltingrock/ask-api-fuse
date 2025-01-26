@@ -31,7 +31,7 @@ These parameters ensure:
 - run_with_orchestration=true: Ensures the extraction is managed by the orchestration system
 
 Usage:
-    python document_status_filter.py [--filter-type {all_failed|ingestion_failed|extraction_failed}] [--trigger-extraction]
+    python document_status_change.py [--filter-type {all_failed|ingestion_failed|extraction_failed}] [--trigger-extraction]
 
 Environment Variables:
     FUSE_API_BASE_URL: Base URL for the Fuse API (default: http://192.168.100.12:7272)
@@ -39,13 +39,13 @@ Environment Variables:
 
 Examples:
     # Find documents where both extraction and ingestion failed
-    python document_status_filter.py --filter-type all_failed
+    python document_status_change.py --filter-type all_failed
 
     # Find and re-extract documents where extraction failed
-    python document_status_filter.py --filter-type extraction_failed --trigger-extraction
+    python document_status_change.py --filter-type extraction_failed --trigger-extraction
 
     # Find documents where only ingestion failed
-    python document_status_filter.py --filter-type ingestion_failed
+    python document_status_change.py --filter-type ingestion_failed
 """
 
 import requests
@@ -275,7 +275,7 @@ def main():
     parser = argparse.ArgumentParser(description='Process documents based on status criteria')
     parser.add_argument('--filter-type', type=str,
                         choices=['all_failed', 'ingestion_failed', 'extraction_failed'],
-                        default='all_failed',
+                        default='ingestion_failed',
                         help='Type of filtering to apply:\n' +
                              '  all_failed: documents where both extraction and ingestion failed\n' +
                              '  ingestion_failed: documents where only ingestion failed\n' +

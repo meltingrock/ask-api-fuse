@@ -159,7 +159,7 @@ class CompletionProvider(Provider):
         generation_config: GenerationConfig,
         **kwargs,
     ) -> AsyncGenerator[LLMChatCompletionChunk, None]:
-        generation_config.stream = True
+        generation_config.stream = False
         task = {
             "messages": messages,
             "generation_config": generation_config,
@@ -174,7 +174,7 @@ class CompletionProvider(Provider):
         generation_config: GenerationConfig,
         **kwargs,
     ) -> Generator[LLMChatCompletionChunk, None, None]:
-        generation_config.stream = True
+        generation_config.stream = False
         task = {
             "messages": messages,
             "generation_config": generation_config,

@@ -144,7 +144,7 @@ class FUSEStreamingRAGAgent(RAGAgentMixin, FUSEStreamingAgent):
         search_pipeline: SearchPipeline,
         config: AgentConfig,
     ):
-        config.stream = True
+        config.stream = False
         super().__init__(
             database_provider=database_provider,
             search_pipeline=search_pipeline,

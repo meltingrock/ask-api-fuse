@@ -229,6 +229,11 @@ class UnstructuredIngestionProvider(IngestionProvider):
         # cleanup extra fields
         ingestion_config.pop("provider", None)
         ingestion_config.pop("excluded_parsers", None)
+        # Clean up any potential duplicate parameters
+        if 'pdf_infer_table_structure' in ingestion_config:
+            ingestion_config.pop('infer_table_structure', None)
+        elif 'infer_table_structure' in ingestion_config:
+            ingestion_config.pop('pdf_infer_table_structure', None)
 
         t0 = time.time()
         parser_overrides = ingestion_config_override.get(
